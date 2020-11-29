@@ -1,0 +1,27 @@
+name: twilio_programmable_voice
+description: Non-official Flutter Twilio API for Twilio Programmable Voice Resource
+version: 0.0.1
+author: 'izio38'
+homepage: 'https://github.com/izio38/'
+
+environment:
+  sdk: '>=2.7.0 <3.0.0'
+  flutter: '>=1.20.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  permission_handler: ^5.0.1+1 # https://pub.dev/packages/permission_handler
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: fr.izio.twilio_programmable_voice
+        pluginClass: TwilioProgrammableVoicePlugin
+      ios:
+        pluginClass: TwilioProgrammableVoicePlugin
