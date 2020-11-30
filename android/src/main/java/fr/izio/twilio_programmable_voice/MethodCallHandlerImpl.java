@@ -28,7 +28,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         if (call.method.equals("getPlatformVersion")) {
             this.getPlatformVersion(result);
-        } if (call.method.equals("registerVoice")) {
+        } else if (call.method.equals("registerVoice")) {
             final String accessToken = call.argument("accessToken");
             final String fcmToken = call.argument("fcmToken");
 
