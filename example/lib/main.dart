@@ -93,6 +93,19 @@ class _MyAppState extends State<MyApp> {
 
     TwilioProgrammableVoice.addCallStatusListener(print);
 
+    TwilioProgrammableVoice.callStatusStream.listen((event) async {
+      print("RECEIVED EVENT :");
+      print(event);
+
+      if (event is String) {
+        if (event.contains("CallInvite")) {
+          await Future.delayed(Duration(seconds: 3));
+          final callResponse = await TwilioProgrammableVoice.answer();
+          print(callResponse);
+        }
+      }
+    });
+
     this.registerVoice();
   }
 
