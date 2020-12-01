@@ -8,11 +8,14 @@ import com.twilio.voice.Voice;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
 
 /** TwilioProgrammableVoicePlugin */
 public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAware {
   private LogLevel voiceLogLevel = LogLevel.DEBUG;
+  final String CALL_STATUS_EVENT_CHANNEL_NAME = "twilio_programmable_voice/call_status";
+
 
   private MethodChannel channel;
   private TwilioProgrammableVoice twilioProgrammableVoice = new TwilioProgrammableVoice();
@@ -22,6 +25,7 @@ public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAwa
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "twilio_programmable_voice");
     channel.setMethodCallHandler(new MethodCallHandlerImpl(twilioProgrammableVoice));
     twilioProgrammableVoice.setChannel(channel);
+    twilioProgrammableVoice.setEventChannel(new EventChannel(flutterPluginBinding.getBinaryMessenger(), CALL_STATUS_EVENT_CHANNEL_NAME));
     Voice.setLogLevel(voiceLogLevel);
   }
 
@@ -33,7 +37,7 @@ public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAwa
   @Override
   public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
     this.twilioProgrammableVoice.setActivity(binding.getActivity());
-    this.twilioProgrammableVoice.registerVoiceReceiver(channel);
+    this.twilioProgrammableVoice.registerVoiceReceiver();
   }
 
   @Override
@@ -50,5 +54,8 @@ public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAwa
   public void onDetachedFromActivity() {
     this.twilioProgrammableVoice.setActivity(null);
     this.twilioProgrammableVoice.unregisterVoiceReceiver();
+    twilioProgrammableVoice.setEventChannel(null);
+    twilioProgrammableVoice.setChannel(null);
+
   }
 }

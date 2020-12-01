@@ -1,20 +1,16 @@
 package fr.izio.twilio_programmable_voice;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
+import com.twilio.voice.AcceptOptions;
 import com.twilio.voice.Call;
-import com.twilio.voice.CallException;
 import com.twilio.voice.CallInvite;
-import com.twilio.voice.CancelledCallInvite;
-import com.twilio.voice.MessageListener;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
@@ -41,37 +37,43 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         } else if (call.method.equals("handleMessage")) {
             final Map<String, String> data = call.argument("messageData");
 
-            if (data == null) {
-                result.error("VALIDATION", "Missing messageData parameter", null);
-                return;
-            }
-
-            Log.d(TAG, "onMethodCall - handleMessage " + data.toString());
-
-            final boolean isValid = Voice.handleMessage(twilioProgrammableVoice.getActivity().getApplicationContext(), data, new MessageListener() {
-                @Override
-                public void onCallInvite(@NonNull CallInvite callInvite) {
-                    Log.d(TAG, "onCallInvite: " + callInvite.toString());
-
-                    result.success(callInvite.toString());
-                }
-
-                @Override
-                public void onCancelledCallInvite(@NonNull CancelledCallInvite cancelledCallInvite, @Nullable CallException callException) {
-                    Log.d(TAG, "onCancelledCallInvite: " + cancelledCallInvite.toString());
-
-                    result.error("CANCELLED_CALL_INVITE", "Call invite cancelled", callException.toString());
-                }
-            });
-
-            if (!isValid) {
-                result.error("NOT_TWILIO_MESSAGE", "Message Data isn't a valid twilio message", null);
-            }
+            this.handleMessage(data, result);
+        } else if (call.method.equals("answer")) {
+            this.answer(result);
         } else if (call.method.equals("getPlatformVersion")) {
             this.getPlatformVersion(result);
         } else {
             result.notImplemented();
         }
+    }
+
+    private void answer(MethodChannel.Result result) {
+        CallInvite callInvite = twilioProgrammableVoice.getCurrentCallInvite();
+
+        AcceptOptions.Builder acceptOptionsBuilder = new AcceptOptions.Builder();
+        AcceptOptions acceptOptions = acceptOptionsBuilder.build();
+
+        Call call = callInvite.accept(twilioProgrammableVoice.getActivity().getApplicationContext(), acceptOptions, twilioProgrammableVoice);
+
+        result.success(call.toString());
+    }
+
+    private void handleMessage(Map<String,String> data, MethodChannel.Result result) {
+        if (data == null) {
+            result.error("VALIDATION", "Missing messageData parameter", null);
+            return;
+        }
+
+        Log.d(TAG, "onMethodCall - handleMessage " + data.toString());
+
+        final boolean isValid = Voice.handleMessage(twilioProgrammableVoice.getActivity().getApplicationContext(), data, this.twilioProgrammableVoice);
+
+        if (!isValid) {
+            result.error("NOT_TWILIO_MESSAGE", "Message Data isn't a valid twilio message", null);
+            return;
+        }
+
+        result.success(true);
     }
 
     private void registerVoice(String accessToken, String fcmToken, MethodChannel.Result result) {
@@ -121,46 +123,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
                         error.getMessage());
 
                 result.error("REGISTRATION_ERROR", message, error);
-            }
-        };
-    }
-
-    private Call.Listener callListener() {
-        return new Call.Listener() {
-
-            @Override
-            public void onConnectFailure(@NonNull Call call, @NonNull CallException callException) {
-                twilioProgrammableVoice.getChannel().invokeMethod("onCallStatusCallback", call.toString());
-            }
-
-            @Override
-            public void onRinging(@NonNull Call call) {
-                twilioProgrammableVoice.getChannel().invokeMethod("onCallStatusCallback", call.toString());
-            }
-
-            @Override
-            public void onConnected(@NonNull Call call) {
-                twilioProgrammableVoice.getChannel().invokeMethod("onCallStatusCallback", call.toString());
-            }
-
-            @Override
-            public void onReconnecting(@NonNull Call call, @NonNull CallException callException) {
-                twilioProgrammableVoice.getChannel().invokeMethod("onCallStatusCallback", call.toString());
-            }
-
-            @Override
-            public void onReconnected(@NonNull Call call) {
-                twilioProgrammableVoice.getChannel().invokeMethod("onCallStatusCallback", call.toString());
-            }
-
-            @Override
-            public void onDisconnected(@NonNull Call call, @Nullable CallException callException) {
-                twilioProgrammableVoice.getChannel().invokeMethod("onCallStatusCallback", call.toString());
-            }
-
-            @Override
-            public void onCallQualityWarningsChanged(@NonNull Call call, @NonNull Set<Call.CallQualityWarning> currentWarnings, @NonNull Set<Call.CallQualityWarning> previousWarnings) {
-                twilioProgrammableVoice.getChannel().invokeMethod("onCallStatusCallback", call.toString());
             }
         };
     }
