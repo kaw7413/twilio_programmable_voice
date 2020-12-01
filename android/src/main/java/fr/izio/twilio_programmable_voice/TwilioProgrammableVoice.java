@@ -3,23 +3,17 @@ package fr.izio.twilio_programmable_voice;
 import android.app.Activity;
 import android.content.IntentFilter;
 
-import com.twilio.voice.Call;
-import com.twilio.voice.CallInvite;
+import io.flutter.plugin.common.MethodChannel;
 
 public class TwilioProgrammableVoice {
     private static final String TAG = "TwilioProgrammableVoice";
 
     private Activity activity;
     public VoiceBroadcastReceiver voiceBroadcastReceiver;
+    private MethodChannel channel;
 
-    private CallInvite activeCallInvite;
-    private Call activeCall;
-    private int activeCallNotificationId;
-
-    TwilioProgrammableVoice() {}
-
-    public void registerVoiceReceiver() {
-        this.voiceBroadcastReceiver = new VoiceBroadcastReceiver();
+    public void registerVoiceReceiver(MethodChannel channel) {
+        this.voiceBroadcastReceiver = new VoiceBroadcastReceiver(channel);
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("ACTION_INCOMING_CALL");
@@ -40,5 +34,13 @@ public class TwilioProgrammableVoice {
 
     public void setActivity(Activity activity) {
         this.activity = activity;
+    }
+
+    public void setChannel(MethodChannel channel) {
+        this.channel = channel;
+    }
+
+    public MethodChannel getChannel() {
+        return this.channel;
     }
 }
