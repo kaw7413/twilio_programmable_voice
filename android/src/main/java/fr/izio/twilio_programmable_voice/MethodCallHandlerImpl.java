@@ -58,7 +58,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         result.success(call.toString());
     }
 
-    private void handleMessage(Map<String,String> data, MethodChannel.Result result) {
+    private void handleMessage(Map<String, String> data, MethodChannel.Result result) {
         if (data == null) {
             result.error("VALIDATION", "Missing messageData parameter", null);
             return;
