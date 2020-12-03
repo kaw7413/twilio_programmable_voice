@@ -12,11 +12,11 @@ public class SoundPoolManager {
     private boolean playing = false;
     private boolean loaded = false;
     private boolean playingCalled = false;
-    private float volume;
+    private final float volume;
     private SoundPool soundPool;
-    private int ringingSoundId;
+    private final int ringingSoundId;
     private int ringingStreamId;
-    private int disconnectSoundId;
+    private final int disconnectSoundId;
     private static SoundPoolManager instance;
 
     private SoundPoolManager(Context context) {

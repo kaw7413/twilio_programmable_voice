@@ -9,6 +9,7 @@ import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         result.success(call.toString());
     }
 
-    private void handleMessage(Map<String,String> data, MethodChannel.Result result) {
+    private void handleMessage(Map<String, String> data, MethodChannel.Result result) {
         if (data == null) {
             result.error("VALIDATION", "Missing messageData parameter", null);
             return;
@@ -66,13 +67,21 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
         Log.d(TAG, "onMethodCall - handleMessage " + data.toString());
 
+/*
+        // To test event; eventSink need to be public
+        HashMap<String, Object> payload = new HashMap<>();
+        payload.put("type", "CallInvite");
+        payload.put("from", "call.getFrom()");
+        payload.put("to", "call.getTo()");
+        payload.put("callSid", "call.getSid()");
+        this.twilioProgrammableVoice.eventSink.success(payload);
+ */
         final boolean isValid = Voice.handleMessage(twilioProgrammableVoice.getActivity().getApplicationContext(), data, this.twilioProgrammableVoice);
 
         if (!isValid) {
             result.error("NOT_TWILIO_MESSAGE", "Message Data isn't a valid twilio message", null);
             return;
         }
-
         result.success(true);
     }
 
