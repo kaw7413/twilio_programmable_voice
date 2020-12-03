@@ -12,6 +12,7 @@ import com.twilio.voice.CallInvite;
 import com.twilio.voice.CancelledCallInvite;
 import com.twilio.voice.MessageListener;
 
+import java.util.HashMap;
 import java.util.Set;
 
 import io.flutter.plugin.common.EventChannel;
@@ -29,6 +30,16 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
 
     private EventChannel eventChannel;
     private EventChannel.EventSink eventSink;
+
+    private static final String CALL_INVITE = "CallInvite";
+    private static final String CANCELLED_CALL_INVITE = "CancelledCallInvite";
+    private static final String CALL_CONNECT_FAILURE = "CallConnectFailure";
+    private static final String CALL_RINGING = "CallRinging";
+    private static final String CALL_CONNECTED = "CallConnected";
+    private static final String CALL_RECONNECTING = "CallReconnecting";
+    private static final String CALL_RECONNECTED = "CallReconnected";
+    private static final String CALL_DISCONNECTED = "CallDisconnected";
+    private static final String CALL_QUALITY_WARNING_CHANGED = "CallQualityWarningChanged";
 
     public void registerVoiceReceiver() {
         this.voiceBroadcastReceiver = new VoiceBroadcastReceiver();
@@ -82,7 +93,8 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
         this.currentCallInvite = currentCallInvite;
 
         if (eventSink != null && currentCallInvite != null) {
-            eventSink.success(currentCallInvite.toString());
+
+            eventSink.success(this.getCallInvitePayload(currentCallInvite));
             SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playRinging();
         }
     }
@@ -95,7 +107,7 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
         this.currentCancelledCallInvite = currentCancelledCallInvite;
 
         if (eventSink != null && currentCancelledCallInvite != null) {
-            eventSink.success(currentCancelledCallInvite.toString());
+            eventSink.success(this.getCancelledCallInvite(currentCancelledCallInvite));
             SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).stopRinging();
             SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playDisconnect();
         }
@@ -123,40 +135,73 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
 
     @Override
     public void onConnectFailure(@NonNull Call call, @NonNull CallException callException) {
-        eventSink.success(call.toString());
+        eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_CONNECT_FAILURE));
         SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).stopRinging();
     }
 
     @Override
     public void onRinging(@NonNull Call call) {
-        eventSink.success(call.toString());
+        eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RINGING));
         SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playRinging();
     }
 
     @Override
     public void onConnected(@NonNull Call call) {
-        eventSink.success(call.toString());
+        eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_CONNECTED));
         SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).stopRinging();
     }
 
     @Override
     public void onReconnecting(@NonNull Call call, @NonNull CallException callException) {
-        eventSink.success(call.toString());
+        eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RECONNECTING));
     }
 
     @Override
     public void onReconnected(@NonNull Call call) {
-        eventSink.success(call.toString());
+        eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RECONNECTED));
     }
 
     @Override
     public void onDisconnected(@NonNull Call call, @Nullable CallException callException) {
-        eventSink.success(call.toString());
+        eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_DISCONNECTED));
         SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playDisconnect();
     }
 
     @Override
     public void onCallQualityWarningsChanged(@NonNull Call call, @NonNull Set<Call.CallQualityWarning> currentWarnings, @NonNull Set<Call.CallQualityWarning> previousWarnings) {
-        eventSink.success(call.toString());
+        eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_QUALITY_WARNING_CHANGED));
+    }
+
+    private HashMap<String, String> getCallInvitePayload(CallInvite callInvite) {
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("type", TwilioProgrammableVoice.CALL_INVITE);
+        payload.put("from", callInvite.getFrom());
+        payload.put("to", callInvite.getTo());
+        payload.put("callSid", callInvite.getCallSid());
+
+        return payload;
+    }
+
+    private HashMap<String, String> getCancelledCallInvite(CancelledCallInvite cancelledCallInvite) {
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("type", TwilioProgrammableVoice.CANCELLED_CALL_INVITE);
+        payload.put("from", cancelledCallInvite.getFrom());
+        payload.put("to", cancelledCallInvite.getTo());
+        payload.put("callSid", cancelledCallInvite.getCallSid());
+
+        return payload;
+    }
+
+    private HashMap<String, Object> getCallPayload(Call call, String type) {
+        HashMap<String, Object> payload = new HashMap<>();
+        payload.put("type", type);
+        payload.put("from", call.getFrom());
+        payload.put("to", call.getTo());
+        payload.put("sid", call.getSid());
+        payload.put("state", call.getState().toString());
+        payload.put("isMuted", call.isMuted());
+        payload.put("isOnHold", call.isOnHold());
+
+        return payload;
     }
 }
