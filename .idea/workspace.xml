@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:feat" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:feat" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="3f4ecda5-4779-47ae-8ae5-28498ea4268a" name="Default Changelist" comment="feat: type work">
       <change afterPath="$PROJECT_DIR$/android/.idea/vcs.xml" afterDir="false" />
@@ -23,7 +52,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[Pixel_3a_API_30]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[]" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -94,16 +123,27 @@
       <option name="project" value="LOCAL" />
       <updated>1606992586360</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat: add unit test for model">
+      <created>1606998091944</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1606998091944</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
-  <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <ignored-roots>
-      <path value="$PROJECT_DIR$/server" />
-    </ignored-roots>
-    <MESSAGE value="feat: type work" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: type work" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
     <state x="1298" y="358" width="272" height="261" key="#Notifications" timestamp="1606746110013">
@@ -123,10 +163,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="962" y="-20" width="476" height="1072" key="AVDManager/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606819445212" />
-    <state x="833" y="137" width="881" height="1025" key="CommitChangelistDialog2" timestamp="1606992611366">
+    <state x="832" y="115" width="881" height="1025" key="CommitChangelistDialog2" timestamp="1606998091871">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state x="833" y="137" width="881" height="1025" key="CommitChangelistDialog2/0.0.2560.1440@0.0.2560.1440" timestamp="1606992611366" />
+    <state x="832" y="115" width="881" height="1025" key="CommitChangelistDialog2/0.0.2560.1440@0.0.2560.1440" timestamp="1606998091871" />
     <state x="994" y="26" width="426" height="477" key="FileChooserDialogImpl" timestamp="1606979237862">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>

@@ -29,6 +29,40 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         Log.d(TAG, "onMethodCall " + call.method);
+
+        switch (call.method) {
+            case "registerVoice":
+                final String accessToken = call.argument("accessToken");
+                final String fcmToken = call.argument("fcmToken");
+
+                this.registerVoice(accessToken, fcmToken, result);
+                break;
+
+            case "handleMessage":
+                final Map<String, String> data = call.argument("messageData");
+
+                this.handleMessage(data, result);
+                break;
+
+            case "makeCall":
+                this.makeCall();
+                break;
+
+            case "answer":
+                this.answer(result);
+                break;
+
+            case "getPlatformVersion":
+                this.getPlatformVersion(result);
+                break;
+
+            default:
+                result.notImplemented();
+                break;
+        }
+
+
+        /*
         if (call.method.equals("registerVoice")) {
             final String accessToken = call.argument("accessToken");
             final String fcmToken = call.argument("fcmToken");
@@ -46,6 +80,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         } else {
             result.notImplemented();
         }
+         */
     }
 
     private void answer(MethodChannel.Result result) {
@@ -83,6 +118,10 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             return;
         }
         result.success(true);
+    }
+
+    private void makeCall() {
+        Log.d("MethodCallHandler", "makeCall");
     }
 
     private void registerVoice(String accessToken, String fcmToken, MethodChannel.Result result) {
