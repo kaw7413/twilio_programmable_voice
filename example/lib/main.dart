@@ -9,6 +9,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
+import 'package:twilio_programmable_voice/models/events.dart';
 
 void main() {
   runApp(MyApp());
@@ -55,7 +56,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
+    print("IN INIT STATE");
     firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
@@ -93,16 +94,104 @@ class _MyAppState extends State<MyApp> {
 
     TwilioProgrammableVoice.addCallStatusListener(print);
 
+    /*
+    // To test event
+    Map<String, String> fakeData = {"foo": "bar"};
+    TwilioProgrammableVoice.handleMessage(fakeData);
+    */
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       print("RECEIVED EVENT :");
-      print(event);
 
-      if (event is String) {
-        if (event.contains("CallInvite")) {
+      switch (event.runtimeType) {
+        case CallInvite:
+          print("CALL_INVITE: ");
+          print(event.to);
+          print(event.from);
+          print(event.callSid);
           await Future.delayed(Duration(seconds: 3));
           final callResponse = await TwilioProgrammableVoice.answer();
           print(callResponse);
-        }
+          break;
+
+        case CancelledCallInvite:
+          print("CANCELLED_CALL_INVITE: ");
+          print(event.to);
+          print(event.from);
+          print(event.callSid);
+          break;
+
+        case CallConnectFailure:
+          print("CALL_CONNECT_FAILURE: ");
+          print(event.to);
+          print(event.from);
+          print(event.state);
+          print(event.sid);
+          print(event.isMuted.toString());
+          print(event.isOnHold.toString());
+          break;
+
+        case CallRinging:
+          print("CALL_RINGING: ");
+          print(event.to);
+          print(event.from);
+          print(event.state);
+          print(event.sid);
+          print(event.isMuted.toString());
+          print(event.isOnHold.toString());
+          break;
+
+        case CallConnected:
+          print("CALL_CONNECTED: ");
+          print(event.to);
+          print(event.from);
+          print(event.state);
+          print(event.sid);
+          print(event.isMuted.toString());
+          print(event.isOnHold.toString());
+          break;
+
+        case CallReconnecting:
+          print("CALL_RECONNECTING: ");
+          print(event.to);
+          print(event.from);
+          print(event.state);
+          print(event.sid);
+          print(event.isMuted.toString());
+          print(event.isOnHold.toString());
+          break;
+
+        case CallReconnected:
+          print("CALL_RECONNECTED: ");
+          print(event.to);
+          print(event.from);
+          print(event.state);
+          print(event.sid);
+          print(event.isMuted.toString());
+          print(event.isOnHold.toString());
+          break;
+
+        case CallDisconnected:
+          print("CALL_DISCONNECTED: ");
+          print(event.to);
+          print(event.from);
+          print(event.state);
+          print(event.sid);
+          print(event.isMuted.toString());
+          print(event.isOnHold.toString());
+          break;
+
+        case CallQualityWarningChanged:
+          print("CALL_QUALITY_WARNING_CHANGED: ");
+          print(event.to);
+          print(event.from);
+          print(event.state);
+          print(event.sid);
+          print(event.isMuted.toString());
+          print(event.isOnHold.toString());
+          break;
+
+        default:
+          break;
       }
     });
 

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import './models/events.dart';
 
 class TwilioProgrammableVoice {
   static final MethodChannel _methodChannel =
@@ -42,7 +43,42 @@ class TwilioProgrammableVoice {
 
   /// Get the incoming calls stream
   static Stream<dynamic> get callStatusStream {
-    return _eventChannel.receiveBroadcastStream();
+    print("IN API");
+    return _eventChannel.receiveBroadcastStream().map((data) {
+      print(data);
+      switch (data['type']) {
+        case 'CallInvite':
+          return CallInvite.from(data);
+
+        case 'CancelledCallInvite':
+          return CancelledCallInvite.from(data);
+
+        case 'CallConnectFailure':
+          return CallConnectFailure.from(data);
+
+        case 'CallRinging':
+          return CallRinging.from(data);
+
+        case 'CallConnected':
+          return CallConnected.from(data);
+
+        case 'CallReconnecting':
+          return CallReconnected.from(data);
+
+        case 'CallReconnected':
+          return CallReconnected.from(data);
+
+        case 'CallDisconnected':
+          return CallDisconnected.from(data);
+
+        case 'CallQualityWarningChanged':
+          return CallQualityWarningChanged.from(data);
+
+        default:
+          break;
+      }
+
+    });
   }
 
   /// Answer the current call invite
