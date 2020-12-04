@@ -94,8 +94,8 @@ class TwilioProgrammableVoice {
     return _methodChannel.invokeMethod('handleMessage', {"messageData": data});
   }
 
-  static Future<bool> makeCall(dynamic data) {
-    return _methodChannel.invokeMethod('makeCall', {"callData": data});
+  static Future<bool> makeCall(Map<String, String> params) {
+    return _methodChannel.invokeMethod('makeCall', {"callData": params});
   }
 
   // Platform specifics

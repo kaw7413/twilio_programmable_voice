@@ -219,9 +219,14 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
+        body: Column(
+          children: [Center(
+            child: Text('Running on: $_platformVersion\n'),
+          ),
+          FlatButton(onPressed: () {
+            TwilioProgrammableVoice.makeCall({"From": "+33644645795", "To": "+33787934070"});
+          }, child: Text('Call'))],
+        )
       ),
     );
   }
