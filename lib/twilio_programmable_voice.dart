@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import './models/events.dart';
+import 'events.dart';
 
 class TwilioProgrammableVoice {
   static final MethodChannel _methodChannel =
@@ -46,11 +46,11 @@ class TwilioProgrammableVoice {
 
   /// Get the incoming calls stream
   static Stream<dynamic> get callStatusStream {
-    print("IN API");
+    print("in STATUS_STREAM");
     return _eventChannel.receiveBroadcastStream().map((data) {
-      print(data);
       switch (data['type']) {
         case 'CallInvite':
+          print("In CALL_INVITE");
           return CallInvite.from(data);
 
         case 'CancelledCallInvite':

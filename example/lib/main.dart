@@ -4,7 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';import 'package:flutter/services.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
-import 'package:twilio_programmable_voice/models/events.dart';
+import 'package:twilio_programmable_voice/events.dart';
+import 'package:twilio_programmable_voice/SoundPoolManager.dart';
 
 void main() {
   runApp(MyApp());
@@ -53,6 +54,8 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     print("IN INIT STATE");
+    SoundPoolManager.getInstance().playRinging();
+
     firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
@@ -88,11 +91,10 @@ class _MyAppState extends State<MyApp> {
 
     TwilioProgrammableVoice.addCallStatusListener(print);
 
-    /*
     // To test event
-    Map<String, String> fakeData = {"foo": "bar"};
-    TwilioProgrammableVoice.handleMessage(fakeData);
-    */
+    // Map<String, String> fakeData = {"foo": "bar"};
+    // TwilioProgrammableVoice.handleMessage(fakeData);
+
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       print("RECEIVED EVENT :");
 
@@ -102,6 +104,7 @@ class _MyAppState extends State<MyApp> {
           print(event.to);
           print(event.from);
           print(event.callSid);
+          // SoundPoolManager.getInstance().playRinging();
           await Future.delayed(Duration(seconds: 3));
           final callResponse = await TwilioProgrammableVoice.answer();
           print(callResponse);

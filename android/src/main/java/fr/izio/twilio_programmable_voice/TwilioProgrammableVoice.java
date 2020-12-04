@@ -13,6 +13,7 @@ import com.twilio.voice.CancelledCallInvite;
 import com.twilio.voice.MessageListener;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import io.flutter.plugin.common.EventChannel;
@@ -95,7 +96,7 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
         if (eventSink != null && currentCallInvite != null) {
 
             eventSink.success(this.getCallInvitePayload(currentCallInvite));
-            SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playRinging();
+//            SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playRinging();
         }
     }
 

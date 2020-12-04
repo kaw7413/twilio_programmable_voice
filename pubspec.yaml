@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   permission_handler: ^5.0.1+1 # https://pub.dev/packages/permission_handler
+  soundpool: ^1.1.3
 
 dev_dependencies:
   flutter_test:
@@ -25,5 +26,8 @@ flutter:
         pluginClass: TwilioProgrammableVoicePlugin
       ios:
         pluginClass: TwilioProgrammableVoicePlugin
-
+  assets:
+    - packages/twilio_programmable_voice/assets/sounds/disconnect.wav
+    - packages/twilio_programmable_voice/assets/sounds/incoming.wav
+    - packages/twilio_programmable_voice/assets/sounds/outgoing.wav
 
