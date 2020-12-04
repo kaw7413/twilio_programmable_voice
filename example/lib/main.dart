@@ -492,7 +492,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Text('Running on: $_platformVersion\n'),
           ),
           FlatButton(onPressed: () {
-            TwilioProgrammableVoice.makeCall({"From": "+33644645795", "To": "+33787934070"});
+            TwilioProgrammableVoice.makeCall(from: "+33644645795", to: "+33787934070");
           }, child: Text('Call'))],
         )
       ),

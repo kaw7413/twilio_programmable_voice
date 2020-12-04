@@ -10,6 +10,7 @@ import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -48,8 +49,10 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
                 break;
 
             case "makeCall":
-                final Map<String, String> params = call.argument("callData");
-                this.makeCall(params, result);
+                final String from = call.argument("from");
+                final String to = call.argument("to");
+
+                this.makeCall(from, to, result);
                 break;
 
             case "answer":
@@ -95,10 +98,19 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         result.success(true);
     }
 
-    private void makeCall(Map<String, String> params, MethodChannel.Result result) {
-        Log.d("MethodCallHandler", "makeCall");
+    private void makeCall(String from, String to, MethodChannel.Result result) {
+        Log.d(TAG, "makeCall");
 
-        this.twilioProgrammableVoice.makeCall(params, this.accessToken);
+        Map<String, String> params = new HashMap<>();
+        params.put("From", from);
+        params.put("To", to);
+
+        // TODO catch SecurityException
+        final ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+                .params(params)
+                .build();
+
+        Call call = Voice.connect(this.twilioProgrammableVoice.getActivity().getApplicationContext(), connectOptions, this.twilioProgrammableVoice);
         result.success(true);
     }
 

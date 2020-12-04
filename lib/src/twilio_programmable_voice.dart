@@ -94,6 +94,14 @@ class TwilioProgrammableVoice {
     return _methodChannel.invokeMethod('handleMessage', {"messageData": data});
   }
 
+  /// Make a call
+  ///
+  /// [from] this device identity (or number)
+  /// [to] the target identity (or number)
+  static Future<bool> makeCall({String from, String to}) {
+    return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to});
+  }
+
   // Platform specifics
   static Future<String> get platformVersion async {
     final String version =

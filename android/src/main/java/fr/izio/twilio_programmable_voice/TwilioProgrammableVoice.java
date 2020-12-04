@@ -61,18 +61,6 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
         this.activity.getApplicationContext().unregisterReceiver(this.voiceBroadcastReceiver);
     }
 
-    public void makeCall(Map<String, String> params, String accessToken) {
-        // TODO catch SecurityException
-        Log.d("!!! Params, FROM: ", params.get("From"));
-        Log.d("!!! PARAMS TO:", params.get("To"));
-        final ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
-            .params(params)
-            .build();
-
-        Voice.connect(activity.getApplicationContext(), connectOptions, this);
-    }
-
-
     public void setCurrentCallInvite(CallInvite currentCallInvite) {
         this.currentCallInvite = currentCallInvite;
 
