@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
+
 // @TODO: export * from ... to avoid multiple import statements
-import 'package:twilio_programmable_voice/models/events.dart';
 import 'package:uuid/uuid.dart';
 
 const callKeepSetupConfig = <String, dynamic>{
@@ -188,11 +188,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     TwilioProgrammableVoice.addCallStatusListener(print);
 
-    /*
     // To test event
-    Map<String, String> fakeData = {"foo": "bar"};
-    TwilioProgrammableVoice.handleMessage(fakeData);
-    */
+    // Map<String, String> fakeData = {"foo": "bar"};
+    // TwilioProgrammableVoice.handleMessage(fakeData);
+
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       print("RECEIVED EVENT :");
 
@@ -203,7 +202,12 @@ class _MyHomePageState extends State<MyHomePage> {
           print(event.to);
           print(event.from);
           print(event.callSid);
+          SoundPoolManager.getInstance().playIncoming();
           await displayIncomingCall(event.from);
+          await Future.delayed(Duration(seconds: 3));
+          final callResponse = await TwilioProgrammableVoice.answer();
+          print(callResponse);
+
           break;
 
         case CancelledCallInvite:
@@ -211,6 +215,8 @@ class _MyHomePageState extends State<MyHomePage> {
           print(event.to);
           print(event.from);
           print(event.callSid);
+          SoundPoolManager.getInstance().stopRinging();
+          SoundPoolManager.getInstance().playDisconnect();
           break;
 
         case CallConnectFailure:
@@ -221,6 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
+          SoundPoolManager.getInstance().stopRinging();
           break;
 
         case CallRinging:
@@ -231,6 +238,12 @@ class _MyHomePageState extends State<MyHomePage> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
+          // if client is calling someone else play outgoing, else play incoming
+          if (event.from == "+33644645795") {
+            SoundPoolManager.getInstance().playOutgoing();
+          } else {
+            SoundPoolManager.getInstance().playIncoming();
+          }
           break;
 
         case CallConnected:
@@ -241,6 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
+          SoundPoolManager.getInstance().stopRinging();
           break;
 
         case CallReconnecting:
@@ -271,6 +285,8 @@ class _MyHomePageState extends State<MyHomePage> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
+          // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
+          SoundPoolManager.getInstance().playDisconnect();
           break;
 
         case CallQualityWarningChanged:
@@ -476,7 +492,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Text('Running on: $_platformVersion\n'),
           ),
           FlatButton(onPressed: () {
-            TwilioProgrammableVoice.makeCall({"From": "+33644645795", "To": "+33787934070"});
+            TwilioProgrammableVoice.makeCall(from: "+33644645795", to: "+33787934070");
           }, child: Text('Call'))],
         )
       ),
