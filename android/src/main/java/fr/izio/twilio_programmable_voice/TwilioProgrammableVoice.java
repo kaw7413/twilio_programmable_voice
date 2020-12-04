@@ -2,6 +2,7 @@ package fr.izio.twilio_programmable_voice;
 
 import android.app.Activity;
 import android.content.IntentFilter;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,9 +11,12 @@ import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
 import com.twilio.voice.CallInvite;
 import com.twilio.voice.CancelledCallInvite;
+import com.twilio.voice.ConnectOptions;
 import com.twilio.voice.MessageListener;
+import com.twilio.voice.Voice;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import io.flutter.plugin.common.EventChannel;
@@ -57,37 +61,17 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
         this.activity.getApplicationContext().unregisterReceiver(this.voiceBroadcastReceiver);
     }
 
-    public Activity getActivity() {
-        return activity;
+    public void makeCall(Map<String, String> params, String accessToken) {
+        // TODO catch SecurityException
+        Log.d("!!! Params, FROM: ", params.get("From"));
+        Log.d("!!! PARAMS TO:", params.get("To"));
+        final ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+            .params(params)
+            .build();
+
+        Voice.connect(activity.getApplicationContext(), connectOptions, this);
     }
 
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    public void setChannel(MethodChannel channel) {
-        this.channel = channel;
-    }
-
-    public MethodChannel getChannel() {
-        return this.channel;
-    }
-
-    public EventChannel getEventChannel() {
-        return eventChannel;
-    }
-
-    public void setEventChannel(EventChannel eventChannel) {
-        this.eventChannel = eventChannel;
-
-        if (eventChannel != null) {
-            eventChannel.setStreamHandler(this);
-        }
-    }
-
-    public CallInvite getCurrentCallInvite() {
-        return currentCallInvite;
-    }
 
     public void setCurrentCallInvite(CallInvite currentCallInvite) {
         this.currentCallInvite = currentCallInvite;
@@ -97,10 +81,6 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
             eventSink.success(this.getCallInvitePayload(currentCallInvite));
             SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playRinging();
         }
-    }
-
-    public CancelledCallInvite getCurrentCancelledCallInvite() {
-        return currentCancelledCallInvite;
     }
 
     public void setCurrentCancelledCallInvite(CancelledCallInvite currentCancelledCallInvite) {
@@ -170,6 +150,42 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
     @Override
     public void onCallQualityWarningsChanged(@NonNull Call call, @NonNull Set<Call.CallQualityWarning> currentWarnings, @NonNull Set<Call.CallQualityWarning> previousWarnings) {
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_QUALITY_WARNING_CHANGED));
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
+    public void setChannel(MethodChannel channel) {
+        this.channel = channel;
+    }
+
+    public MethodChannel getChannel() {
+        return this.channel;
+    }
+
+    public EventChannel getEventChannel() {
+        return eventChannel;
+    }
+
+    public void setEventChannel(EventChannel eventChannel) {
+        this.eventChannel = eventChannel;
+
+        if (eventChannel != null) {
+            eventChannel.setStreamHandler(this);
+        }
+    }
+
+    public CallInvite getCurrentCallInvite() {
+        return currentCallInvite;
+    }
+
+    public CancelledCallInvite getCurrentCancelledCallInvite() {
+        return currentCancelledCallInvite;
     }
 
     private HashMap<String, String> getCallInvitePayload(CallInvite callInvite) {
