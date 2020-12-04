@@ -126,17 +126,6 @@
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
-    <option name="oldMeFiltersMigrated" value="true" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <ignored-roots>
-      <path value="$PROJECT_DIR$/server" />
-    </ignored-roots>
-    <MESSAGE value="feat: type work" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: type work" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
@@ -147,6 +136,14 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/server" />
+    </ignored-roots>
+    <MESSAGE value="feat: type work" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: type work" />
   </component>
   <component name="WindowStateProjectService">
     <state x="1298" y="358" width="272" height="261" key="#Notifications" timestamp="1606746110013">

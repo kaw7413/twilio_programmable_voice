@@ -64,25 +64,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
                 result.notImplemented();
                 break;
         }
-
-
-//        if (call.method.equals("registerVoice")) {
-//            final String accessToken = call.argument("accessToken");
-//            final String fcmToken = call.argument("fcmToken");
-//
-//            this.registerVoice(accessToken, fcmToken, result);
-//
-//        } else if (call.method.equals("handleMessage")) {
-//            final Map<String, String> data = call.argument("messageData");
-//
-//            this.handleMessage(data, result);
-//        } else if (call.method.equals("answer")) {
-//            this.answer(result);
-//        } else if (call.method.equals("getPlatformVersion")) {
-//            this.getPlatformVersion(result);
-//        } else {
-//            result.notImplemented();
-//        }
     }
 
     private void answer(MethodChannel.Result result) {
