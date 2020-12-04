@@ -67,17 +67,8 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
         Log.d(TAG, "onMethodCall - handleMessage " + data.toString());
 
-
-        // To test event; eventSink need to be public
-//        HashMap<String, String> payload = new HashMap<>();
-//        payload.put("type", "CallInvite");
-//        payload.put("from", "call.getFrom()");
-//        payload.put("to", "call.getTo()");
-//        payload.put("callSid", "call.getSid()");
-//        this.twilioProgrammableVoice.eventSink.success(payload);
         final boolean isValid = Voice.handleMessage(twilioProgrammableVoice.getActivity().getApplicationContext(), data, this.twilioProgrammableVoice);
 
-//
         if (!isValid) {
             result.error("NOT_TWILIO_MESSAGE", "Message Data isn't a valid twilio message", null);
             return;

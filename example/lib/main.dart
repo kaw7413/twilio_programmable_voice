@@ -4,8 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';import 'package:flutter/services.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
-import 'package:twilio_programmable_voice/events.dart';
-import 'package:twilio_programmable_voice/SoundPoolManager.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -53,9 +52,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    print("IN INIT STATE");
-    SoundPoolManager.getInstance().playRinging();
-
     firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
@@ -104,7 +100,7 @@ class _MyAppState extends State<MyApp> {
           print(event.to);
           print(event.from);
           print(event.callSid);
-          // SoundPoolManager.getInstance().playRinging();
+          SoundPoolManager.getInstance().playIncoming();
           await Future.delayed(Duration(seconds: 3));
           final callResponse = await TwilioProgrammableVoice.answer();
           print(callResponse);
@@ -115,6 +111,8 @@ class _MyAppState extends State<MyApp> {
           print(event.to);
           print(event.from);
           print(event.callSid);
+          SoundPoolManager.getInstance().stopRinging();
+          SoundPoolManager.getInstance().playDisconnect();
           break;
 
         case CallConnectFailure:
@@ -125,6 +123,7 @@ class _MyAppState extends State<MyApp> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
+          SoundPoolManager.getInstance().stopRinging();
           break;
 
         case CallRinging:
@@ -135,6 +134,12 @@ class _MyAppState extends State<MyApp> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
+          // if client is calling someone else play outgoing, else play incoming
+          if (event.from == "+33644645795") {
+            SoundPoolManager.getInstance().playOutgoing();
+          } else {
+            SoundPoolManager.getInstance().playIncoming();
+          }
           break;
 
         case CallConnected:
@@ -145,6 +150,7 @@ class _MyAppState extends State<MyApp> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
+          SoundPoolManager.getInstance().stopRinging();
           break;
 
         case CallReconnecting:
@@ -175,6 +181,8 @@ class _MyAppState extends State<MyApp> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
+          // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
+          SoundPoolManager.getInstance().playDisconnect();
           break;
 
         case CallQualityWarningChanged:
