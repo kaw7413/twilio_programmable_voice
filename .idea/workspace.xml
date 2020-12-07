@@ -31,22 +31,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f4ecda5-4779-47ae-8ae5-28498ea4268a" name="Default Changelist" comment="feat: type work">
-      <change afterPath="$PROJECT_DIR$/lib/SoundPoolManager.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/assets/sounds/disconnect.wav" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/assets/sounds/incoming.wav" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/assets/sounds/outgoing.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/MethodCallHandlerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/MethodCallHandlerImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoice.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoice.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoicePlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoicePlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/android/app/src/main/java/fr/izio/twilio_programmable_voice_example/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/android/app/src/main/java/fr/izio/twilio_programmable_voice_example/Application.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/events.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/events.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/twilio_programmable_voice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/twilio_programmable_voice.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/twilio_programmable_voice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/twilio_programmable_voice.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -199,7 +188,6 @@
     <state width="902" height="284" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
     <state width="2516" height="1176" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935319" />
-
     <state x="968" y="187" width="603" height="750" key="RollbackChangesDialog" timestamp="1606924381466">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
