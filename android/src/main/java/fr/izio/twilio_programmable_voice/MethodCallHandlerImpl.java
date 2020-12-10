@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.twilio.voice.AcceptOptions;
 import com.twilio.voice.Call;
 import com.twilio.voice.CallInvite;
+import com.twilio.voice.ConnectOptions;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
@@ -20,6 +21,9 @@ import io.flutter.plugin.common.MethodChannel;
 public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
     final String TAG = "[TwilioProgrammableVoice - MethodCallHandlerImpl]";
+
+    // TODO make this persistent and remove class attribute
+    private String accessToken;
     public TwilioProgrammableVoice twilioProgrammableVoice;
 
     public MethodCallHandlerImpl(TwilioProgrammableVoice twilioProgrammableVoice) {
@@ -29,22 +33,39 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         Log.d(TAG, "onMethodCall " + call.method);
-        if (call.method.equals("registerVoice")) {
-            final String accessToken = call.argument("accessToken");
-            final String fcmToken = call.argument("fcmToken");
 
-            this.registerVoice(accessToken, fcmToken, result);
+        switch (call.method) {
+            case "registerVoice":
+                final String accessToken = call.argument("accessToken");
+                final String fcmToken = call.argument("fcmToken");
 
-        } else if (call.method.equals("handleMessage")) {
-            final Map<String, String> data = call.argument("messageData");
+                this.registerVoice(accessToken, fcmToken, result);
+                break;
 
-            this.handleMessage(data, result);
-        } else if (call.method.equals("answer")) {
-            this.answer(result);
-        } else if (call.method.equals("getPlatformVersion")) {
-            this.getPlatformVersion(result);
-        } else {
-            result.notImplemented();
+            case "handleMessage":
+                final Map<String, String> data = call.argument("messageData");
+
+                this.handleMessage(data, result);
+                break;
+
+            case "makeCall":
+                final String from = call.argument("from");
+                final String to = call.argument("to");
+
+                this.makeCall(from, to, result);
+                break;
+
+            case "answer":
+                this.answer(result);
+                break;
+
+            case "getPlatformVersion":
+                this.getPlatformVersion(result);
+                break;
+
+            default:
+                result.notImplemented();
+                break;
         }
     }
 
@@ -67,21 +88,29 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
         Log.d(TAG, "onMethodCall - handleMessage " + data.toString());
 
-/*
-        // To test event; eventSink need to be public
-        HashMap<String, Object> payload = new HashMap<>();
-        payload.put("type", "CallInvite");
-        payload.put("from", "call.getFrom()");
-        payload.put("to", "call.getTo()");
-        payload.put("callSid", "call.getSid()");
-        this.twilioProgrammableVoice.eventSink.success(payload);
- */
         final boolean isValid = Voice.handleMessage(twilioProgrammableVoice.getActivity().getApplicationContext(), data, this.twilioProgrammableVoice);
 
         if (!isValid) {
             result.error("NOT_TWILIO_MESSAGE", "Message Data isn't a valid twilio message", null);
             return;
         }
+
+        result.success(true);
+    }
+
+    private void makeCall(String from, String to, MethodChannel.Result result) {
+        Log.d(TAG, "makeCall");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("From", from);
+        params.put("To", to);
+
+        // TODO catch SecurityException
+        final ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+                .params(params)
+                .build();
+
+        Call call = Voice.connect(this.twilioProgrammableVoice.getActivity().getApplicationContext(), connectOptions, this.twilioProgrammableVoice);
         result.success(true);
     }
 
@@ -97,7 +126,8 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             return;
         }
 
-
+        //TODO remove this line when access token is persistent
+        this.accessToken = accessToken;
         Voice.register(accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener(result));
     }
 
