@@ -48,21 +48,49 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
       final callUUID = Uuid().v4();
 
       _callKeep.on(CallKeepPerformAnswerCallAction(),
-              (CallKeepPerformAnswerCallAction event) {
+              (CallKeepPerformAnswerCallAction event) async {
             print(
                 'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
-            _callKeep.startCall(event.callUUID, "number", "number");
 
-            Timer(const Duration(seconds: 1), () {
-              print('[setCurrentCallActive] $callUUID, number: "number"');
-              _callKeep.setCurrentCallActive(callUUID);
-            });
-            //_callKeep.endCall(event.callUUID);
+            _callKeep.startCall(event.callUUID, "number", "number");
+            // Generate accessToken from backend.
+            // http://localhost:3000/accessToken/test
+            final tokenResponse =
+                await Dio().get("http://host:3000/accessToken/defaultId");
+
+            print("[TOKEN RESPONSE DATA]");
+            print(tokenResponse.data);
+            // Get fcmToken.
+            final fcmToken = await FirebaseMessaging().getToken();
+            print("[FCM TOKEN]");
+            print(fcmToken);
+
+            await TwilioProgrammableVoice.registerVoice(tokenResponse.data, fcmToken);
+            await TwilioProgrammableVoice.handleMessage(dataMap);
+            await TwilioProgrammableVoice.answer();
+
+            _callKeep.setCurrentCallActive(callUUID);
           });
 
       _callKeep.on(CallKeepPerformEndCallAction(),
-              (CallKeepPerformEndCallAction event) {
+              (CallKeepPerformEndCallAction event) async {
             print('backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
+
+            // Generate accessToken from backend.
+            // http://localhost:3000/accessToken/test
+            final tokenResponse =
+                await Dio().get("http://host:3000/accessToken/defaultId");
+
+            print("[TOKEN RESPONSE DATA]");
+            print(tokenResponse.data);
+            // Get fcmToken.
+            final fcmToken = await FirebaseMessaging().getToken();
+            print("[FCM TOKEN]");
+            print(fcmToken);
+
+            await TwilioProgrammableVoice.registerVoice(tokenResponse.data, fcmToken);
+            await TwilioProgrammableVoice.handleMessage(dataMap);
+            await TwilioProgrammableVoice.reject();
           });
 
       if (!_callKeepInited) {
@@ -287,6 +315,9 @@ class _MyHomePageState extends State<MyHomePage> {
           print(event.isOnHold.toString());
           // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
           SoundPoolManager.getInstance().playDisconnect();
+
+          // @TODO: only end the current active call
+          _callKeep.endAllCalls();
           break;
 
         case CallQualityWarningChanged:
@@ -361,6 +392,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> endCall(CallKeepPerformEndCallAction event) async {
     print('endCall: ${event.callUUID}');
+    await TwilioProgrammableVoice.reject();
     removeCall(event.callUUID);
   }
 

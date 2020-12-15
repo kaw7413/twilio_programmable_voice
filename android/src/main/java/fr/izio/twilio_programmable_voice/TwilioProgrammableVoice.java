@@ -31,6 +31,7 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
 
     private CallInvite currentCallInvite;
     private CancelledCallInvite currentCancelledCallInvite;
+    private Call currentCall;
 
     private EventChannel eventChannel;
     private EventChannel.EventSink eventSink;
@@ -67,6 +68,7 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
         if (eventSink != null && currentCallInvite != null) {
 
             eventSink.success(this.getCallInvitePayload(currentCallInvite));
+            // SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playRinging();
         }
     }
 
@@ -75,6 +77,8 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
 
         if (eventSink != null && currentCancelledCallInvite != null) {
             eventSink.success(this.getCancelledCallInvite(currentCancelledCallInvite));
+            // SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).stopRinging();
+            // SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playDisconnect();
         }
     }
 
@@ -101,16 +105,19 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
     @Override
     public void onConnectFailure(@NonNull Call call, @NonNull CallException callException) {
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_CONNECT_FAILURE));
+        // SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).stopRinging();
     }
 
     @Override
     public void onRinging(@NonNull Call call) {
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RINGING));
+        // SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playRinging();
     }
 
     @Override
     public void onConnected(@NonNull Call call) {
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_CONNECTED));
+        // SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).stopRinging();
     }
 
     @Override
@@ -201,5 +208,13 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
         payload.put("isOnHold", call.isOnHold());
 
         return payload;
+    }
+
+    public Call getCurrentCall() {
+        return currentCall;
+    }
+
+    public void setCurrentCall(Call currentCall) {
+        this.currentCall = currentCall;
     }
 }

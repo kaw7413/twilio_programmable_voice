@@ -94,6 +94,11 @@ class TwilioProgrammableVoice {
     return _methodChannel.invokeMethod('handleMessage', {"messageData": data});
   }
 
+  /// Reject the current call invite
+  static Future<void> reject() {
+    return _methodChannel.invokeMethod('reject');
+  }
+
   /// Make a call
   ///
   /// [from] this device identity (or number)
