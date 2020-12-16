@@ -13,6 +13,8 @@ class TwilioProgrammableVoice {
   static List<void Function(Object)> onCallStatusCallbacks =
       <void Function(Object)>[];
 
+  static CallEvent _currentCall;
+
   /// Request microphone permission on the platform
   ///
   /// Return the microphone [PermissionStatus] after trying to request permissions.
@@ -51,36 +53,46 @@ class TwilioProgrammableVoice {
       switch (data['type']) {
         case 'CallInvite':
           print("In CALL_INVITE");
-          return CallInvite.from(data);
+            TwilioProgrammableVoice._currentCall = CallInvite.from(data);
+            break;
 
         case 'CancelledCallInvite':
-          return CancelledCallInvite.from(data);
+            TwilioProgrammableVoice._currentCall = CancelledCallInvite.from(data);
+            break;
 
         case 'CallConnectFailure':
-          return CallConnectFailure.from(data);
+            TwilioProgrammableVoice._currentCall = CallConnectFailure.from(data);
+            break;
 
         case 'CallRinging':
-          return CallRinging.from(data);
+            TwilioProgrammableVoice._currentCall = CallRinging.from(data);
+            break;
 
         case 'CallConnected':
-          return CallConnected.from(data);
+            TwilioProgrammableVoice._currentCall = CallConnected.from(data);
+            break;
 
         case 'CallReconnecting':
-          return CallReconnected.from(data);
+            TwilioProgrammableVoice._currentCall = CallReconnected.from(data);
+            break;
 
         case 'CallReconnected':
-          return CallReconnected.from(data);
+            TwilioProgrammableVoice._currentCall = CallReconnected.from(data);
+            break;
 
         case 'CallDisconnected':
-          return CallDisconnected.from(data);
+            TwilioProgrammableVoice._currentCall = CallDisconnected.from(data);
+            break;
 
         case 'CallQualityWarningChanged':
-          return CallQualityWarningChanged.from(data);
+            TwilioProgrammableVoice._currentCall = CallQualityWarningChanged.from(data);
+            break;
 
         default:
           break;
       }
 
+      return TwilioProgrammableVoice.getCurrentCall;
     });
   }
 
@@ -113,4 +125,6 @@ class TwilioProgrammableVoice {
         await _methodChannel.invokeMethod('getPlatformVersion');
     return version;
   }
+
+  static CallEvent get getCurrentCall => _currentCall;
 }
