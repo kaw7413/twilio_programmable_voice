@@ -31,6 +31,7 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
 
     private CallInvite currentCallInvite;
     private CancelledCallInvite currentCancelledCallInvite;
+    private Call currentCall;
 
     private EventChannel eventChannel;
     private EventChannel.EventSink eventSink;
@@ -126,7 +127,6 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
     @Override
     public void onDisconnected(@NonNull Call call, @Nullable CallException callException) {
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_DISCONNECTED));
-//        SoundPoolManager.getInstance(this.getActivity().getApplicationContext()).playDisconnect();
     }
 
     @Override
@@ -201,5 +201,13 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
         payload.put("isOnHold", call.isOnHold());
 
         return payload;
+    }
+
+    public Call getCurrentCall() {
+        return currentCall;
+    }
+
+    public void setCurrentCall(Call currentCall) {
+        this.currentCall = currentCall;
     }
 }

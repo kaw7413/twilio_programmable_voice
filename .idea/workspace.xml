@@ -31,29 +31,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f4ecda5-4779-47ae-8ae5-28498ea4268a" name="Default Changelist" comment="feat: type work">
-      <change afterPath="$PROJECT_DIR$/lib/SoundPoolManager.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/assets/sounds/disconnect.wav" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/assets/sounds/incoming.wav" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/assets/sounds/outgoing.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/MethodCallHandlerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/MethodCallHandlerImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoice.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoice.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoicePlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoicePlugin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/events.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/events.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/twilio_programmable_voice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/twilio_programmable_voice.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/events.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/events.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/twilio_programmable_voice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/twilio_programmable_voice.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[Pixel_3a_API_30_x86]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[Pixel_3a_API_30]" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -175,31 +164,30 @@
     </state>
     <state x="833" y="354" width="822" height="511" key="FileChooserDialogImpl/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606746729315" />
     <state x="994" y="26" width="426" height="477" key="FileChooserDialogImpl/0.0.2560.1440@0.0.2560.1440" timestamp="1606979237862" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.bottom" timestamp="1607085935319">
+    <state width="2516" height="1200" key="GridCell.Tab.0.bottom" timestamp="1608125597081">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935319" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.center" timestamp="1607085935319">
+    <state width="2516" height="1200" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1608125597081" />
+    <state width="2516" height="1200" key="GridCell.Tab.0.center" timestamp="1608125597080">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935319" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.left" timestamp="1607085935318">
+    <state width="2516" height="1200" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1608125597080" />
+    <state width="2516" height="1200" key="GridCell.Tab.0.left" timestamp="1608125597080">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935318" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.right" timestamp="1607085935319">
+    <state width="2516" height="1200" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1608125597080" />
+    <state width="2516" height="1200" key="GridCell.Tab.0.right" timestamp="1608125597081">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935319" />
-
+    <state width="2516" height="1200" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1608125597081" />
     <state x="968" y="187" width="603" height="750" key="RollbackChangesDialog" timestamp="1606924381466">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
