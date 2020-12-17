@@ -32,8 +32,9 @@
   <component name="ChangeListManager">
     <list default="true" id="3f4ecda5-4779-47ae-8ae5-28498ea4268a" name="Default Changelist" comment="feat: type work">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoice.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoicePlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoicePlugin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/events.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/events.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/src/twilio_programmable_voice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/twilio_programmable_voice.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -168,30 +169,30 @@
     </state>
     <state x="833" y="354" width="822" height="511" key="FileChooserDialogImpl/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606746729315" />
     <state x="994" y="26" width="426" height="477" key="FileChooserDialogImpl/0.0.2560.1440@0.0.2560.1440" timestamp="1606979237862" />
-    <state width="2516" height="1200" key="GridCell.Tab.0.bottom" timestamp="1608125597081">
+    <state width="2516" height="1003" key="GridCell.Tab.0.bottom" timestamp="1608222061178">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1200" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1608125597081" />
-    <state width="2516" height="1200" key="GridCell.Tab.0.center" timestamp="1608125597080">
+    <state width="2516" height="1003" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1608222061178" />
+    <state width="2516" height="1003" key="GridCell.Tab.0.center" timestamp="1608222061178">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1200" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1608125597080" />
-    <state width="2516" height="1200" key="GridCell.Tab.0.left" timestamp="1608125597080">
+    <state width="2516" height="1003" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1608222061178" />
+    <state width="2516" height="1003" key="GridCell.Tab.0.left" timestamp="1608222061177">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1200" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1608125597080" />
-    <state width="2516" height="1200" key="GridCell.Tab.0.right" timestamp="1608125597081">
+    <state width="2516" height="1003" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1608222061177" />
+    <state width="2516" height="1003" key="GridCell.Tab.0.right" timestamp="1608222061178">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1200" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1608125597081" />
+    <state width="2516" height="1003" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1608222061178" />
     <state x="968" y="187" width="603" height="750" key="RollbackChangesDialog" timestamp="1606924381466">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
@@ -209,9 +210,9 @@
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="1280" y="-21" width="1280" height="1437" key="dock-window-1/0.0.2560.1440@0.0.2560.1440" timestamp="1606989652059" />
-    <state x="943" y="327" key="run.anything.popup" timestamp="1607075573587">
+    <state x="943" y="327" key="run.anything.popup" timestamp="1608220876139">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state x="943" y="327" key="run.anything.popup/0.0.2560.1440@0.0.2560.1440" timestamp="1607075573587" />
+    <state x="943" y="327" key="run.anything.popup/0.0.2560.1440@0.0.2560.1440" timestamp="1608220876139" />
   </component>
 </project>

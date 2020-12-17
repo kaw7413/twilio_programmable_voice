@@ -13,9 +13,7 @@ class TwilioProgrammableVoice {
   static List<void Function(Object)> onCallStatusCallbacks =
       <void Function(Object)>[];
 
-  /// All current call indexed by the call sid e.g
-  /// TwilioProgrammableVoice.getCalls[sid] 
-  static Map<String, CallEvent> _currentCallsEvent = {};
+  static CallEvent _currentCallEvent;
 
   /// Request microphone permission on the platform
   ///
@@ -94,8 +92,7 @@ class TwilioProgrammableVoice {
         default:
           break;
       }
-
-      TwilioProgrammableVoice._updateCalls(currentCallEvent);
+      TwilioProgrammableVoice._currentCallEvent= currentCallEvent;
       return currentCallEvent;
     });
   }
@@ -130,14 +127,5 @@ class TwilioProgrammableVoice {
     return version;
   }
 
-  static void _updateCalls(CallEvent currentCallEvent) {
-    // TODO remove currentCall when call isn't used e.g:
-    // if (callIsNowUnuse)
-    //   TwilioProgrammableVoice._calls.remove(currentCall);
-    if (currentCallEvent.sid != null) {
-      TwilioProgrammableVoice._currentCallsEvent[currentCallEvent.sid] = currentCallEvent;
-    }
-  }
-
-  static get getCalls => _currentCallsEvent;
+  static get getCall => _currentCallEvent;
 }

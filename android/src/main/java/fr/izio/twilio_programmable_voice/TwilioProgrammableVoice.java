@@ -2,7 +2,6 @@ package fr.izio.twilio_programmable_voice;
 
 import android.app.Activity;
 import android.content.IntentFilter;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,12 +10,9 @@ import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
 import com.twilio.voice.CallInvite;
 import com.twilio.voice.CancelledCallInvite;
-import com.twilio.voice.ConnectOptions;
 import com.twilio.voice.MessageListener;
-import com.twilio.voice.Voice;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import io.flutter.plugin.common.EventChannel;
