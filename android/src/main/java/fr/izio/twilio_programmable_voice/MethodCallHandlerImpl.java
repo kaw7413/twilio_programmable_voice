@@ -33,7 +33,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         Log.d(TAG, "onMethodCall " + call.method);
-
         switch (call.method) {
             case "registerVoice":
                 final String accessToken = call.argument("accessToken");
@@ -59,6 +58,10 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
                 this.answer(result);
                 break;
 
+            case "reject":
+                this.reject(result);
+                break;
+
             case "getPlatformVersion":
                 this.getPlatformVersion(result);
                 break;
@@ -67,6 +70,21 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
                 result.notImplemented();
                 break;
         }
+    }
+
+    private void reject(MethodChannel.Result result) {
+        CallInvite callInvite = twilioProgrammableVoice.getCurrentCallInvite();
+        Call call = twilioProgrammableVoice.getCurrentCall();
+
+        // @TODO: keep track of all active call invites / calls
+        // And only cancel what the end-user need to cancel.
+        if (call != null) {
+            call.disconnect();
+        }
+
+        callInvite.reject(twilioProgrammableVoice.getActivity().getApplicationContext());
+
+        result.success(null);
     }
 
     private void answer(MethodChannel.Result result) {
