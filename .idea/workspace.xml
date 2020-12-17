@@ -31,10 +31,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f4ecda5-4779-47ae-8ae5-28498ea4268a" name="Default Changelist" comment="feat: type work">
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/MethodCallHandlerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/MethodCallHandlerImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoice.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/fr/izio/twilio_programmable_voice/TwilioProgrammableVoice.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/android/app/src/main/java/fr/izio/twilio_programmable_voice_example/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/android/app/src/main/java/fr/izio/twilio_programmable_voice_example/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/events.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/events.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/src/twilio_programmable_voice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/twilio_programmable_voice.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,7 +41,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[Pixel_3a_API_30_x86]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[Pixel_3a_API_30]" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -75,7 +74,8 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.3233602" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
   <component name="RecentsManager">
@@ -151,6 +151,10 @@
     </state>
     <state x="1116" y="266" width="682" height="394" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606819455176" />
     <state x="1487" y="333" key="#com.intellij.fileTypes.FileTypeChooser/0.0.2560.1440@0.0.2560.1440" timestamp="1606991438046" />
+    <state x="1013" y="502" width="522" height="319" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1608201066510">
+      <screen x="0" y="0" width="2560" height="1440" />
+    </state>
+    <state x="1013" y="502" width="522" height="319" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.2560.1440@0.0.2560.1440" timestamp="1608201066510" />
     <state x="962" y="-20" width="476" height="1072" key="AVDManager" timestamp="1606819445212">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -164,39 +168,39 @@
     </state>
     <state x="833" y="354" width="822" height="511" key="FileChooserDialogImpl/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606746729315" />
     <state x="994" y="26" width="426" height="477" key="FileChooserDialogImpl/0.0.2560.1440@0.0.2560.1440" timestamp="1606979237862" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.bottom" timestamp="1607085935319">
+    <state width="2516" height="1200" key="GridCell.Tab.0.bottom" timestamp="1608211592822">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935319" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.center" timestamp="1607085935319">
+    <state width="2516" height="1200" key="GridCell.Tab.0.bottom/0.0.2560.1440@0.0.2560.1440" timestamp="1608211592822" />
+    <state width="2516" height="1200" key="GridCell.Tab.0.center" timestamp="1608211592821">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935319" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.left" timestamp="1607085935318">
+    <state width="2516" height="1200" key="GridCell.Tab.0.center/0.0.2560.1440@0.0.2560.1440" timestamp="1608211592821" />
+    <state width="2516" height="1200" key="GridCell.Tab.0.left" timestamp="1608211592821">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935318" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.right" timestamp="1607085935319">
+    <state width="2516" height="1200" key="GridCell.Tab.0.left/0.0.2560.1440@0.0.2560.1440" timestamp="1608211592821" />
+    <state width="2516" height="1200" key="GridCell.Tab.0.right" timestamp="1608211592822">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state width="902" height="284" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606820815460" />
     <state width="1872" height="284" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1606747961109" />
-    <state width="2516" height="1176" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1607085935319" />
+    <state width="2516" height="1200" key="GridCell.Tab.0.right/0.0.2560.1440@0.0.2560.1440" timestamp="1608211592822" />
     <state x="968" y="187" width="603" height="750" key="RollbackChangesDialog" timestamp="1606924381466">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="968" y="187" width="603" height="750" key="RollbackChangesDialog/0.0.2560.1440@0.0.2560.1440" timestamp="1606924381466" />
-    <state x="-1" y="-22" width="2560" height="1440" key="SettingsEditor" timestamp="1606925515731">
+    <state x="0" y="0" width="2560" height="1440" key="SettingsEditor" timestamp="1608125913759">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="794" y="-26" width="904" height="1074" key="SettingsEditor/0.0.1920.1080/1920.0.1920.1080@0.0.1920.1080" timestamp="1606818520889" />
-    <state x="-1" y="-22" width="2560" height="1440" key="SettingsEditor/0.0.2560.1440@0.0.2560.1440" timestamp="1606925515731" />
+    <state x="0" y="0" width="2560" height="1440" key="SettingsEditor/0.0.2560.1440@0.0.2560.1440" timestamp="1608125913759" />
     <state x="952" y="567" width="646" height="210" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1606918921503">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>

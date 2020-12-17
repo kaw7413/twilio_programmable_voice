@@ -1,27 +1,34 @@
-abstract class CallEvent {}
+abstract class CallEvent {
+  String from;
+  String to;
+  String sid;
+  String state;
+  bool isMuted;
+  bool isOnHold;
+}
 
 class CallInvite extends CallEvent {
   String from;
   String to;
-  String callSid;
+  String sid;
 
   CallInvite();
   CallInvite.from(Map<dynamic, dynamic> data)
     : from = data['from'] as String,
       to = data['to'] as String,
-      callSid = data['callSid'] as String;
+      sid = data['callSid'] as String;
 }
 
 class CancelledCallInvite extends CallEvent {
   String from;
   String to;
-  String callSid;
+  String sid;
 
   CancelledCallInvite();
   CancelledCallInvite.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
-        callSid = data['callSid'] as String;
+        sid = data['callSid'] as String;
 }
 
 class CallConnectFailure extends CallEvent {
