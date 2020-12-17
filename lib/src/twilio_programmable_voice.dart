@@ -13,7 +13,9 @@ class TwilioProgrammableVoice {
   static List<void Function(Object)> onCallStatusCallbacks =
       <void Function(Object)>[];
 
-  static CallEvent _currentCall;
+  /// All current call indexed by the call sid e.g
+  /// TwilioProgrammableVoice.getCalls[sid] 
+  static Map<String, CallEvent> _currentCallsEvent = {};
 
   /// Request microphone permission on the platform
   ///
@@ -49,50 +51,52 @@ class TwilioProgrammableVoice {
   /// Get the incoming calls stream
   static Stream<dynamic> get callStatusStream {
     print("in STATUS_STREAM");
+    CallEvent currentCallEvent;
+
     return _eventChannel.receiveBroadcastStream().map((data) {
       switch (data['type']) {
         case 'CallInvite':
-          print("In CALL_INVITE");
-            TwilioProgrammableVoice._currentCall = CallInvite.from(data);
-            break;
+          currentCallEvent = CallInvite.from(data);
+          break;
 
         case 'CancelledCallInvite':
-            TwilioProgrammableVoice._currentCall = CancelledCallInvite.from(data);
-            break;
+          currentCallEvent = CancelledCallInvite.from(data);
+          break;
 
         case 'CallConnectFailure':
-            TwilioProgrammableVoice._currentCall = CallConnectFailure.from(data);
-            break;
+          currentCallEvent = CallConnectFailure.from(data);
+          break;
 
         case 'CallRinging':
-            TwilioProgrammableVoice._currentCall = CallRinging.from(data);
-            break;
+          currentCallEvent = CallRinging.from(data);
+          break;
 
         case 'CallConnected':
-            TwilioProgrammableVoice._currentCall = CallConnected.from(data);
-            break;
+          currentCallEvent = CallConnected.from(data);
+          break;
 
         case 'CallReconnecting':
-            TwilioProgrammableVoice._currentCall = CallReconnected.from(data);
-            break;
+          currentCallEvent = CallReconnected.from(data);
+          break;
 
         case 'CallReconnected':
-            TwilioProgrammableVoice._currentCall = CallReconnected.from(data);
-            break;
+          currentCallEvent = CallReconnected.from(data);
+          break;
 
         case 'CallDisconnected':
-            TwilioProgrammableVoice._currentCall = CallDisconnected.from(data);
-            break;
+          currentCallEvent = CallDisconnected.from(data);
+          break;
 
         case 'CallQualityWarningChanged':
-            TwilioProgrammableVoice._currentCall = CallQualityWarningChanged.from(data);
-            break;
+          currentCallEvent = CallQualityWarningChanged.from(data);
+          break;
 
         default:
           break;
       }
 
-      return TwilioProgrammableVoice.getCurrentCall;
+      TwilioProgrammableVoice._updateCalls(currentCallEvent);
+      return currentCallEvent;
     });
   }
 
@@ -126,5 +130,14 @@ class TwilioProgrammableVoice {
     return version;
   }
 
-  static CallEvent get getCurrentCall => _currentCall;
+  static void _updateCalls(CallEvent currentCallEvent) {
+    // TODO remove currentCall when call isn't used e.g:
+    // if (callIsNowUnuse)
+    //   TwilioProgrammableVoice._calls.remove(currentCall);
+    if (currentCallEvent.sid != null) {
+      TwilioProgrammableVoice._currentCallsEvent[currentCallEvent.sid] = currentCallEvent;
+    }
+  }
+
+  static get getCalls => _currentCallsEvent;
 }
