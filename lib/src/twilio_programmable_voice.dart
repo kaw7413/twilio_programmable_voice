@@ -94,6 +94,7 @@ class TwilioProgrammableVoice {
         default:
           break;
       }
+
       TwilioProgrammableVoice._updateCalls(currentCallEvent);
       return currentCallEvent;
     });

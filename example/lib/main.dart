@@ -222,7 +222,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       print("RECEIVED EVENT :");
-      print(TwilioProgrammableVoice.getCalls[event.sid]);
+      print("TWILIO STATIC CURRENT CALL: ");
+      print(TwilioProgrammableVoice.getCurrentCall.from);
+      print(TwilioProgrammableVoice.getCurrentCall.to);
+      print(TwilioProgrammableVoice.getCurrentCall.sid);
+      print(TwilioProgrammableVoice.getCurrentCall.state);
+      print(TwilioProgrammableVoice.getCurrentCall.isOnHold.toString());
+      print(TwilioProgrammableVoice.getCurrentCall.isMuted.toString());
+      
       // @TODO: event is [CLASS]
       switch (event.runtimeType) {
         case CallInvite:
