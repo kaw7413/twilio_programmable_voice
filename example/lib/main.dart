@@ -8,9 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
-// @TODO: export * from ... to avoid multiple import statements
-import 'package:uuid/uuid.dart';
-
 const callKeepSetupConfig = <String, dynamic>{
   'ios': {
     'appName': 'Bilik Pro',
@@ -45,7 +42,7 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
       final dataMap = Map<String, String>.from(message["data"]);
       currentCallInviteDate = dataMap;
 
-      final callUUID = Uuid().v4();
+      final callUUID = TwilioProgrammableVoice.getCall.sid;
 
       _callKeep.on(CallKeepPerformAnswerCallAction(),
               (CallKeepPerformAnswerCallAction event) async {
@@ -133,7 +130,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final FlutterCallkeep _callKeep = FlutterCallkeep();
   Map<String, Call> calls = {};
-  String newUUID() => Uuid().v4();
 
   Future<void> registerVoice() async {
     // Generate accessToken from backend.
@@ -216,19 +212,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     TwilioProgrammableVoice.addCallStatusListener(print);
 
-    // To test event
-    // Map<String, String> fakeData = {"foo": "bar"};
-    // TwilioProgrammableVoice.handleMessage(fakeData);
-
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       print("RECEIVED EVENT :");
-      print("TWILIO STATIC CURRENT CALL: ");
-      print(TwilioProgrammableVoice.getCurrentCall.from);
-      print(TwilioProgrammableVoice.getCurrentCall.to);
-      print(TwilioProgrammableVoice.getCurrentCall.sid);
-      print(TwilioProgrammableVoice.getCurrentCall.state);
-      print(TwilioProgrammableVoice.getCurrentCall.isOnHold.toString());
-      print(TwilioProgrammableVoice.getCurrentCall.isMuted.toString());
       
       // @TODO: event is [CLASS]
       switch (event.runtimeType) {
@@ -379,6 +364,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void setCallMuted(String callUUID, bool muted) {
     setState(() {
+      print(TwilioProgrammableVoice.getCall.sid);
       calls[callUUID].muted = muted;
     });
   }
@@ -413,7 +399,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // @TODO: sometime we receive `didReceiveStartCallAction` with handle` undefined`
       return;
     }
-    final String callUUID = event.callUUID ?? newUUID();
+    final String callUUID = TwilioProgrammableVoice.getCall.sid;
     setState(() {
       calls[callUUID] = Call(event.handle);
     });
@@ -485,7 +471,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> displayIncomingCall(String number) async {
-    final String callUUID = newUUID();
+    final String callUUID = TwilioProgrammableVoice.getCall.sid;
     setState(() {
       calls[callUUID] = Call(number);
     });
