@@ -123,13 +123,18 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         params.put("From", from);
         params.put("To", to);
 
-        // TODO catch SecurityException
-        final ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
-                .params(params)
-                .build();
+        try {
+            final ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+                    .params(params)
+                    .build();
 
-        Call call = Voice.connect(this.twilioProgrammableVoice.getActivity().getApplicationContext(), connectOptions, this.twilioProgrammableVoice);
-        result.success(true);
+            Voice.connect(this.twilioProgrammableVoice.getActivity().getApplicationContext(), connectOptions, this.twilioProgrammableVoice);
+            result.success(true);
+        } catch (SecurityException error) {
+            Log.e("SecurityException throw", "Error was throw while connecting with twilio");
+            result.success(false);
+            throw error;
+        }
     }
 
     private void registerVoice(String accessToken, String fcmToken, MethodChannel.Result result) {

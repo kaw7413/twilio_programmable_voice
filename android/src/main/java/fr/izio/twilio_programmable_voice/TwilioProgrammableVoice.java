@@ -97,36 +97,43 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
 
     @Override
     public void onConnectFailure(@NonNull Call call, @NonNull CallException callException) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_CONNECT_FAILURE));
     }
 
     @Override
     public void onRinging(@NonNull Call call) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RINGING));
     }
 
     @Override
     public void onConnected(@NonNull Call call) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_CONNECTED));
     }
 
     @Override
     public void onReconnecting(@NonNull Call call, @NonNull CallException callException) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RECONNECTING));
     }
 
     @Override
     public void onReconnected(@NonNull Call call) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RECONNECTED));
     }
 
     @Override
     public void onDisconnected(@NonNull Call call, @Nullable CallException callException) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_DISCONNECTED));
     }
 
     @Override
     public void onCallQualityWarningsChanged(@NonNull Call call, @NonNull Set<Call.CallQualityWarning> currentWarnings, @NonNull Set<Call.CallQualityWarning> previousWarnings) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_QUALITY_WARNING_CHANGED));
     }
 
