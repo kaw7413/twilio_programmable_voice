@@ -14,8 +14,7 @@ const callKeepSetupConfig = <String, dynamic>{
   },
   'android': {
     'alertTitle': 'Permission requise',
-    'alertDescription':
-    'Bilik Pro a besoin d\'accèder aux appels',
+    'alertDescription': 'Bilik Pro a besoin d\'accèder aux appels',
     'cancelButton': 'Fermer Bilik Pro',
     'okButton': 'Autoriser',
   },
@@ -30,6 +29,7 @@ void main() {
 final FlutterCallkeep _callKeep = FlutterCallkeep();
 bool _callKeepInited = false;
 Map<String, String> currentCallInviteDate = new Map();
+final String callerName = "Toto";
 
 Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
   // It's a data
@@ -45,50 +45,52 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
       final callUUID = TwilioProgrammableVoice.getCall.sid;
 
       _callKeep.on(CallKeepPerformAnswerCallAction(),
-              (CallKeepPerformAnswerCallAction event) async {
-            print(
-                'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
+          (CallKeepPerformAnswerCallAction event) async {
+        print(
+            'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
 
-            _callKeep.startCall(event.callUUID, "number", "number");
-            // Generate accessToken from backend.
-            // http://localhost:3000/accessToken/test
-            final tokenResponse =
-                await Dio().get("http://host:3000/accessToken/testId");
+        _callKeep.startCall(event.callUUID, TwilioProgrammableVoice.getCall.from, callerName);
+        // Generate accessToken from backend.
+        // http://localhost:3000/accessToken/test
+        final tokenResponse =
+            await Dio().get("http://host:3000/accessToken/testId");
 
-            print("[TOKEN RESPONSE DATA]");
-            print(tokenResponse.data);
-            // Get fcmToken.
-            final fcmToken = await FirebaseMessaging().getToken();
-            print("[FCM TOKEN]");
-            print(fcmToken);
+        print("[TOKEN RESPONSE DATA]");
+        print(tokenResponse.data);
+        // Get fcmToken.
+        final fcmToken = await FirebaseMessaging().getToken();
+        print("[FCM TOKEN]");
+        print(fcmToken);
 
-            await TwilioProgrammableVoice.registerVoice(tokenResponse.data, fcmToken);
-            await TwilioProgrammableVoice.handleMessage(dataMap);
-            await TwilioProgrammableVoice.answer();
+        await TwilioProgrammableVoice.registerVoice(
+            tokenResponse.data, fcmToken);
+        await TwilioProgrammableVoice.handleMessage(dataMap);
+        await TwilioProgrammableVoice.answer();
 
-            _callKeep.setCurrentCallActive(callUUID);
-          });
+        _callKeep.setCurrentCallActive(callUUID);
+      });
 
       _callKeep.on(CallKeepPerformEndCallAction(),
-              (CallKeepPerformEndCallAction event) async {
-            print('backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
+          (CallKeepPerformEndCallAction event) async {
+        print(
+            'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
 
-            // Generate accessToken from backend.
-            // http://localhost:3000/accessToken/test
-            final tokenResponse =
-                await Dio().get("http://host:3000/accessToken/testId");
+        // Generate accessToken from backend.
+        // http://localhost:3000/accessToken/test
+        final tokenResponse =
+            await Dio().get("http://host:3000/accessToken/testId");
 
-            print("[TOKEN RESPONSE DATA]");
-            print(tokenResponse.data);
-            // Get fcmToken.
-            final fcmToken = await FirebaseMessaging().getToken();
-            print("[FCM TOKEN]");
-            print(fcmToken);
+        print("[TOKEN RESPONSE DATA]");
+        print(tokenResponse.data);
+        // Get fcmToken.
+        final fcmToken = await FirebaseMessaging().getToken();
+        print("[FCM TOKEN]");
+        print(fcmToken);
 
-            await TwilioProgrammableVoice.registerVoice(tokenResponse.data, fcmToken);
-            await TwilioProgrammableVoice.handleMessage(dataMap);
-            await TwilioProgrammableVoice.reject();
-          });
+        await TwilioProgrammableVoice.registerVoice(tokenResponse.data, fcmToken);
+        await TwilioProgrammableVoice.handleMessage(dataMap);
+        await TwilioProgrammableVoice.reject();
+      });
 
       if (!_callKeepInited) {
         _callKeep.setup(callKeepSetupConfig);
@@ -134,8 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> registerVoice() async {
     // Generate accessToken from backend.
     // http://localhost:3000/accessToken/test
-    final tokenResponse =
-    await Dio().get("http://host:3000/accessToken/testId");
+    final tokenResponse = await Dio().get("http://host:3000/accessToken/testId");
 
     print("[TOKEN RESPONSE DATA]");
     print(tokenResponse.data);
@@ -148,8 +149,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void iOS_Permission() {
-    _firebaseMessaging.requestNotificationPermissions(
-        IosNotificationSettings());
+    _firebaseMessaging
+        .requestNotificationPermissions(IosNotificationSettings());
     _firebaseMessaging.onIosSettingsRegistered
         .listen((IosNotificationSettings settings) {
       print('Settings registered: $settings');
@@ -214,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       print("RECEIVED EVENT :");
-      
+
       // @TODO: event is [CLASS]
       switch (event.runtimeType) {
         case CallInvite:
@@ -258,11 +259,11 @@ class _MyHomePageState extends State<MyHomePage> {
           print(event.sid);
           print(event.isMuted.toString());
           print(event.isOnHold.toString());
-          // if client is calling someone else play outgoing, else play incoming
+          // TwilioProgrammableVoice.getCall.to and TwilioProgrammableVoice.getCall.from are always null when making a call
+          // TODO replace brut phone number with TwilioProgrammableVoice.getCall.to
+          await makeCall("+33787934070");
           if (event.from == "+33644645795") {
             SoundPoolManager.getInstance().playOutgoing();
-          } else {
-            SoundPoolManager.getInstance().playIncoming();
           }
           break;
 
@@ -370,17 +371,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
-    final String callUUID = event.callUUID;
+    final String callUUID = TwilioProgrammableVoice.getCall.sid;
     final String number = calls[callUUID].number;
     print('[answerCall] $callUUID, number: $number');
 
     TwilioProgrammableVoice.answer();
 
-    _callKeep.startCall(event.callUUID, number, number);
-    Timer(const Duration(seconds: 1), () {
-      print('[setCurrentCallActive] $callUUID, number: $number');
-      _callKeep.setCurrentCallActive(callUUID);
-    });
+    _callKeep.setCurrentCallActive(callUUID);
   }
 
   Future<void> endCall(CallKeepPerformEndCallAction event) async {
@@ -395,7 +392,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> didReceiveStartCallAction(
       CallKeepDidReceiveStartCallAction event) async {
+    print('[didReceiveStartCallAction] method called');
     if (event.handle == null) {
+      print('[didReceiveStartCallAction] handle == null');
       // @TODO: sometime we receive `didReceiveStartCallAction` with handle` undefined`
       return;
     }
@@ -405,13 +404,35 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     print('[didReceiveStartCallAction] $callUUID, number: ${event.handle}');
 
-    _callKeep.startCall(callUUID, event.handle, event.handle);
+    _callKeep.startCall(callUUID, calls[callUUID].number, callerName);
 
     Timer(const Duration(seconds: 1), () {
       print('[setCurrentCallActive] $callUUID, number: ${event.handle}');
       _callKeep.setCurrentCallActive(callUUID);
     });
   }
+
+  Future<void> makeCall(String number) async {
+    print('[makeCall]');
+    final String callUUID = "MakeCall"; // TwilioProgrammableVoice.getCall.sid
+    setState(() {
+      calls[callUUID] = Call(number);
+    });
+    final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+    if (!hasPhoneAccount) {
+      await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
+        'alertTitle': 'Permissions required',
+        'alertDescription':
+            'This application needs to access your phone accounts',
+        'cancelButton': 'Cancel',
+        'okButton': 'ok',
+      });
+    }
+
+    print('[makeCall] $callUUID number: $number');
+    _callKeep.startCall(callUUID, number, callerName);
+  }
+
 
   Future<void> didPerformSetMutedCallAction(
       CallKeepDidPerformSetMutedCallAction event) async {
@@ -481,7 +502,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
         'alertTitle': 'Permissions required',
         'alertDescription':
-        'This application needs to access your phone accounts',
+            'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
       });
@@ -489,7 +510,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     print('[displayIncomingCall] $callUUID number: $number');
     _callKeep.displayIncomingCall(callUUID, number,
-        handleType: 'number', hasVideo: false);
+        handleType: 'number', hasVideo: false, callerName: callerName);
   }
 
   void didDisplayIncomingCall(CallKeepDidDisplayIncomingCall event) {
@@ -509,18 +530,22 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Column(
-          children: [Center(
-            child: Text('Running on: $_platformVersion\n'),
+          appBar: AppBar(
+            title: const Text('Plugin example app'),
           ),
-          FlatButton(onPressed: () {
-            TwilioProgrammableVoice.makeCall(from: "+33644645795", to: "+33787934070");
-          }, child: Text('Call'))],
-        )
-      ),
+          body: Column(
+            children: [
+              Center(
+                child: Text('Running on: $_platformVersion\n'),
+              ),
+              FlatButton(
+                  onPressed: () {
+                    TwilioProgrammableVoice.makeCall(
+                        from: "+33644645795", to: "+33787934070");
+                  },
+                  child: Text('Call'))
+            ],
+          )),
     );
   }
 }

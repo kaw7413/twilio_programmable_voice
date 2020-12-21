@@ -18,9 +18,9 @@ packages:
   callkeep:
     dependency: "direct main"
     description:
-      name: callkeep
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "packages/callkeep"
+      relative: true
+    source: path
     version: "0.2.0"
   characters:
     dependency: transitive

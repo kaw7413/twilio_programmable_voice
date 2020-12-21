@@ -82,7 +82,10 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             call.disconnect();
         }
 
-        callInvite.reject(twilioProgrammableVoice.getActivity().getApplicationContext());
+        if (callInvite != null) {
+            callInvite.reject(twilioProgrammableVoice.getActivity().getApplicationContext());
+        }
+
 
         result.success(null);
     }
