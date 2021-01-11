@@ -414,7 +414,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> makeCall(String number) async {
     print('[makeCall]');
-    final String callUUID = "MakeCall"; // TwilioProgrammableVoice.getCall.sid
+    final String callUUID = TwilioProgrammableVoice.getCall.sid;
     setState(() {
       calls[callUUID] = Call(number);
     });
