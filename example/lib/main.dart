@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
+import 'callkeep_functions.dart';
 
 const callKeepSetupConfig = <String, dynamic>{
   'ios': {
@@ -115,13 +116,6 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
   // Or do other work.
 }
 
-class Call {
-  Call(this.number);
-  String number;
-  bool held = false;
-  bool muted = false;
-}
-
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -131,7 +125,6 @@ class _MyHomePageState extends State<MyHomePage> {
   String _platformVersion = 'Unknown';
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final FlutterCallkeep _callKeep = FlutterCallkeep();
-  Map<String, Call> calls = {};
 
   Future<void> registerVoice() async {
     // Generate accessToken from backend.
@@ -156,13 +149,13 @@ class _MyHomePageState extends State<MyHomePage> {
       print('Settings registered: $settings');
     });
   }
-
+// All this function should be in another file
   Future<void> initCallKeep() async {
     _callKeep.on(CallKeepDidDisplayIncomingCall(), didDisplayIncomingCall);
-    _callKeep.on(CallKeepPerformAnswerCallAction(), answerCall);
+    _callKeep.on(CallKeepPerformAnswerCallAction(), answerCall); // TODO pass _callKeep to answserCall function
     _callKeep.on(CallKeepDidPerformDTMFAction(), didPerformDTMFAction);
     _callKeep.on(
-        CallKeepDidReceiveStartCallAction(), didReceiveStartCallAction);
+        CallKeepDidReceiveStartCallAction(), didReceiveStartCallAction); // TODO pass _callKeep
     _callKeep.on(CallKeepDidToggleHoldAction(), didToggleHoldCallAction);
     _callKeep.on(
         CallKeepDidPerformSetMutedCallAction(), didPerformSetMutedCallAction);
@@ -351,43 +344,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void removeCall(String callUUID) {
-    setState(() {
-      calls.remove(callUUID);
-    });
-  }
-
-  void setCallHeld(String callUUID, bool held) {
-    setState(() {
-      calls[callUUID].held = held;
-    });
-  }
-
-  void setCallMuted(String callUUID, bool muted) {
-    setState(() {
-      print(TwilioProgrammableVoice.getCall.sid);
-      calls[callUUID].muted = muted;
-    });
-  }
-
   Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
     final String callUUID = TwilioProgrammableVoice.getCall.sid;
-    final String number = calls[callUUID].number;
-    print('[answerCall] $callUUID, number: $number');
+    final String from = TwilioProgrammableVoice.getCall.from;
+    print('[answerCall] $callUUID, from: $from');
 
     TwilioProgrammableVoice.answer();
 
     _callKeep.setCurrentCallActive(callUUID);
-  }
-
-  Future<void> endCall(CallKeepPerformEndCallAction event) async {
-    print('endCall: ${event.callUUID}');
-    await TwilioProgrammableVoice.reject();
-    removeCall(event.callUUID);
-  }
-
-  Future<void> didPerformDTMFAction(CallKeepDidPerformDTMFAction event) async {
-    print('[didPerformDTMFAction] ${event.callUUID}, digits: ${event.digits}');
   }
 
   Future<void> didReceiveStartCallAction(
@@ -399,12 +363,10 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
     final String callUUID = TwilioProgrammableVoice.getCall.sid;
-    setState(() {
-      calls[callUUID] = Call(event.handle);
-    });
+
     print('[didReceiveStartCallAction] $callUUID, number: ${event.handle}');
 
-    _callKeep.startCall(callUUID, calls[callUUID].number, callerName);
+    _callKeep.startCall(callUUID, TwilioProgrammableVoice.getCall.from, callerName);
 
     Timer(const Duration(seconds: 1), () {
       print('[setCurrentCallActive] $callUUID, number: ${event.handle}');
@@ -415,9 +377,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> makeCall(String number) async {
     print('[makeCall]');
     final String callUUID = TwilioProgrammableVoice.getCall.sid;
-    setState(() {
-      calls[callUUID] = Call(number);
-    });
     final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
     if (!hasPhoneAccount) {
       await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
@@ -436,53 +395,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> didPerformSetMutedCallAction(
       CallKeepDidPerformSetMutedCallAction event) async {
-    final String number = calls[event.callUUID].number;
     print(
-        '[didPerformSetMutedCallAction] ${event.callUUID}, number: $number (${event.muted})');
-
-    setCallMuted(event.callUUID, event.muted);
+        '[didPerformSetMutedCallAction] ${event.callUUID}, muted: ${TwilioProgrammableVoice.getCall.isMuted}');
   }
 
   Future<void> didToggleHoldCallAction(
       CallKeepDidToggleHoldAction event) async {
-    final String number = calls[event.callUUID].number;
     print(
-        '[didToggleHoldCallAction] ${event.callUUID}, number: $number (${event.hold})');
-
-    setCallHeld(event.callUUID, event.hold);
+        '[didToggleHoldCallAction] ${event.callUUID}, hold (${TwilioProgrammableVoice.getCall.isOnHold})');
   }
 
   Future<void> hangup(String callUUID) async {
     _callKeep.endCall(callUUID);
-    removeCall(callUUID);
   }
 
   Future<void> setOnHold(String callUUID, bool held) async {
     _callKeep.setOnHold(callUUID, held);
-    final String handle = calls[callUUID].number;
-    print('[setOnHold: $held] $callUUID, number: $handle');
-    setCallHeld(callUUID, held);
+    print('[setOnHold: $held] $callUUID, callUUID: $callUUID');
   }
 
   Future<void> setMutedCall(String callUUID, bool muted) async {
     _callKeep.setMutedCall(callUUID, muted);
-    final String handle = calls[callUUID].number;
-    print('[setMutedCall: $muted] $callUUID, number: $handle');
-    setCallMuted(callUUID, muted);
-  }
-
-  Future<void> updateDisplay(String callUUID) async {
-    final String number = calls[callUUID].number;
-    // Workaround because Android doesn't display well displayName, se we have to switch ...
-    if (isIOS) {
-      _callKeep.updateDisplay(callUUID,
-          displayName: 'New Name', handle: number);
-    } else {
-      _callKeep.updateDisplay(callUUID,
-          displayName: number, handle: 'New Name');
-    }
-
-    print('[updateDisplay: $number] $callUUID');
+    print('[setMutedCall: $muted] $callUUID');
   }
 
   Future<void> displayIncomingCallDelayed(String number) async {
@@ -493,9 +427,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> displayIncomingCall(String number) async {
     final String callUUID = TwilioProgrammableVoice.getCall.sid;
-    setState(() {
-      calls[callUUID] = Call(number);
-    });
     print('Display incoming call now');
     final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
     if (!hasPhoneAccount) {
@@ -511,19 +442,6 @@ class _MyHomePageState extends State<MyHomePage> {
     print('[displayIncomingCall] $callUUID number: $number');
     _callKeep.displayIncomingCall(callUUID, number,
         handleType: 'number', hasVideo: false, localizedCallerName: callerName);
-  }
-
-  void didDisplayIncomingCall(CallKeepDidDisplayIncomingCall event) {
-    var callUUID = event.callUUID;
-    var number = event.handle;
-    print('[displayIncomingCall] $callUUID number: $number');
-    setState(() {
-      calls[callUUID] = Call(number);
-    });
-  }
-
-  void onPushKitToken(CallKeepPushKitToken event) {
-    print('[onPushKitToken] token => ${event.token}');
   }
 
   @override
