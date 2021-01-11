@@ -510,7 +510,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     print('[displayIncomingCall] $callUUID number: $number');
     _callKeep.displayIncomingCall(callUUID, number,
-        handleType: 'number', hasVideo: false, callerName: callerName);
+        handleType: 'number', hasVideo: false, localizedCallerName: callerName);
   }
 
   void didDisplayIncomingCall(CallKeepDidDisplayIncomingCall event) {

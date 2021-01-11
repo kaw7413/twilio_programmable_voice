@@ -14,10 +14,8 @@ dependencies:
 
   dio: ^3.0.10
   firebase_messaging: 7.0.3
-  # callkeep: ^0.2.0
+  callkeep: ^0.2.3
   uuid: 2.2.2
-  callkeep:
-    path: packages/callkeep
 
   twilio_programmable_voice:
     # When depending on this package from a real application you should use:
