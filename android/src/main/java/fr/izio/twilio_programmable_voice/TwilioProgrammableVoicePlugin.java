@@ -15,7 +15,7 @@ import io.flutter.plugin.common.MethodChannel;
  * TwilioProgrammableVoicePlugin
  */
 public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAware {
-    private final LogLevel voiceLogLevel = LogLevel.DEBUG;
+    private final LogLevel voiceLogLevel = LogLevel.ERROR;
     final String CALL_STATUS_EVENT_CHANNEL_NAME = "twilio_programmable_voice/call_status";
 
 

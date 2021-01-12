@@ -2,7 +2,6 @@ package fr.izio.twilio_programmable_voice;
 
 import android.app.Activity;
 import android.content.IntentFilter;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,12 +10,9 @@ import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
 import com.twilio.voice.CallInvite;
 import com.twilio.voice.CancelledCallInvite;
-import com.twilio.voice.ConnectOptions;
 import com.twilio.voice.MessageListener;
-import com.twilio.voice.Voice;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import io.flutter.plugin.common.EventChannel;
@@ -101,36 +97,43 @@ public class TwilioProgrammableVoice implements MessageListener, EventChannel.St
 
     @Override
     public void onConnectFailure(@NonNull Call call, @NonNull CallException callException) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_CONNECT_FAILURE));
     }
 
     @Override
     public void onRinging(@NonNull Call call) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RINGING));
     }
 
     @Override
     public void onConnected(@NonNull Call call) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_CONNECTED));
     }
 
     @Override
     public void onReconnecting(@NonNull Call call, @NonNull CallException callException) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RECONNECTING));
     }
 
     @Override
     public void onReconnected(@NonNull Call call) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_RECONNECTED));
     }
 
     @Override
     public void onDisconnected(@NonNull Call call, @Nullable CallException callException) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_DISCONNECTED));
     }
 
     @Override
     public void onCallQualityWarningsChanged(@NonNull Call call, @NonNull Set<Call.CallQualityWarning> currentWarnings, @NonNull Set<Call.CallQualityWarning> previousWarnings) {
+        setCurrentCall(call);
         eventSink.success(this.getCallPayload(call, TwilioProgrammableVoice.CALL_QUALITY_WARNING_CHANGED));
     }
 

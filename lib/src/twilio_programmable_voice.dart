@@ -10,12 +10,7 @@ class TwilioProgrammableVoice {
   static final EventChannel _eventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
 
-  static List<void Function(Object)> onCallStatusCallbacks =
-      <void Function(Object)>[];
-
-  /// All current call indexed by the call sid e.g
-  /// TwilioProgrammableVoice.getCalls[sid] 
-  static Map<String, CallEvent> _currentCallsEvent = {};
+  static CallEvent _currentCallEvent;
 
   /// Request microphone permission on the platform
   ///
@@ -38,18 +33,8 @@ class TwilioProgrammableVoice {
         'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
   }
 
-  /// Add a listener to call status
-  static void addCallStatusListener(void Function(Object) callback) {
-    onCallStatusCallbacks.add(callback);
-  }
-
-  /// Add a previously registered listener
-  static void removeCallStatusListener(void Function(Object) callback) {
-    onCallStatusCallbacks.remove(callback);
-  }
-
   /// Get the incoming calls stream
-  static Stream<dynamic> get callStatusStream {
+  static Stream<CallEvent> get callStatusStream {
     print("in STATUS_STREAM");
     CallEvent currentCallEvent;
 
@@ -94,8 +79,7 @@ class TwilioProgrammableVoice {
         default:
           break;
       }
-
-      TwilioProgrammableVoice._updateCalls(currentCallEvent);
+      TwilioProgrammableVoice._currentCallEvent= currentCallEvent;
       return currentCallEvent;
     });
   }
@@ -130,14 +114,5 @@ class TwilioProgrammableVoice {
     return version;
   }
 
-  static void _updateCalls(CallEvent currentCallEvent) {
-    // TODO remove currentCall when call isn't used e.g:
-    // if (callIsNowUnuse)
-    //   TwilioProgrammableVoice._calls.remove(currentCall);
-    if (currentCallEvent.sid != null) {
-      TwilioProgrammableVoice._currentCallsEvent[currentCallEvent.sid] = currentCallEvent;
-    }
-  }
-
-  static get getCalls => _currentCallsEvent;
+  static get getCall => _currentCallEvent;
 }
