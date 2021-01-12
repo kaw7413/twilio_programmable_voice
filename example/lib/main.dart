@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:callkeep/callkeep.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,7 +10,8 @@ import 'callkeep_functions.dart';
 import 'background_message_handler.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
-void main() {
+void main() async {
+  await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
@@ -26,6 +28,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> registerVoice() async {
     // Generate accessToken from backend.
     // http://localhost:3000/accessToken/test
+    print("ctrlF");
+    print(DotEnv().env['TOKEN_URL']);
     final tokenResponse = await Dio().get("http://host:3000/accessToken/testId"); // TODO testId should be a varaible
 
     print("[TOKEN RESPONSE DATA]");

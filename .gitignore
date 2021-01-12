@@ -6,5 +6,7 @@
 
 build/
 
+/example/assets/.env
+
 # Anoying
 .idea/*.xml
