@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'box_wrapper.dart';
 import 'events.dart';
 
 class TwilioProgrammableVoice {
@@ -9,9 +10,6 @@ class TwilioProgrammableVoice {
       const MethodChannel('twilio_programmable_voice');
   static final EventChannel _eventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
-
-  static List<void Function(Object)> onCallStatusCallbacks =
-      <void Function(Object)>[];
 
   static CallEvent _currentCallEvent;
 
@@ -36,18 +34,12 @@ class TwilioProgrammableVoice {
         'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
   }
 
-  /// Add a listener to call status
-  static void addCallStatusListener(void Function(Object) callback) {
-    onCallStatusCallbacks.add(callback);
-  }
-
-  /// Add a previously registered listener
-  static void removeCallStatusListener(void Function(Object) callback) {
-    onCallStatusCallbacks.remove(callback);
+  static Future<void> persistAccessToken(String accessToken) async {
+    await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.key, accessToken));
   }
 
   /// Get the incoming calls stream
-  static Stream<dynamic> get callStatusStream {
+  static Stream<CallEvent> get callStatusStream {
     print("in STATUS_STREAM");
     CallEvent currentCallEvent;
 

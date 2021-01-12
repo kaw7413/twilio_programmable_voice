@@ -2,9 +2,6 @@ abstract class CallEvent {
   String from;
   String to;
   String sid;
-  String state;
-  bool isMuted;
-  bool isOnHold;
 }
 
 class CallInvite extends CallEvent {
