@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> {
     if (accessTokenUrl == null) {
       throw ("ACCESS_TOKEN_URL is not defined in .env");
     }
+
     final tokenResponse = await Dio().get(accessTokenUrl);
     logger.d("[TOKEN RESPONSE DATA]", tokenResponse.data);
 
