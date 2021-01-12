@@ -12,6 +12,7 @@ class TwilioProgrammableVoice {
       const EventChannel("twilio_programmable_voice/call_status");
 
   static CallEvent _currentCallEvent;
+  static Function _accessTokenStrategy;
 
   /// Request microphone permission on the platform
   ///
@@ -29,12 +30,24 @@ class TwilioProgrammableVoice {
   /// Delegate the registration to Twilio and start listening to call status.
   ///
   /// Throws an error if fail, the error returned by the Twilio Voice.register.
-  static Future<void> registerVoice(String accessToken, String fcmToken) {
+  static Future<void> registerVoice(Function accessTokenStrategy, String fcmToken) async {
+    _accessTokenStrategy = accessTokenStrategy;
+    String accessToken = await _getAccessToken();
     return _methodChannel.invokeMethod(
         'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
   }
 
-  static Future<void> persistAccessToken(String accessToken) async {
+  static Future<String> _getAccessToken() async {
+    String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxWrapper.key));
+    if (accessToken == null) {
+      accessToken = _accessTokenStrategy();
+      _persistAccessToken(accessToken);
+    }
+
+    return accessToken;
+  }
+
+  static Future<void> _persistAccessToken(String accessToken) async {
     await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.key, accessToken));
   }
 
@@ -84,7 +97,7 @@ class TwilioProgrammableVoice {
         default:
           break;
       }
-      TwilioProgrammableVoice._currentCallEvent= currentCallEvent;
+      _currentCallEvent = currentCallEvent;
       return currentCallEvent;
     });
   }

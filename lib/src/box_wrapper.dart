@@ -12,7 +12,7 @@ class BoxWrapper {
       BoxWrapper._internal();
     }
 
-    await BoxWrapper.initializationDone;
+    await _initializationDone;
     return _instance;
   }
 
@@ -25,5 +25,5 @@ class BoxWrapper {
     _instance = await Hive.openBox(BoxWrapper.box);
   }
 
-  static Future get initializationDone => BoxWrapper._boxCreated;
+  static Future get _initializationDone => BoxWrapper._boxCreated;
 }

@@ -42,16 +42,17 @@ class _HomePageState extends State<HomePage> {
       throw ("ACCESS_TOKEN_URL is not defined in .env");
     }
 
-    final tokenResponse = await Dio().get(accessTokenUrl);
-    logger.d("[TOKEN RESPONSE DATA]", tokenResponse.data);
+    final accessTokenStrategy = () async {
+      String accessToken = await Dio().get(accessTokenUrl).then((token) => token.data);
+      return accessToken;
+    };
 
     // Get fcmToken.
     final fcmToken = await _firebaseMessaging.getToken();
     logger.d("[FCM TOKEN]", fcmToken);
 
-    TwilioProgrammableVoice.persistAccessToken(tokenResponse.data);
     // This must be called when the user is authorized to receive and make calls
-    TwilioProgrammableVoice.registerVoice(tokenResponse.data, fcmToken);
+    TwilioProgrammableVoice.registerVoice(accessTokenStrategy, fcmToken);
   }
 
   Future<void> checkDefaultPhoneAccount() async {
