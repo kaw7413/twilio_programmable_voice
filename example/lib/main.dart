@@ -6,83 +6,97 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logger/logger.dart';
 import 'callkeep_functions.dart';
 import 'background_message_handler.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
+final logger = Logger();
+
 void main() async {
+  // Change this to swap log levels
+  Logger.level = Level.verbose;
+
   await DotEnv().load('.env');
+
+  // TODO: Verify if it's still needed
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+
+  runApp(TwilioProgrammingVoiceExampleApp());
 }
 
-class MyHomePage extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<StatefulWidget> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final FlutterCallkeep _callKeep = FlutterCallkeep();
 
   Future<void> registerVoice() async {
-    // Generate accessToken from backend.
-    // http://localhost:3000/accessToken/test
-    print("ctrlF");
-    print(DotEnv().env['TOKEN_URL']);
-    final tokenResponse = await Dio().get("http://host:3000/accessToken/testId"); // TODO testId should be a varaible
+    // Generate accessToken from the /server application.
+    // You can edit the URL to whatever backend you're using to authorize users
+    final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
+    if (accessTokenUrl == null) {
+      throw ("ACCESS_TOKEN_URL is not defined in .env");
+    }
+    final tokenResponse = await Dio().get(accessTokenUrl);
+    logger.d("[TOKEN RESPONSE DATA]", tokenResponse.data);
 
-    print("[TOKEN RESPONSE DATA]");
-    print(tokenResponse.data);
     // Get fcmToken.
     final fcmToken = await _firebaseMessaging.getToken();
-    print("[FCM TOKEN]");
-    print(fcmToken);
+    logger.d("[FCM TOKEN]", fcmToken);
 
+    // This must be called when the user is authorized to receive and make calls
     TwilioProgrammableVoice.registerVoice(tokenResponse.data, fcmToken);
   }
 
-  Future<void> makeCall(String number) async {
-    print('[makeCall]');
-
-    final String callUUID = TwilioProgrammableVoice.getCall.sid;
+  Future<void> checkDefaultPhoneAccount() async {
+    logger.d('[checkDefaultPhoneAccount]');
     final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
 
     if (!hasPhoneAccount) {
+      logger.d("Doesn't have phone account, asking for permission");
       await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
         'alertTitle': 'Permissions required',
         'alertDescription':
-        'This application needs to access your phone accounts',
+            'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
       });
     }
-
-    print('[makeCall] $callUUID number: $number');
-
-    _callKeep.startCall(callUUID, number, "callerName");
   }
 
-  Future<void> displayIncomingCall(String number) async {
-    print('Display incoming call now');
+  Future<void> displayMakeCallScreen(
+      String targetNumber, String callerDisplayName) async {
+    logger.d('[makeCall]');
 
     final String callUUID = TwilioProgrammableVoice.getCall.sid;
-    final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+    await checkDefaultPhoneAccount();
 
-    if (!hasPhoneAccount) {
-      await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
-        'alertTitle': 'Permissions required',
-        'alertDescription':
-        'This application needs to access your phone accounts',
-        'cancelButton': 'Cancel',
-        'okButton': 'ok',
-      });
-    }
+    logger.d(
+        '[makeCall] uuid: $callUUID, number: $targetNumber, displayName: $callerDisplayName');
 
-    print('[displayIncomingCall] $callUUID number: $number');
+    // Display a start call screen
+    _callKeep.startCall(callUUID, targetNumber, callerDisplayName);
+  }
 
-    _callKeep.displayIncomingCall(callUUID, number,
-        handleType: 'number', hasVideo: false, localizedCallerName: "callerName");
+  Future<void> displayIncomingCallInvite(
+      String callerNumber, String callerDisplayName) async {
+    logger.d('[displayIncomingCallInvite]');
+
+    // TODO: review how getCall works to separate calls and call invites
+    final String callUUID = TwilioProgrammableVoice.getCall.sid;
+    await checkDefaultPhoneAccount();
+
+    logger.d(
+        '[displayIncomingCallInvite] uuid: $callUUID, number: $callerNumber, displayName: $callerDisplayName');
+
+    _callKeep.displayIncomingCall(callUUID, callerNumber,
+        handleType: 'number',
+        hasVideo: false,
+        localizedCallerName: callerDisplayName);
   }
 
   @override
@@ -92,144 +106,74 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
+        logger.d('[onFirebaseMessage]', message);
         // It's a real push notification
         if (message["notification"]["title"] != null) {}
 
         // It's a data
         if (message.containsKey("data") && message["data"] != null) {
           // It's a twilio data message
-          print("Message contains data");
+          logger.d("Message contains data", message["data"]);
           if (message["data"].containsKey("twi_message_type")) {
-            print("Message is a Twilio Message");
+            logger.d("Message is a Twilio Message");
 
             final dataMap = Map<String, String>.from(message["data"]);
 
             TwilioProgrammableVoice.handleMessage(dataMap);
-            print("handleMessage called in main.dart");
+            logger
+                .d("TwilioProgrammableVoice.handleMessage called in main.dart");
           }
         }
       },
       onBackgroundMessage: myBackgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
+        logger.d("onLaunch: $message");
       },
       onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
+        logger.d("onResume: $message");
       },
     );
 
-    TwilioProgrammableVoice.requestMicrophonePermissions().then(print);
-    TwilioProgrammableVoice.addCallStatusListener(print);
+    // TODO: maybe export this so it can be awaited
+    TwilioProgrammableVoice.requestMicrophonePermissions().then(logger.d);
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
-      print("RECEIVED EVENT :");
-      switch (event.runtimeType) {
-        case CallInvite:
-          print("CALL_INVITE: ");
-          print(event.to);
-          print(event.from);
-          print(event.sid);
-          SoundPoolManager.getInstance().playIncoming();
-          await displayIncomingCall(event.from);
-          await Future.delayed(Duration(seconds: 3));
-          final callResponse = await TwilioProgrammableVoice.answer();
-          print(callResponse);
-          break;
+      logger.d("[TwilioProgrammableVoice Event]");
 
-        case CancelledCallInvite:
-          print("CANCELLED_CALL_INVITE: ");
-          print(event.to);
-          print(event.from);
-          print(event.sid);
-          SoundPoolManager.getInstance().stopRinging();
-          SoundPoolManager.getInstance().playDisconnect();
-          break;
+      // TODO: make this readable
+      if (event is CallInvite) {
+        logger.d("CALL_INVITE", event);
+        SoundPoolManager.getInstance().playIncoming();
+        await displayIncomingCallInvite(event.from, "CallerDisplayName");
+      } else if (event is CancelledCallInvite) {
+        logger.d("CANCELLED_CALL_INVITE", event);
+        SoundPoolManager.getInstance().stopRinging();
+        SoundPoolManager.getInstance().playDisconnect();
+      } else if (event is CallConnectFailure) {
+        logger.d("CALL_CONNECT_FAILURE", event);
+        SoundPoolManager.getInstance().stopRinging();
+      } else if (event is CallRinging) {
+        logger.d("CALL_RINGING", event);
+        SoundPoolManager.getInstance().stopRinging();
+        // TwilioProgrammableVoice.getCall.to and TwilioProgrammableVoice.getCall.from are always null when making a call
+        // TODO replace brut phone number with TwilioProgrammableVoice.getCall.to
+        await displayMakeCallScreen("+33787934070", "Display Caller Name");
+      } else if (event is CallConnected) {
+        logger.d("CALL_CONNECTED", event);
+        SoundPoolManager.getInstance().stopRinging();
+      } else if (event is CallReconnecting) {
+        logger.d("CALL_RECONNECTING", event);
+      } else if (event is CallReconnected) {
+        logger.d("CALL_RECONNECTED", event);
+      } else if (event is CallDisconnected) {
+        logger.d("CALL_DISCONNECTED", event);
 
-        case CallConnectFailure:
-          print("CALL_CONNECT_FAILURE: ");
-          print(event.to);
-          print(event.from);
-          print(event.state);
-          print(event.sid);
-          print(event.isMuted.toString());
-          print(event.isOnHold.toString());
-          SoundPoolManager.getInstance().stopRinging();
-          break;
+        // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
+        SoundPoolManager.getInstance().playDisconnect();
 
-        case CallRinging:
-          print("CALL_RINGING: ");
-          print(event.to);
-          print(event.from);
-          print(event.state);
-          print(event.sid);
-          print(event.isMuted.toString());
-          print(event.isOnHold.toString());
-          // TwilioProgrammableVoice.getCall.to and TwilioProgrammableVoice.getCall.from are always null when making a call
-          // TODO replace brut phone number with TwilioProgrammableVoice.getCall.to
-          await makeCall("+33787934070");
-          if (event.from == "+33644645795") {
-            SoundPoolManager.getInstance().playOutgoing();
-          }
-          break;
-
-        case CallConnected:
-          print("CALL_CONNECTED: ");
-          print(event.to);
-          print(event.from);
-          print(event.state);
-          print(event.sid);
-          print(event.isMuted.toString());
-          print(event.isOnHold.toString());
-          SoundPoolManager.getInstance().stopRinging();
-          break;
-
-        case CallReconnecting:
-          print("CALL_RECONNECTING: ");
-          print(event.to);
-          print(event.from);
-          print(event.state);
-          print(event.sid);
-          print(event.isMuted.toString());
-          print(event.isOnHold.toString());
-          break;
-
-        case CallReconnected:
-          print("CALL_RECONNECTED: ");
-          print(event.to);
-          print(event.from);
-          print(event.state);
-          print(event.sid);
-          print(event.isMuted.toString());
-          print(event.isOnHold.toString());
-          break;
-
-        case CallDisconnected:
-          print("CALL_DISCONNECTED: ");
-          print(event.to);
-          print(event.from);
-          print(event.state);
-          print(event.sid);
-          print(event.isMuted.toString());
-          print(event.isOnHold.toString());
-          // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
-          SoundPoolManager.getInstance().playDisconnect();
-
-          // @TODO: only end the current active call
-          _callKeep.endAllCalls();
-          break;
-
-        case CallQualityWarningChanged:
-          print("CALL_QUALITY_WARNING_CHANGED: ");
-          print(event.to);
-          print(event.from);
-          print(event.state);
-          print(event.sid);
-          print(event.isMuted.toString());
-          print(event.isOnHold.toString());
-          break;
-
-        default:
-          break;
+        // @TODO: only end the current active call
+        _callKeep.endAllCalls();
+      } else if (event is CallQualityWarningChanged) {
+        logger.d("CALL_QUALITY_WARNING_CHANGED", event);
       }
     });
 
@@ -257,13 +201,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class MyApp extends StatelessWidget {
+class TwilioProgrammingVoiceExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Welcome to Flutter',
+      title: 'Twilio Programming Voice Example',
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
+      home: HomePage(),
     );
   }
 }

@@ -8,5 +8,6 @@ build/
 
 /example/assets/.env
 
-# Anoying
-.idea/*.xml
+example/.env
+
+.idea/

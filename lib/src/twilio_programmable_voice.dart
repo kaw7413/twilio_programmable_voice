@@ -10,9 +10,6 @@ class TwilioProgrammableVoice {
   static final EventChannel _eventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
 
-  static List<void Function(Object)> onCallStatusCallbacks =
-      <void Function(Object)>[];
-
   static CallEvent _currentCallEvent;
 
   /// Request microphone permission on the platform
@@ -36,18 +33,8 @@ class TwilioProgrammableVoice {
         'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
   }
 
-  /// Add a listener to call status
-  static void addCallStatusListener(void Function(Object) callback) {
-    onCallStatusCallbacks.add(callback);
-  }
-
-  /// Add a previously registered listener
-  static void removeCallStatusListener(void Function(Object) callback) {
-    onCallStatusCallbacks.remove(callback);
-  }
-
   /// Get the incoming calls stream
-  static Stream<dynamic> get callStatusStream {
+  static Stream<CallEvent> get callStatusStream {
     print("in STATUS_STREAM");
     CallEvent currentCallEvent;
 

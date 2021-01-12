@@ -2,9 +2,6 @@ abstract class CallEvent {
   String from;
   String to;
   String sid;
-  String state;
-  bool isMuted;
-  bool isOnHold;
 }
 
 class CallInvite extends CallEvent {
@@ -13,7 +10,7 @@ class CallInvite extends CallEvent {
   String sid;
 
   CallInvite();
-  CallInvite.from(Map<dynamic, dynamic> data)
+  CallInvite.from(Map<String, dynamic> data)
     : from = data['from'] as String,
       to = data['to'] as String,
       sid = data['callSid'] as String;
@@ -25,7 +22,7 @@ class CancelledCallInvite extends CallEvent {
   String sid;
 
   CancelledCallInvite();
-  CancelledCallInvite.from(Map<dynamic, dynamic> data)
+  CancelledCallInvite.from(Map<String, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['callSid'] as String;
@@ -40,7 +37,7 @@ class CallConnectFailure extends CallEvent {
   bool isOnHold;
 
   CallConnectFailure();
-  CallConnectFailure.from(Map<dynamic, dynamic> data)
+  CallConnectFailure.from(Map<String, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
@@ -58,7 +55,7 @@ class CallRinging extends CallEvent {
   bool isOnHold;
 
   CallRinging();
-  CallRinging.from(Map<dynamic, dynamic> data)
+  CallRinging.from(Map<String, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
@@ -76,7 +73,7 @@ class CallConnected extends CallEvent {
   bool isOnHold;
 
   CallConnected();
-  CallConnected.from(Map<dynamic, dynamic> data)
+  CallConnected.from(Map<String, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
@@ -94,7 +91,7 @@ class CallReconnecting extends CallEvent {
   bool isOnHold;
 
   CallReconnecting();
-  CallReconnecting.from(Map<dynamic, dynamic> data)
+  CallReconnecting.from(Map<String, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
@@ -112,7 +109,7 @@ class CallReconnected extends CallEvent {
   bool isOnHold;
 
   CallReconnected();
-  CallReconnected.from(Map<dynamic, dynamic> data)
+  CallReconnected.from(Map<String, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
@@ -130,7 +127,7 @@ class CallDisconnected extends CallEvent {
   bool isOnHold;
 
   CallDisconnected();
-  CallDisconnected.from(Map<dynamic, dynamic> data)
+  CallDisconnected.from(Map<String, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
@@ -148,7 +145,7 @@ class CallQualityWarningChanged extends CallEvent {
   bool isOnHold;
 
   CallQualityWarningChanged();
-  CallQualityWarningChanged.from(Map<dynamic, dynamic> data)
+  CallQualityWarningChanged.from(Map<String, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,

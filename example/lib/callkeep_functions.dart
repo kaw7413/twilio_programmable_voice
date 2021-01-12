@@ -9,10 +9,10 @@ FlutterCallkeep _callKeep;
 Future<void> initCallKeep(FlutterCallkeep callKeep) async {
   _callKeep = callKeep;
   _callKeep.on(CallKeepDidDisplayIncomingCall(), didDisplayIncomingCall);
-  _callKeep.on(CallKeepPerformAnswerCallAction(), answerCall); // TODO pass _callKeep to answserCall function
+  _callKeep.on(CallKeepPerformAnswerCallAction(), answerCall);
   _callKeep.on(CallKeepDidPerformDTMFAction(), didPerformDTMFAction);
   _callKeep.on(
-      CallKeepDidReceiveStartCallAction(), didReceiveStartCallAction); // TODO pass _callKeep
+      CallKeepDidReceiveStartCallAction(), didReceiveStartCallAction);
   _callKeep.on(CallKeepDidToggleHoldAction(), didToggleHoldCallAction);
   _callKeep.on(
       CallKeepDidPerformSetMutedCallAction(), didPerformSetMutedCallAction);
