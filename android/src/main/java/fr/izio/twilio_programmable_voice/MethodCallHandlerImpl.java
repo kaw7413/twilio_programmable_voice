@@ -31,23 +31,24 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         Log.d(TAG, "onMethodCall " + call.method);
-        if (call.method == "registerVoice") {
+        if (call.method.equals("registerVoice")) {
             final String accessToken = call.argument("accessToken");
             final String fcmToken = call.argument("fcmToken");
             this.registerVoice(accessToken, fcmToken, result);
-        } else if (call.method == "handleMessage") {
+        } else if (call.method.equals("handleMessage")) {
             final Map<String, String> data = call.argument("messageData");
             this.handleMessage(data, result);
-        } else if (call.method == "makeCall") {
+        } else if (call.method.equals("makeCall")) {
             final String from = call.argument("from");
             final String to = call.argument("to");
             final String accessToken = call.argument("accessToken");
             this.makeCall(from, to, accessToken, result);
-        } else if (call.method == "answer") {
+        } else if (call.method.equals("answer")) {
             this.answer(result);
-        } else if (call.method == "reject") {
+        } else if (call.method.equals("reject")) {
             this.reject(result);
         } else {
+            Log.d(TAG, "DEFAULT");
             result.notImplemented();
         }
     }
