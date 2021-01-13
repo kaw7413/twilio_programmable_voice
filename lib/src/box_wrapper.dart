@@ -4,8 +4,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 class BoxWrapper {
   static Future _boxCreated;
   static Box _instance;
-  static final box = "accessTokenBox";
-  static final key = "accessToken";
+  static const BOX = "accessTokenBox";
+  static const KEY = "accessToken";
 
   static Future<Box> getInstance() async {
     if (_instance == null) {
@@ -22,7 +22,7 @@ class BoxWrapper {
 
   _createBox() async {
     await Hive.initFlutter();
-    _instance = await Hive.openBox(BoxWrapper.box);
+    _instance = await Hive.openBox(BoxWrapper.BOX);
   }
 
   static Future get _initializationDone => BoxWrapper._boxCreated;

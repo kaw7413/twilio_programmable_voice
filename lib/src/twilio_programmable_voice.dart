@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'box_wrapper.dart';
+import 'workmanager_wrapper.dart';
 import 'events.dart';
 
 class TwilioProgrammableVoice {
+  static const String ACCESS_TOKEN_STRATEGY_NULL = "Access Token Strategy is null, you need to pass a function to the registerVoice function";
   static final MethodChannel _methodChannel =
       const MethodChannel('twilio_programmable_voice');
   static final EventChannel _callStatusEventChannel =
@@ -32,16 +34,19 @@ class TwilioProgrammableVoice {
   /// Delegate the registration to Twilio and start listening to call status.
   ///
   /// Throws an error if fail, the error returned by the Twilio Voice.register.
-  static Future<void> registerVoice(Function accessTokenStrategy, String fcmToken) async {
-    _accessTokenStrategy = accessTokenStrategy;
+  static Future<void> registerVoice(
+      Function accessTokenStrategy, String fcmToken) async {
+    _setAccessTokenStrategy(accessTokenStrategy);
+
     String accessToken = await _getAccessToken();
 
     _twilioRegistrationEventChannel.receiveBroadcastStream().where((data) => data is bool).forEach((isRegistrationValid) async {
       if (!isRegistrationValid) {
-        await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.key, null));
+        await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.KEY, null));
         accessToken = await _getAccessToken();
       }
 
+      WorkmanagerWrapper.launchInBg(accessToken);
       _persistAccessToken(accessToken);
     });
 
@@ -50,16 +55,16 @@ class TwilioProgrammableVoice {
   }
 
   static Future<String> _getAccessToken() async {
-    String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxWrapper.key));
+    String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxWrapper.KEY));
     if (accessToken == null) {
-      accessToken = await _accessTokenStrategy();
+        accessToken = await _accessTokenStrategy();
     }
 
     return accessToken;
   }
 
   static Future<void> _persistAccessToken(String accessToken) async {
-    await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.key, accessToken));
+    await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.KEY, accessToken));
   }
 
   /// Get the twilio registration stream
@@ -152,5 +157,15 @@ class TwilioProgrammableVoice {
     return false;
   }
 
+  static void _setAccessTokenStrategy(Function accessTokenStrategy) {
+    if (accessTokenStrategy != null) {
+      _accessTokenStrategy = accessTokenStrategy;
+    } else if (_accessTokenStrategy == null) {
+      throw Exception(TwilioProgrammableVoice.ACCESS_TOKEN_STRATEGY_NULL);
+    }
+  }
+
   static get getCall => _currentCallEvent;
+
+  static Function get getAccessTokenStrategy => _accessTokenStrategy;
 }
