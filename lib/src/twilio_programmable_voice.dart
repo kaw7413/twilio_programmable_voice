@@ -8,8 +8,10 @@ import 'events.dart';
 class TwilioProgrammableVoice {
   static final MethodChannel _methodChannel =
       const MethodChannel('twilio_programmable_voice');
-  static final EventChannel _eventChannel =
+  static final EventChannel _callStatusEventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
+  static final EventChannel _twilioRegistrationEventChannel =
+      const EventChannel("twilio_programmable_voice/twilio_registration");
 
   static CallEvent _currentCallEvent;
   static Function _accessTokenStrategy;
@@ -33,6 +35,7 @@ class TwilioProgrammableVoice {
   static Future<void> registerVoice(Function accessTokenStrategy, String fcmToken) async {
     _accessTokenStrategy = accessTokenStrategy;
     String accessToken = await _getAccessToken();
+
     return _methodChannel.invokeMethod(
         'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
   }
@@ -40,7 +43,7 @@ class TwilioProgrammableVoice {
   static Future<String> _getAccessToken() async {
     String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxWrapper.key));
     if (accessToken == null) {
-      accessToken = _accessTokenStrategy();
+      accessToken = await _accessTokenStrategy();
       _persistAccessToken(accessToken);
     }
 
@@ -51,12 +54,20 @@ class TwilioProgrammableVoice {
     await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.key, accessToken));
   }
 
+  static Stream<dynamic> get twilioRegistrationStream {
+    // TODO check if data is boolean
+    return _twilioRegistrationEventChannel.receiveBroadcastStream().map((data) {
+      print("[TwilioProgrammableVoice] in receiveBroadcastStream");
+      print(data);
+      return data;
+    });
+  }
+
   /// Get the incoming calls stream
   static Stream<CallEvent> get callStatusStream {
-    print("in STATUS_STREAM");
     CallEvent currentCallEvent;
 
-    return _eventChannel.receiveBroadcastStream().map((data) {
+    return _callStatusEventChannel.receiveBroadcastStream().where((data) => _containsCall(data['type'])).map((data) {
       switch (data['type']) {
         case 'CallInvite':
           currentCallEvent = CallInvite.from(data);
@@ -125,11 +136,11 @@ class TwilioProgrammableVoice {
     return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to});
   }
 
-  // Platform specifics
-  static Future<String> get platformVersion async {
-    final String version =
-        await _methodChannel.invokeMethod('getPlatformVersion');
-    return version;
+  static bool _containsCall(dynamic value) {
+    if (value is String) {
+      return value.contains("Call");
+    }
+    return false;
   }
 
   static get getCall => _currentCallEvent;

@@ -62,10 +62,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
                 this.reject(result);
                 break;
 
-            case "getPlatformVersion":
-                this.getPlatformVersion(result);
-                break;
-
             default:
                 result.notImplemented();
                 break;
@@ -155,12 +151,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         //TODO remove this line when access token is persistent
         this.accessToken = accessToken;
         Voice.register(accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener(result));
-    }
-
-    private void getPlatformVersion(MethodChannel.Result result) {
-        final String platformVersion = "Android " + android.os.Build.VERSION.RELEASE;
-
-        result.success(platformVersion);
     }
 
     private RegistrationListener registrationListener(MethodChannel.Result result) {
