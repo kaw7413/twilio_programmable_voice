@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
         // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
         SoundPoolManager.getInstance().playDisconnect();
 
-        // @TODO: only end the current active call
+        // TODO: only end the current active call
         _callKeep.endAllCalls();
       } else if (event is CallQualityWarningChanged) {
         logger.d("CALL_QUALITY_WARNING_CHANGED", event);

@@ -36,6 +36,15 @@ class TwilioProgrammableVoice {
     _accessTokenStrategy = accessTokenStrategy;
     String accessToken = await _getAccessToken();
 
+    _twilioRegistrationEventChannel.receiveBroadcastStream().where((data) => data is bool).forEach((isRegistrationValid) async {
+      if (!isRegistrationValid) {
+        await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.key, null));
+        accessToken = await _getAccessToken();
+      }
+
+      _persistAccessToken(accessToken);
+    });
+
     return _methodChannel.invokeMethod(
         'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
   }
@@ -44,7 +53,6 @@ class TwilioProgrammableVoice {
     String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxWrapper.key));
     if (accessToken == null) {
       accessToken = await _accessTokenStrategy();
-      _persistAccessToken(accessToken);
     }
 
     return accessToken;
@@ -54,12 +62,12 @@ class TwilioProgrammableVoice {
     await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.key, accessToken));
   }
 
-  static Stream<dynamic> get twilioRegistrationStream {
-    // TODO check if data is boolean
-    return _twilioRegistrationEventChannel.receiveBroadcastStream().map((data) {
-      print("[TwilioProgrammableVoice] in receiveBroadcastStream");
-      print(data);
-      return data;
+  /// Get the twilio registration stream
+  // TODO make this work
+  // can't map ?
+  static Stream<bool> get twilioRegistrationStream {
+    return _twilioRegistrationEventChannel.receiveBroadcastStream().where((data) => data is bool).map((isRegistrationValid) {
+      return isRegistrationValid;
     });
   }
 
@@ -132,8 +140,9 @@ class TwilioProgrammableVoice {
   ///
   /// [from] this device identity (or number)
   /// [to] the target identity (or number)
-  static Future<bool> makeCall({String from, String to}) {
-    return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to});
+  static Future<bool> makeCall({String from, String to}) async {
+    String accessToken = await _getAccessToken();
+    return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to, "accessToken": accessToken});
   }
 
   static bool _containsCall(dynamic value) {

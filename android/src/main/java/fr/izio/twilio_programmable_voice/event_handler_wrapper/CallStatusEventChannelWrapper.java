@@ -45,7 +45,7 @@ public class CallStatusEventChannelWrapper extends BaseEventChannelWrapper {
         }
     }
 
-    public void sendCallReconnecting(HashMap<String, Object> sendCallReconnecting) {
+    public void sendCallReconnecting(HashMap<String, Object> callReconnecting) {
         Log.d("[CallEventHandler]", "sendSuccess called");
         if (isEventSinkHydrated(callReconnecting)) {
             eventSink.success(callReconnecting);

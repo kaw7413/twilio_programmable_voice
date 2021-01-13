@@ -22,8 +22,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
     final String TAG = "[TwilioProgrammableVoice - MethodCallHandlerImpl]";
 
-    // TODO make this persistent and remove class attribute
-    private String accessToken;
     public TwilioProgrammableVoice twilioProgrammableVoice;
 
     public MethodCallHandlerImpl(TwilioProgrammableVoice twilioProgrammableVoice) {
@@ -33,38 +31,24 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         Log.d(TAG, "onMethodCall " + call.method);
-        switch (call.method) {
-            case "registerVoice":
-                final String accessToken = call.argument("accessToken");
-                final String fcmToken = call.argument("fcmToken");
-
-                this.registerVoice(accessToken, fcmToken, result);
-                break;
-
-            case "handleMessage":
-                final Map<String, String> data = call.argument("messageData");
-
-                this.handleMessage(data, result);
-                break;
-
-            case "makeCall":
-                final String from = call.argument("from");
-                final String to = call.argument("to");
-
-                this.makeCall(from, to, result);
-                break;
-
-            case "answer":
-                this.answer(result);
-                break;
-
-            case "reject":
-                this.reject(result);
-                break;
-
-            default:
-                result.notImplemented();
-                break;
+        if (call.method == "registerVoice") {
+            final String accessToken = call.argument("accessToken");
+            final String fcmToken = call.argument("fcmToken");
+            this.registerVoice(accessToken, fcmToken, result);
+        } else if (call.method == "handleMessage") {
+            final Map<String, String> data = call.argument("messageData");
+            this.handleMessage(data, result);
+        } else if (call.method == "makeCall") {
+            final String from = call.argument("from");
+            final String to = call.argument("to");
+            final String accessToken = call.argument("accessToken");
+            this.makeCall(from, to, accessToken, result);
+        } else if (call.method == "answer") {
+            this.answer(result);
+        } else if (call.method == "reject") {
+            this.reject(result);
+        } else {
+            result.notImplemented();
         }
     }
 
@@ -115,7 +99,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         result.success(true);
     }
 
-    private void makeCall(String from, String to, MethodChannel.Result result) {
+    private void makeCall(String from, String to, String accessToken, MethodChannel.Result result) {
         Log.d(TAG, "makeCall");
 
         Map<String, String> params = new HashMap<>();
@@ -148,8 +132,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             return;
         }
 
-        //TODO remove this line when access token is persistent
-        this.accessToken = accessToken;
         Voice.register(accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener(result));
     }
 
@@ -158,12 +140,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             @Override
             public void onRegistered(@NonNull String accessToken, @NonNull String fcmToken) {
                 Log.d(TAG, "Successfully registered FCM " + fcmToken);
-
-                // @TODO: probably call this when a call is accepted ?
-                // Bind call listener to the application context.
-                // Voice.connect(twilioProgrammableVoice.getActivity().getApplicationContext(), accessToken, callListener());
-
-                // Maybe return the token that got registered ?
+                twilioProgrammableVoice.handleTwilioRegistrationSuccess();
                 result.success(null);
             }
 
@@ -177,6 +154,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
                         error.getErrorCode(),
                         error.getMessage());
 
+                twilioProgrammableVoice.handleTwilioRegistrationFailure();
                 result.error("REGISTRATION_ERROR", message, error);
             }
         };

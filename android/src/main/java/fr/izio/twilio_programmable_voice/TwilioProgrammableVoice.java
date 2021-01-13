@@ -2,6 +2,7 @@ package fr.izio.twilio_programmable_voice;
 
 import android.app.Activity;
 import android.content.IntentFilter;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -197,5 +198,13 @@ public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
 
     public void setCurrentCall(Call currentCall) {
         this.currentCall = currentCall;
+    }
+
+    public void handleTwilioRegistrationSuccess() {
+        twilioRegistrationEventChannelWrapper.sendSuccess();
+    }
+
+    public void handleTwilioRegistrationFailure() {
+        twilioRegistrationEventChannelWrapper.sendFailure();
     }
 }
