@@ -2,7 +2,6 @@ package fr.izio.twilio_programmable_voice;
 
 import android.app.Activity;
 import android.content.IntentFilter;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,23 +16,16 @@ import java.util.HashMap;
 import java.util.Set;
 
 import fr.izio.twilio_programmable_voice.event_handler_wrapper.CallStatusEventChannelWrapper;
-import fr.izio.twilio_programmable_voice.event_handler_wrapper.TwilioRegistrationEventChannelWrapper;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
 
 public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
-    private static final String TAG = "TwilioProgrammableVoice";
-
     private Activity activity;
     public VoiceBroadcastReceiver voiceBroadcastReceiver;
     private MethodChannel channel;
-
     private CallInvite currentCallInvite;
-    private CancelledCallInvite currentCancelledCallInvite;
     private Call currentCall;
-
     private CallStatusEventChannelWrapper callStatusEventChannelWrapper;
-    private TwilioRegistrationEventChannelWrapper twilioRegistrationEventChannelWrapper;
 
     private static final String CALL_INVITE = "CallInvite";
     private static final String CANCELLED_CALL_INVITE = "CancelledCallInvite";
@@ -67,7 +59,6 @@ public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
     }
 
     public void setCurrentCancelledCallInvite(CancelledCallInvite currentCancelledCallInvite) {
-        this.currentCancelledCallInvite = currentCancelledCallInvite;
         callStatusEventChannelWrapper.sendCancelledCallInvite(getCancelledCallInvite(currentCancelledCallInvite));
     }
 
@@ -135,28 +126,12 @@ public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
         this.channel = channel;
     }
 
-    public MethodChannel getChannel() {
-        return this.channel;
-    }
-
-    public CallStatusEventChannelWrapper getCallStatusEventChannel() {
-        return callStatusEventChannelWrapper;
-    }
-
     public void setCallStatusEventChannelWrapper(EventChannel callStatusEventChannel) {
         this.callStatusEventChannelWrapper = new CallStatusEventChannelWrapper(callStatusEventChannel);
     }
 
-    public void setTwilioRegistrationEventChannelWrapper(EventChannel twilioRegistrationEventChannel) {
-        this.twilioRegistrationEventChannelWrapper = new TwilioRegistrationEventChannelWrapper(twilioRegistrationEventChannel);
-    }
-
     public CallInvite getCurrentCallInvite() {
         return currentCallInvite;
-    }
-
-    public CancelledCallInvite getCurrentCancelledCallInvite() {
-        return currentCancelledCallInvite;
     }
 
     private HashMap<String, String> getCallInvitePayload(CallInvite callInvite) {
@@ -198,13 +173,5 @@ public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
 
     public void setCurrentCall(Call currentCall) {
         this.currentCall = currentCall;
-    }
-
-    public void handleTwilioRegistrationSuccess() {
-        twilioRegistrationEventChannelWrapper.sendSuccess();
-    }
-
-    public void handleTwilioRegistrationFailure() {
-        twilioRegistrationEventChannelWrapper.sendFailure();
     }
 }

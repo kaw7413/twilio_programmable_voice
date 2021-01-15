@@ -1,13 +1,15 @@
 import 'package:callkeep/callkeep.dart';
-import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
+
 import 'utils/callkeep_config.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 final FlutterCallkeep _callKeep = FlutterCallkeep();
 bool _callKeepInited = false;
 
 Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
+  await DotEnv().load('.env');
+  final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
   // It's a data
   if (message.containsKey("data") && message["data"] != null) {
     // It's a twilio data message
@@ -26,18 +28,10 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
             _callKeep.startCall(event.callUUID, TwilioProgrammableVoice.getCall.from, "callerName");
             // Generate accessToken from backend.
             // http://localhost:3000/accessToken/test
-            final tokenResponse =
-            await Dio().get("http://host:3000/accessToken/testId");
 
-            print("[TOKEN RESPONSE DATA]");
-            print(tokenResponse.data);
-            // Get fcmToken.
-            final fcmToken = await FirebaseMessaging().getToken();
-            print("[FCM TOKEN]");
-            print(fcmToken);
 
-            await TwilioProgrammableVoice.registerVoice(
-                tokenResponse.data, fcmToken);
+
+            await TwilioProgrammableVoice.setUp(accessTokenUrl);
             await TwilioProgrammableVoice.handleMessage(dataMap);
             await TwilioProgrammableVoice.answer();
 
@@ -49,19 +43,7 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
             print(
                 'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
 
-            // Generate accessToken from backend.
-            // http://localhost:3000/accessToken/test
-            final tokenResponse =
-            await Dio().get("http://host:3000/accessToken/testId");
-
-            print("[TOKEN RESPONSE DATA]");
-            print(tokenResponse.data);
-            // Get fcmToken.
-            final fcmToken = await FirebaseMessaging().getToken();
-            print("[FCM TOKEN]");
-            print(fcmToken);
-
-            await TwilioProgrammableVoice.registerVoice(tokenResponse.data, fcmToken);
+            await TwilioProgrammableVoice.setUp(accessTokenUrl);
             await TwilioProgrammableVoice.handleMessage(dataMap);
             await TwilioProgrammableVoice.reject();
           });

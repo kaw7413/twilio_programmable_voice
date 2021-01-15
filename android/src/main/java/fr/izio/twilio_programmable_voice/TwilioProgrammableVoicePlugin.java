@@ -17,8 +17,6 @@ import io.flutter.plugin.common.MethodChannel;
 public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAware {
     private final LogLevel voiceLogLevel = LogLevel.ERROR;
     final String CALL_STATUS_EVENT_CHANNEL_NAME = "twilio_programmable_voice/call_status";
-    final String TWILIO_REGISTRATION_EVENT_CHANNEL_NAME = "twilio_programmable_voice/twilio_registration";
-
 
     private MethodChannel channel;
     private final TwilioProgrammableVoice twilioProgrammableVoice = new TwilioProgrammableVoice();
@@ -29,7 +27,6 @@ public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAwa
         channel.setMethodCallHandler(new MethodCallHandlerImpl(twilioProgrammableVoice));
         twilioProgrammableVoice.setChannel(channel);
         twilioProgrammableVoice.setCallStatusEventChannelWrapper(new EventChannel(flutterPluginBinding.getBinaryMessenger(), CALL_STATUS_EVENT_CHANNEL_NAME));
-        twilioProgrammableVoice.setTwilioRegistrationEventChannelWrapper(new EventChannel(flutterPluginBinding.getBinaryMessenger(), TWILIO_REGISTRATION_EVENT_CHANNEL_NAME));
         Voice.setLogLevel(voiceLogLevel);
     }
 

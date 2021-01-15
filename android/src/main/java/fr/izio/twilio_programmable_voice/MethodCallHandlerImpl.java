@@ -141,22 +141,17 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             @Override
             public void onRegistered(@NonNull String accessToken, @NonNull String fcmToken) {
                 Log.d(TAG, "Successfully registered FCM " + fcmToken);
-                twilioProgrammableVoice.handleTwilioRegistrationSuccess();
-                result.success(null);
+                // Return this in MethodChannel
+                result.success(true);
             }
 
             @Override
             public void onError(@NonNull RegistrationException error,
                                 @NonNull String accessToken,
                                 @NonNull String fcmToken) {
-                String message = String.format(
-                        Locale.US,
-                        "Registration Error: %d, %s",
-                        error.getErrorCode(),
-                        error.getMessage());
-
-                twilioProgrammableVoice.handleTwilioRegistrationFailure();
-                result.error("REGISTRATION_ERROR", message, error);
+                Log.d(TAG, "Error while registering " + error.getMessage());
+                // this looks weird but we need to return a bool to Dart code a let it handle the failure
+                result.success(false);
             }
         };
     }
