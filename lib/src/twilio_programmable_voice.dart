@@ -1,19 +1,97 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
+import 'package:workmanager/workmanager.dart';
+
+import 'box_wrapper.dart';
+import 'callback_dispatcher.dart';
 import 'events.dart';
 
 class TwilioProgrammableVoice {
+  static const ACCESS_TOKEN_URL_IS_NULL = "You must provide a valid accessTokenUrl, null was provided";
+  static const BG_UNIQUE_NAME = "registrationJob";
+  static const BG_TASK_NAME = "twilio-registration";
+  static const BG_TAG = "registration";
+  static const BG_URL_DATA_KEY = "accessTokenUrl";
+  static const Duration SAFETY_DURATION = Duration(seconds: 15);
   static final MethodChannel _methodChannel =
       const MethodChannel('twilio_programmable_voice');
-  static final EventChannel _eventChannel =
+  static final EventChannel _callStatusEventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
 
-  static List<void Function(Object)> onCallStatusCallbacks =
-      <void Function(Object)>[];
-
   static CallEvent _currentCallEvent;
+  static String _accessTokenUrl;
+
+  /// Must be the first function you call in the TwilioProgrammableVoice package
+  ///
+  /// This function will store the accessTokenUrl inside the class,
+  /// init the background registration strategy and call registerVoice method
+  static Future<bool> setUp(String accessTokenUrl) async{
+    _setAccessTokenUrl(accessTokenUrl);
+    _setUpWorkmanager(accessTokenUrl);
+    final bool isRegistrationValid = await registerVoice(accessTokenUrl);
+    return isRegistrationValid;
+  }
+
+  /// Delegate the registration to Twilio and start listening to call status.
+  /// You must call setUp method before because it will initialise the
+  /// background registration strategy and store the accessTokenUrl inside
+  /// the class
+  ///
+  /// Throws an error if fail, the error returned by the Twilio Voice.register.
+  ///
+  /// Returns a bool value representing the registration status
+  ///
+  /// [accessTokenUrl] an url which returns a valid accessToken when access
+  /// by HTTP GET method
+  // we can't make this function private because it's use by the callBackDispatcher function
+  static Future<bool> registerVoice(String accessTokenUrl) async {
+    String accessToken = await _getAccessToken(accessTokenUrl);
+    String fcmToken = await _getFcmToken();
+
+    final bool isRegistrationValid = await _methodChannel.invokeMethod(
+        'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
+
+    if (!isRegistrationValid) {
+      await BoxWrapper.getInstance().then((box) => box.delete(BoxWrapper.KEY));
+      registerVoice(accessTokenUrl);
+    }
+
+    _persistAccessToken(accessToken);
+
+    launchJobInBg(accessTokenUrl, accessToken);
+
+    return isRegistrationValid;
+  }
+
+  /// Make a call
+  ///
+  /// [from] this device identity (or number)
+  /// [to] the target identity (or number)
+  static Future<bool> makeCall({String from, String to}) async {
+    String accessToken = await _getAccessToken(_accessTokenUrl);
+    return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to, "accessToken": accessToken});
+  }
+
+  /// Answer the current call invite
+  static Future<String> answer() {
+    return _methodChannel.invokeMethod('answer');
+  }
+
+  /// Handle Fcm Message and delegate to Twilio
+  static Future<bool> handleMessage(Map<String, String> data) {
+    return _methodChannel.invokeMethod('handleMessage', {"messageData": data});
+  }
+
+  /// Reject the current call invite
+  static Future<void> reject() {
+    return _methodChannel.invokeMethod('reject');
+  }
 
   /// Request microphone permission on the platform
   ///
@@ -28,30 +106,11 @@ class TwilioProgrammableVoice {
     return microphonePermissionStatus;
   }
 
-  /// Delegate the registration to Twilio and start listening to call status.
-  ///
-  /// Throws an error if fail, the error returned by the Twilio Voice.register.
-  static Future<void> registerVoice(String accessToken, String fcmToken) {
-    return _methodChannel.invokeMethod(
-        'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
-  }
-
-  /// Add a listener to call status
-  static void addCallStatusListener(void Function(Object) callback) {
-    onCallStatusCallbacks.add(callback);
-  }
-
-  /// Add a previously registered listener
-  static void removeCallStatusListener(void Function(Object) callback) {
-    onCallStatusCallbacks.remove(callback);
-  }
-
   /// Get the incoming calls stream
-  static Stream<dynamic> get callStatusStream {
-    print("in STATUS_STREAM");
+  static Stream<CallEvent> get callStatusStream {
     CallEvent currentCallEvent;
 
-    return _eventChannel.receiveBroadcastStream().map((data) {
+    return _callStatusEventChannel.receiveBroadcastStream().where((data) => _containsCall(data['type'])).map((data) {
       switch (data['type']) {
         case 'CallInvite':
           currentCallEvent = CallInvite.from(data);
@@ -92,40 +151,86 @@ class TwilioProgrammableVoice {
         default:
           break;
       }
-      TwilioProgrammableVoice._currentCallEvent= currentCallEvent;
+
+      _currentCallEvent = currentCallEvent;
       return currentCallEvent;
     });
   }
 
-  /// Answer the current call invite
-  static Future<String> answer() {
-    return _methodChannel.invokeMethod('answer');
+  static Future<String> _getAccessToken(String accessTokenUrl) async {
+    String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxWrapper.KEY)).catchError(print);
+
+    if (accessToken == null && accessTokenUrl != null) {
+      accessToken = await _accessTokenStrategy(accessTokenUrl);
+    } else if (accessTokenUrl == null) {
+      throw Exception(ACCESS_TOKEN_URL_IS_NULL);
+    }
+
+    return accessToken;
   }
 
-  /// Handle Fcm Message and delegate to Twilio
-  static Future<bool> handleMessage(Map<String, String> data) {
-    return _methodChannel.invokeMethod('handleMessage', {"messageData": data});
+  static Future<String> _accessTokenStrategy(String url) async {
+    final tokenResponse =
+    await Dio().get(url);
+    return tokenResponse.data;
   }
 
-  /// Reject the current call invite
-  static Future<void> reject() {
-    return _methodChannel.invokeMethod('reject');
+  static Future<void> _persistAccessToken(String accessToken) async {
+    await BoxWrapper.getInstance().then((box) => box.put(BoxWrapper.KEY, accessToken));
   }
 
-  /// Make a call
-  ///
-  /// [from] this device identity (or number)
-  /// [to] the target identity (or number)
-  static Future<bool> makeCall({String from, String to}) {
-    return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to});
+  static Future<String> _getFcmToken() async {
+    // Maybe persist the fcm token
+    return await _fcmTokenStrategy();
   }
 
-  // Platform specifics
-  static Future<String> get platformVersion async {
-    final String version =
-        await _methodChannel.invokeMethod('getPlatformVersion');
-    return version;
+  static Future<String> _fcmTokenStrategy() {
+    return FirebaseMessaging().getToken();
+  }
+
+  static void _setUpWorkmanager(String accessTokenUrl) {
+    Workmanager.initialize(
+        callbackDispatcher,
+        isInDebugMode: true
+    );
+    Workmanager.cancelByTag(BG_TAG);
+  }
+
+  static Future<void> launchJobInBg(String accessTokenUrl, String accessToken) async {
+    await Workmanager.registerOneOffTask(getUniqueName(), BG_TASK_NAME,
+        tag: BG_TAG,
+        inputData: {
+          BG_URL_DATA_KEY: accessTokenUrl
+        },
+        initialDelay: _getDelayBeforeExec(accessToken));
+  }
+
+  static Duration _getDelayBeforeExec(String accessToken) {
+    DateTime expirationDate = JwtDecoder.getExpirationDate(accessToken);
+    Duration duration = expirationDate.difference(DateTime.now());
+
+    return duration - SAFETY_DURATION;
+  }
+
+  static void _setAccessTokenUrl(String accessTokenUrl) {
+    if (accessTokenUrl == null) {
+      throw(ACCESS_TOKEN_URL_IS_NULL);
+    }
+
+    _accessTokenUrl = accessTokenUrl;
+  }
+
+  static bool _containsCall(dynamic value) {
+    if (value is String) {
+      return value.contains("Call");
+    }
+    return false;
   }
 
   static get getCall => _currentCallEvent;
+
+  static String getUniqueName() {
+    return BG_UNIQUE_NAME + Uuid().v1();
+  }
 }
+

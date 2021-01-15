@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-
+// TODO is this still used ? remove ?
 public class VoiceBroadcastReceiver extends BroadcastReceiver {
 
     public String TAG = "VoiceBroadcastReceiver";
