@@ -18,6 +18,7 @@ class TwilioProgrammableVoice {
   static const BG_TASK_NAME = "twilio-registration";
   static const BG_TAG = "registration";
   static const BG_URL_DATA_KEY = "accessTokenUrl";
+  static const BG_BACKOFF_POLICY_DELAY = Duration(seconds: 15);
   static const Duration SAFETY_DURATION = Duration(seconds: 15);
   static final MethodChannel _methodChannel =
       const MethodChannel('twilio_programmable_voice');
@@ -199,6 +200,12 @@ class TwilioProgrammableVoice {
   static Future<void> launchJobInBg(String accessTokenUrl, String accessToken) async {
     await Workmanager.registerOneOffTask(getUniqueName(), BG_TASK_NAME,
         tag: BG_TAG,
+        constraints: Constraints(
+            networkType: NetworkType.connected,
+        ),
+        existingWorkPolicy: ExistingWorkPolicy.replace,
+        backoffPolicy: BackoffPolicy.linear,
+        backoffPolicyDelay: BG_BACKOFF_POLICY_DELAY,
         inputData: {
           BG_URL_DATA_KEY: accessTokenUrl
         },
