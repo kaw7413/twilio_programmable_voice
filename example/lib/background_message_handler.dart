@@ -26,13 +26,9 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
                 'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
 
             _callKeep.startCall(event.callUUID, TwilioProgrammableVoice.getCall.from, "callerName");
-            // Generate accessToken from backend.
-            // http://localhost:3000/accessToken/test
 
-
-
-            await TwilioProgrammableVoice.setUp(accessTokenUrl);
-            await TwilioProgrammableVoice.handleMessage(dataMap);
+            await TwilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl);
+            await TwilioProgrammableVoice.handleMessage(data: dataMap);
             await TwilioProgrammableVoice.answer();
 
             _callKeep.setCurrentCallActive(callUUID);
@@ -43,8 +39,8 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
             print(
                 'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
 
-            await TwilioProgrammableVoice.setUp(accessTokenUrl);
-            await TwilioProgrammableVoice.handleMessage(dataMap);
+            await TwilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl);
+            await TwilioProgrammableVoice.handleMessage(data: dataMap);
             await TwilioProgrammableVoice.reject();
           });
 

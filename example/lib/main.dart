@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
     await DotEnv().load('.env');
     final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
-    TwilioProgrammableVoice.setUp(accessTokenUrl).then((isRegistrationValid) {
+    TwilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl).then((isRegistrationValid) {
       logger.d("registration is valid: " + isRegistrationValid.toString());
     });
   }
@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
 
             final dataMap = Map<String, String>.from(message["data"]);
 
-            TwilioProgrammableVoice.handleMessage(dataMap);
+            TwilioProgrammableVoice.handleMessage(data: dataMap);
             logger
                 .d("TwilioProgrammableVoice.handleMessage called in main.dart");
           }
