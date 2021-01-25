@@ -42,13 +42,15 @@ abstract class BaseEventChannelWrapper  implements EventChannel.StreamHandler {
         }
     }
 
-    protected Boolean isEventSinkHydrated(Object data) {
+    protected Boolean send(Object data) {
         if (eventSink == null) {
             Log.d("[BaseEventHandler]", "eventSink is null, add data to queue");
             queue.add(data);
             return false;
+        } else {
+            eventSink.success(data);
+            return true;
         }
-
-        return true;
     }
+
 }
