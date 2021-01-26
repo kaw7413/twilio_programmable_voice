@@ -33,6 +33,11 @@ class _HomePageState extends State<HomePage> {
   Future<void> setUpTwilioProgrammableVoice() async {
     await TwilioProgrammableVoice.requestMicrophonePermissions().then(logger.d);
     await checkDefaultPhoneAccount();
+    // TODO uncomment this when callkeep merge our pull request
+    // await checkDefaultPhoneAccount().then((userAccept) {
+    //   // we can use this callback to handle the case where the end user refuse to give the telecom manager permission
+    //   logger.d("User has taped ok the telecom manager permission dialog : " + userAccept.toString());
+    // });
 
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       logger.d("[TwilioProgrammableVoice Event]");
@@ -83,12 +88,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> checkDefaultPhoneAccount() async {
+  Future<bool> checkDefaultPhoneAccount() async {
     logger.d('[checkDefaultPhoneAccount]');
     final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
 
     if (!hasPhoneAccount) {
       logger.d("Doesn't have phone account, asking for permission");
+      // TODO return this when callkeep merge our pull request
       await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
         'alertTitle': 'Permissions required',
         'alertDescription':
@@ -97,6 +103,8 @@ class _HomePageState extends State<HomePage> {
         'okButton': 'ok',
       });
     }
+
+    return hasPhoneAccount;
   }
 
   Future<void> displayMakeCallScreen(

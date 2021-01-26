@@ -19,8 +19,6 @@ Future<void> initCallKeep(FlutterCallkeep callKeep) async {
       CallKeepDidPerformSetMutedCallAction(), didPerformSetMutedCallAction);
   _callKeep.on(CallKeepPerformEndCallAction(), endCall);
   _callKeep.on(CallKeepPushKitToken(), onPushKitToken);
-
-  // TODO make this return a bool so we can handle the case when endUser refuse to give his permission
   _callKeep.setup(callKeepSetupConfig);
 }
 
