@@ -18,9 +18,6 @@ void main() async {
 
   await DotEnv().load('.env');
 
-  // TODO: remove when test is done
-  // WidgetsFlutterBinding.ensureInitialized();
-
   runApp(TwilioProgrammingVoiceExampleApp());
 }
 
@@ -35,6 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> setUpTwilioProgrammableVoice() async {
     await TwilioProgrammableVoice.requestMicrophonePermissions().then(logger.d);
+    await checkDefaultPhoneAccount();
 
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       logger.d("[TwilioProgrammableVoice Event]");
