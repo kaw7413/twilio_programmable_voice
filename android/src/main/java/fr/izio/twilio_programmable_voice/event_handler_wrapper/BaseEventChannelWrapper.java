@@ -34,7 +34,7 @@ abstract class BaseEventChannelWrapper  implements EventChannel.StreamHandler {
 
     protected void send(Object data) {
         Log.d("[BaseEventHandler]", "send called");
-        if (isEventSinkHydrated()) {
+        if (eventSink != null) {
             Log.d("[BaseEventHandler]", "send data throught eventSink");
             eventSink.success(data);
         } else {
@@ -49,10 +49,5 @@ abstract class BaseEventChannelWrapper  implements EventChannel.StreamHandler {
         {
             eventSink.success(status);
         }
-    }
-
-    private Boolean isEventSinkHydrated() {
-        Log.d("[BaseEventHandler]", "isEventSinkHydrated");
-        return (eventSink == null);
     }
 }

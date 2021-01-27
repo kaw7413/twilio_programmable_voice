@@ -49,28 +49,43 @@ abstract class TokenManager {
   }
 
   static Future<String> getAccessToken({@required String accessTokenUrl}) async {
+    print('[getAccessToken] getAccessToken called');
     String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.ACCESS_TOKEN)).catchError(print);
-
+    print('[getAccessToken] accessToken from hive : $accessToken');
     if (accessToken == null) {
+      print('[getAccessToken] accessToken is null');
       accessToken = await _accessTokenStrategyBinder(accessTokenUrl: accessTokenUrl);
     }
 
+    print('[getAccessToken] accessToken returned : ' + accessToken);
     return accessToken;
   }
 
   static Future<String> _accessTokenStrategyBinder({@required String accessTokenUrl}) async {
+    print('[_accessTokenStrategyBinder] _accessTokenStrategyBinder called');
     return await BoxWrapper.getInstance().then((box) async {
+      print('[_accessTokenStrategyBinder] in Hive callback');
       if (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) == AccessTokenStrategy.GET) {
+        print('[_accessTokenStrategyBinder] GET strategy');
         return await _httpGetAccessTokenStrategy(accessTokenUrl: accessTokenUrl);
       } else {
+        print('[_accessTokenStrategyBinder] NO strategy');
         throw(_UNDEFINED_ACCESS_TOKEN_STRATEGY);
       }
     });
   }
 
   static Future<String> _httpGetAccessTokenStrategy({@required String accessTokenUrl}) async {
+    print('[_httpGetAccessTokenStrategy] _httpGetAccessTokenStrategy called');
     final headers = await getHeaders();
+    print('[_httpGetAccessTokenStrategy] before headers loop');
+    headers.forEach((key, value) {
+      print('[_httpGetAccessTokenStrategy] in headers loop');
+      print('key : ' + key.toString() + 'value : ' + value.toString());
+    });
+
     final tokenResponse = await Dio().get(accessTokenUrl, options: Options(headers: headers));
+    print('[_httpGetAccessTokenStrategy] tokenResponse.data : ' + tokenResponse.data);
     return tokenResponse.data;
   }
 
@@ -83,24 +98,34 @@ abstract class TokenManager {
   }
 
   static Future<Map<String, dynamic>> getHeaders() async {
-    return await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.HEADERS));
+    // typecast to Map<String, dynamic>, box.get isn't type safe
+    final Map<String, dynamic> headers = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.HEADERS));
+    return headers;
   }
 
   static Future<String> getFcmToken() async {
-    return await _fcmTokenStrategyBinder();
+    print('[getFcmToken] getFcmToken called');
+    final tmp = await _fcmTokenStrategyBinder();
+    print('[getFcmToken] fcmToken' + tmp);
+    return tmp;
   }
 
   static Future<String> _fcmTokenStrategyBinder() async {
+    print('[_fcmTokenStrategyBinder] _fcmTokenStrategyBinder called');
     return await BoxWrapper.getInstance().then((box) {
+      print('[_fcmTokenStrategyBinder] in Hive callback');
       if (box.get(BoxKeys.FCM_TOKEN_STRATEGY) == FcmTokenStrategy.FIREBASE_MESSAGING) {
-        return _fcmTokenStrategy();
+        print('[_fcmTokenStrategyBinder] FIREBASE strategy');
+        return _firebaseMessagingFcmTokenStrategy();
       } else {
+        print('[_fcmTokenStrategyBinder] NO strategy');
         throw(_UNDEFINED_FCM_TOKEN_STRATEGY);
       }
     });
   }
 
-  static Future<String> _fcmTokenStrategy() {
+  static Future<String> _firebaseMessagingFcmTokenStrategy() {
+    print('[ _firebaseMessagingFcmTokenStrategy] FIREBASE strategy');
     return FirebaseMessaging().getToken();
   }
 }

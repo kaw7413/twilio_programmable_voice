@@ -23,7 +23,7 @@ abstract class WorkmanagerWrapper {
 
   static Future<void> launchJobInBg(
       {@required String accessTokenUrl, @required String accessToken}) async {
-    await Workmanager.registerOneOffTask(getUniqueName(), _BG_TASK_NAME,
+    await Workmanager.registerOneOffTask(_getUniqueName(), _BG_TASK_NAME,
         tag: _BG_TAG,
         constraints: Constraints(
           networkType: NetworkType.connected,
@@ -34,17 +34,17 @@ abstract class WorkmanagerWrapper {
         inputData: {
           BG_URL_DATA_KEY: accessTokenUrl
         },
-        initialDelay: WorkmanagerWrapper.getDelayBeforeExec(accessToken: accessToken));
+        initialDelay: WorkmanagerWrapper._getDelayBeforeExec(accessToken: accessToken));
   }
 
-  static Duration getDelayBeforeExec({@required String accessToken}) {
+  static Duration _getDelayBeforeExec({@required String accessToken}) {
     DateTime expirationDate = JwtDecoder.getExpirationDate(accessToken);
     Duration duration = expirationDate.difference(DateTime.now());
 
     return duration - _SAFETY_DURATION;
   }
 
-  static String getUniqueName() {
+  static String _getUniqueName() {
     return _BG_UNIQUE_NAME + Uuid().v1();
   }
 }
