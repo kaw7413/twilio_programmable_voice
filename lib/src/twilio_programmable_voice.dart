@@ -1,26 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:twilio_programmable_voice/src/token_manager.dart';
-import 'package:uuid/uuid.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:meta/meta.dart';
 
-import 'callback_dispatcher.dart';
 import 'box_utils.dart';
 import 'events.dart';
 import 'box_wrapper.dart';
+import 'token_manager.dart';
+import 'workmanager_wrapper.dart';
 
-class TwilioProgrammableVoice {
+abstract class TwilioProgrammableVoice {
   static const _ACCESS_TOKEN_URL_IS_NULL = "You must provide a valid accessTokenUrl, null was provided";
-  static const _BG_UNIQUE_NAME = "registrationJob";
-  static const _BG_TASK_NAME = "twilio-registration";
-  static const _BG_TAG = "registration";
-  static const BG_URL_DATA_KEY = "accessTokenUrl";
-  static const _BG_BACKOFF_POLICY_DELAY = Duration(seconds: 15);
-  static const Duration _SAFETY_DURATION = Duration(seconds: 15);
   static CallEvent _currentCallEvent;
   static String _accessTokenUrl;
 
@@ -37,13 +28,13 @@ class TwilioProgrammableVoice {
   /// [accessTokenUrl] is the url that return the access token
   ///
   ///
-  /// [tokenManagerConfig] an optional map where you can set defined the strategies you want to use to retrieve tokens
+  /// [tokenManagerStrategies] an optional map where you can set defined the strategies you want to use to retrieve tokens
   ///
   /// [headers] optional headers, use by the GET access token strategy
-  static Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerConfig, Map<String, dynamic> headers}) async {
+  static Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
     _setAccessTokenUrl(accessTokenUrl);
-    _setUpWorkmanager();
-    _setUpTokenManager(tokenManagerConfig, headers);
+    WorkmanagerWrapper.setUpWorkmanager();
+    TokenManager.init(tokenManagerStrategies, headers);
 
     final bool isRegistrationValid = await registerVoice(accessTokenUrl: accessTokenUrl);
     return isRegistrationValid;
@@ -68,7 +59,7 @@ class TwilioProgrammableVoice {
       isRegistrationValid = await _methodChannel.invokeMethod(
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       TokenManager.persistAccessToken(accessToken: accessToken);
-      launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
+      WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
     } catch (err) {
       isRegistrationValid = false;
       await BoxWrapper.getInstance().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
@@ -166,50 +157,6 @@ class TwilioProgrammableVoice {
     });
   }
 
-  static void _setUpWorkmanager() {
-    Workmanager.initialize(
-        callbackDispatcher,
-        isInDebugMode: true
-    );
-    Workmanager.cancelByTag(_BG_TAG);
-  }
-
-  static Future<void> _setUpTokenManager(Map<String, String> tokenManagerConfig, Map<String, dynamic> headers) async {
-    bool areStrategiesDefined = await TokenManager.areStrategiesDefined();
-    if (tokenManagerConfig != null) {
-      TokenManager.setUp(config: tokenManagerConfig);
-    } else if (!areStrategiesDefined) {
-      TokenManager.setUp(config: TokenManager.DEFAULT_CONFIG);
-    }
-
-    if (headers != null) {
-      TokenManager.setHeaders(headers: headers);
-    }
-  }
-
-  static Future<void> launchJobInBg(
-      {@required String accessTokenUrl, @required String accessToken}) async {
-    await Workmanager.registerOneOffTask(getUniqueName(), _BG_TASK_NAME,
-        tag: _BG_TAG,
-        constraints: Constraints(
-            networkType: NetworkType.connected,
-        ),
-        existingWorkPolicy: ExistingWorkPolicy.replace,
-        backoffPolicy: BackoffPolicy.linear,
-        backoffPolicyDelay: _BG_BACKOFF_POLICY_DELAY,
-        inputData: {
-          BG_URL_DATA_KEY: accessTokenUrl
-        },
-        initialDelay: _getDelayBeforeExec(accessToken: accessToken));
-  }
-
-  static Duration _getDelayBeforeExec({@required String accessToken}) {
-    DateTime expirationDate = JwtDecoder.getExpirationDate(accessToken);
-    Duration duration = expirationDate.difference(DateTime.now());
-
-    return duration - _SAFETY_DURATION;
-  }
-
   static void _setAccessTokenUrl([String accessTokenUrl]) {
     if (accessTokenUrl == null) {
       throw(_ACCESS_TOKEN_URL_IS_NULL);
@@ -226,9 +173,5 @@ class TwilioProgrammableVoice {
   }
 
   static get getCall => _currentCallEvent;
-
-  static String getUniqueName() {
-    return _BG_UNIQUE_NAME + Uuid().v1();
-  }
 }
 

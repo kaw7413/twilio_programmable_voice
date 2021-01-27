@@ -4,15 +4,29 @@ import 'package:meta/meta.dart';
 
 import 'box_utils.dart';
 import 'box_wrapper.dart';
-
-class TokenManager {
-  static const DEFAULT_CONFIG = { BoxKeys.ACCESS_TOKEN_STRATEGY : AccessTokenStrategy.GET, BoxKeys.FCM_TOKEN_STRATEGY : FcmTokenStrategy.FIREBASE_MESSAGING };
+// This might be a "real" class created by factories
+// Problem is our plugin need to work in background context
+abstract class TokenManager {
+  static const _DEFAULT_CONFIG = { BoxKeys.ACCESS_TOKEN_STRATEGY : AccessTokenStrategy.GET, BoxKeys.FCM_TOKEN_STRATEGY : FcmTokenStrategy.FIREBASE_MESSAGING };
   static const _NO_ACCESS_TOKEN_STRATEGY = "You need to pass a value to the key BoxKeys.ACCESS_TOKEN_STRATEGY if you want to add a custom config";
   static const _UNDEFINED_ACCESS_TOKEN_STRATEGY = "The specified access token strategy isn't defined";
   static const _NO_FCM_TOKEN_STRATEGY = "You need to pass a value to the key BoxKeys.FCM_TOKEN_STRATEGY if you want to add a custom config";
   static const _UNDEFINED_FCM_TOKEN_STRATEGY = "The specified fcm token strategy isn't defined";
+  
+  static Future<void> init(Map<String, String> tokenManagerStrategies, Map<String, dynamic> headers) async {
+    bool areStrategiesDefined = await _areStrategiesDefined();
+    if (tokenManagerStrategies != null) {
+      _setUpStrategies(config: tokenManagerStrategies);
+    } else if (!areStrategiesDefined) {
+      _setUpStrategies(config: _DEFAULT_CONFIG);
+    }
 
-  static Future<void> setUp({@required Map<String, Object> config}) async {
+    if (headers != null) {
+      _setHeaders(headers: headers);
+    }
+  }
+  
+  static Future<void> _setUpStrategies({@required Map<String, Object> config}) async {
     await BoxWrapper.getInstance().then((box) {
       if (config[BoxKeys.ACCESS_TOKEN_STRATEGY] != null) {
         box.put(BoxKeys.ACCESS_TOKEN_STRATEGY, config[BoxKeys.ACCESS_TOKEN_STRATEGY]);
@@ -28,7 +42,7 @@ class TokenManager {
     });
   }
 
-  static Future<bool> areStrategiesDefined() async {
+  static Future<bool> _areStrategiesDefined() async {
     return await BoxWrapper.getInstance().then((box) {
       return (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) != null && box.get(BoxKeys.FCM_TOKEN_STRATEGY) != null);
     });
@@ -64,7 +78,7 @@ class TokenManager {
     await BoxWrapper.getInstance().then((box) => box.put(BoxKeys.ACCESS_TOKEN, accessToken));
   }
 
-  static Future<void> setHeaders({@required Map<String, dynamic> headers}) async {
+  static Future<void> _setHeaders({@required Map<String, dynamic> headers}) async {
     await BoxWrapper.getInstance().then((box) => box.put(BoxKeys.HEADERS, headers));
   }
 

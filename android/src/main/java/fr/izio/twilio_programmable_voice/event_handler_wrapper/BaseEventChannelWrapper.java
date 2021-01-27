@@ -32,9 +32,18 @@ abstract class BaseEventChannelWrapper  implements EventChannel.StreamHandler {
         eventSink = null;
     }
 
-//    This solution is great because it abstract the deQueue process
-//    The problem is it's not type safe
-    protected void deQueue() {
+    protected void send(Object data) {
+        Log.d("[BaseEventHandler]", "send called");
+        if (isEventSinkHydrated()) {
+            Log.d("[BaseEventHandler]", "send data throught eventSink");
+            eventSink.success(data);
+        } else {
+            Log.d("[BaseEventHandler]", "add data to queue");
+            queue.add(data);
+        }
+    }
+
+    private void deQueue() {
         Log.d("[BaseEventHandler]", "deQueue called");
         for (Object status : queue)
         {
@@ -42,10 +51,9 @@ abstract class BaseEventChannelWrapper  implements EventChannel.StreamHandler {
         }
     }
 
-    protected Boolean isEventSinkHydrated(Object data) {
+    private Boolean isEventSinkHydrated() {
         if (eventSink == null) {
-            Log.d("[BaseEventHandler]", "eventSink is null, add data to queue");
-            queue.add(data);
+            Log.d("[BaseEventHandler]", "eventSink is null");
             return false;
         }
 

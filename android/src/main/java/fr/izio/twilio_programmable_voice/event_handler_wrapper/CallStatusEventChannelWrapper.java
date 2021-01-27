@@ -12,65 +12,47 @@ public class CallStatusEventChannelWrapper extends BaseEventChannelWrapper {
 
     public void sendCallInvite(HashMap<String, String> callInvite) {
         Log.d("[CallEventHandler]", "sendCallInvite called");
-        if (isEventSinkHydrated(callInvite)) {
-            eventSink.success(callInvite);
-        }
+        send(callInvite);
     }
 
     public void sendCancelledCallInvite(HashMap<String, String> cancelledCallInvite) {
         Log.d("[CallEventHandler]", "sendCancelledCallInvite called");
-        if (isEventSinkHydrated(cancelledCallInvite)) {
-            eventSink.success(cancelledCallInvite);
-        }
+        send(cancelledCallInvite);
     }
 
     public void sendCallConnectFailure(HashMap<String, Object> callConnectFailure) {
         Log.d("[CallEventHandler]", "sendCallConnectFailure called");
-        if (isEventSinkHydrated(callConnectFailure)) {
-            eventSink.success(callConnectFailure);
-        }
+        send(callConnectFailure);
     }
 
     public void sendCallRinging(HashMap<String, Object> callRinging) {
         Log.d("[CallEventHandler]", "sendCallRinging called");
-        if (isEventSinkHydrated(callRinging)) {
-            eventSink.success(callRinging);
-        }
+        send(callRinging);
     }
 
     public void sendCallConnected(HashMap<String, Object> callConnected) {
         Log.d("[CallEventHandler]", "sendCallConnected called");
-        if (isEventSinkHydrated(callConnected)) {
-            eventSink.success(callConnected);
-        }
+        send(callConnected);
     }
 
     public void sendCallReconnecting(HashMap<String, Object> callReconnecting) {
         Log.d("[CallEventHandler]", "sendSuccess called");
-        if (isEventSinkHydrated(callReconnecting)) {
-            eventSink.success(callReconnecting);
-        }
+        send(callReconnecting);
     }
 
     public void sendCallReconnected(HashMap<String, Object> callReconnected) {
         Log.d("[CallEventHandler]", "sendCallReconnected called");
-        if (isEventSinkHydrated(callReconnected)) {
-            eventSink.success(callReconnected);
-        }
+        send(callReconnected);
     }
 
     public void sendCallDisconnected(HashMap<String, Object> callDisconnected) {
         Log.d("[CallEventHandler]", "sendCallDisconnected called");
-        if (isEventSinkHydrated(callDisconnected)) {
-            eventSink.success(callDisconnected);
-        }
+        send(callDisconnected);
     }
 
     public void sendCallQualityWarningsChanged(HashMap<String, Object> callQualityWarningsChanged) {
         Log.d("[CallEventHandler]", "sendCallQualityWarningsChanged called");
-        if (isEventSinkHydrated(callQualityWarningsChanged)) {
-            eventSink.success(callQualityWarningsChanged);
-        }
+        send(callQualityWarningsChanged);
     }
 
 }
