@@ -2,10 +2,9 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class BoxWrapper {
-  static Future _boxCreated;
   static Box _instance;
-  static const BOX = "accessTokenBox";
-  static const KEY = "accessToken";
+  static const _BOX = "TwilioProgrammableVoiceBox";
+  static Future _boxCreated;
 
   static Future<Box> getInstance() async {
     if (_instance == null) {
@@ -22,8 +21,8 @@ class BoxWrapper {
 
   _createBox() async {
     await Hive.initFlutter();
-    _instance = await Hive.openBox(BoxWrapper.BOX);
+    _instance = await Hive.openBox(BoxWrapper._BOX);
   }
 
-  static Future get _initializationDone => BoxWrapper._boxCreated;
+  static Future get _initializationDone => _boxCreated;
 }
