@@ -9,7 +9,6 @@ class CallInvite extends CallEvent {
   String to;
   String sid;
 
-  CallInvite();
   CallInvite.from(Map<dynamic, dynamic> data)
     : from = data['from'] as String,
       to = data['to'] as String,
@@ -21,7 +20,6 @@ class CancelledCallInvite extends CallEvent {
   String to;
   String sid;
 
-  CancelledCallInvite();
   CancelledCallInvite.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
@@ -36,7 +34,6 @@ class CallConnectFailure extends CallEvent {
   bool isMuted;
   bool isOnHold;
 
-  CallConnectFailure();
   CallConnectFailure.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
@@ -54,7 +51,6 @@ class CallRinging extends CallEvent {
   bool isMuted;
   bool isOnHold;
 
-  CallRinging();
   CallRinging.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
@@ -72,7 +68,6 @@ class CallConnected extends CallEvent {
   bool isMuted;
   bool isOnHold;
 
-  CallConnected();
   CallConnected.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
@@ -90,7 +85,6 @@ class CallReconnecting extends CallEvent {
   bool isMuted;
   bool isOnHold;
 
-  CallReconnecting();
   CallReconnecting.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
@@ -108,7 +102,6 @@ class CallReconnected extends CallEvent {
   bool isMuted;
   bool isOnHold;
 
-  CallReconnected();
   CallReconnected.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
@@ -126,7 +119,6 @@ class CallDisconnected extends CallEvent {
   bool isMuted;
   bool isOnHold;
 
-  CallDisconnected();
   CallDisconnected.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,
@@ -144,7 +136,6 @@ class CallQualityWarningChanged extends CallEvent {
   bool isMuted;
   bool isOnHold;
 
-  CallQualityWarningChanged();
   CallQualityWarningChanged.from(Map<dynamic, dynamic> data)
       : from = data['from'] as String,
         to = data['to'] as String,

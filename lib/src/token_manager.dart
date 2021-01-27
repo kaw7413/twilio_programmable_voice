@@ -83,7 +83,9 @@ abstract class TokenManager {
   }
 
   static Future<Map<String, dynamic>> getHeaders() async {
-    return await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.HEADERS));
+    // typecast to Map<String, dynamic>, box.get isn't type safe
+    final Map<String, dynamic> headers = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.HEADERS));
+    return headers;
   }
 
   static Future<String> getFcmToken() async {
