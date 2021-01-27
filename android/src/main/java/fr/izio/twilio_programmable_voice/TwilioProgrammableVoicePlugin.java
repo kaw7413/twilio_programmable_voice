@@ -54,7 +54,6 @@ public class TwilioProgrammableVoicePlugin implements FlutterPlugin, ActivityAwa
     @Override
     public void onDetachedFromActivity() {
         this.twilioProgrammableVoice.setActivity(null);
-        this.twilioProgrammableVoice.unregisterVoiceReceiver();
         twilioProgrammableVoice.setCallStatusEventChannelWrapper(null);
         twilioProgrammableVoice.setChannel(null);
     }

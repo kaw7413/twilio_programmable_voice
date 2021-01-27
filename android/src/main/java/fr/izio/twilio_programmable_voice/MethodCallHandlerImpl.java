@@ -19,7 +19,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
-
+    static final String REGISTRATION_ERROR_CODE = "1";
+    static final String REGISTRATION_ERROR_MESSAGE = "Registration failed";
     final String TAG = "[TwilioProgrammableVoice - MethodCallHandlerImpl]";
 
     public TwilioProgrammableVoice twilioProgrammableVoice;
@@ -48,7 +49,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         } else if (call.method.equals("reject")) {
             this.reject(result);
         } else {
-            Log.d(TAG, "DEFAULT");
             result.notImplemented();
         }
     }
@@ -141,7 +141,6 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             @Override
             public void onRegistered(@NonNull String accessToken, @NonNull String fcmToken) {
                 Log.d(TAG, "Successfully registered FCM " + fcmToken);
-                // Return this in MethodChannel
                 result.success(true);
             }
 
@@ -150,8 +149,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
                                 @NonNull String accessToken,
                                 @NonNull String fcmToken) {
                 Log.d(TAG, "Error while registering " + error.getMessage());
-                // this looks weird but we need to return a bool to Dart code a let it handle the failure
-                result.success(false);
+                result.error(MethodCallHandlerImpl.REGISTRATION_ERROR_CODE, MethodCallHandlerImpl.REGISTRATION_ERROR_MESSAGE, null);
             }
         };
     }

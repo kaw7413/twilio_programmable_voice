@@ -21,7 +21,6 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
     private Activity activity;
-    public VoiceBroadcastReceiver voiceBroadcastReceiver;
     private MethodChannel channel;
     private CallInvite currentCallInvite;
     private Call currentCall;
@@ -38,19 +37,11 @@ public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
     private static final String CALL_QUALITY_WARNING_CHANGED = "CallQualityWarningChanged";
 
     public void registerVoiceReceiver() {
-        this.voiceBroadcastReceiver = new VoiceBroadcastReceiver();
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("ACTION_INCOMING_CALL");
         intentFilter.addAction("ACTION_CANCEL_CALL");
         intentFilter.addAction("ACTION_FCM_TOKEN");
-
-        // Register the receiver at application context.
-        this.activity.getApplicationContext().registerReceiver(this.voiceBroadcastReceiver, intentFilter);
-    }
-
-    public void unregisterVoiceReceiver() {
-        this.activity.getApplicationContext().unregisterReceiver(this.voiceBroadcastReceiver);
     }
 
     public void setCurrentCallInvite(CallInvite currentCallInvite) {

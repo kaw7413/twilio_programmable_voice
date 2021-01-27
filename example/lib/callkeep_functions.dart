@@ -19,7 +19,6 @@ Future<void> initCallKeep(FlutterCallkeep callKeep) async {
       CallKeepDidPerformSetMutedCallAction(), didPerformSetMutedCallAction);
   _callKeep.on(CallKeepPerformEndCallAction(), endCall);
   _callKeep.on(CallKeepPushKitToken(), onPushKitToken);
-
   _callKeep.setup(callKeepSetupConfig);
 }
 
@@ -46,11 +45,13 @@ Future<void> didPerformDTMFAction(CallKeepDidPerformDTMFAction event) async {
 Future<void> didReceiveStartCallAction(
     CallKeepDidReceiveStartCallAction event) async {
   print('[didReceiveStartCallAction] method called');
+
   if (event.handle == null) {
     print('[didReceiveStartCallAction] handle == null');
     // @TODO: sometime we receive `didReceiveStartCallAction` with handle` undefined`
     return;
   }
+
   final String callUUID = TwilioProgrammableVoice.getCall.sid;
 
   print('[didReceiveStartCallAction] $callUUID, number: ${event.handle}');

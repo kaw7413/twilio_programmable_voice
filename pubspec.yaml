@@ -19,6 +19,7 @@ dependencies:
   jwt_decoder: ^1.0.3
   firebase_messaging: 7.0.3
   dio: ^3.0.10
+  meta: ^1.2.4
   uuid: ^2.2.2
 
 dev_dependencies:

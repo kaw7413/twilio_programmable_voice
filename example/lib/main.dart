@@ -18,9 +18,6 @@ void main() async {
 
   await DotEnv().load('.env');
 
-  // TODO: remove when test is done
-  // WidgetsFlutterBinding.ensureInitialized();
-
   runApp(TwilioProgrammingVoiceExampleApp());
 }
 
@@ -35,6 +32,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> setUpTwilioProgrammableVoice() async {
     await TwilioProgrammableVoice.requestMicrophonePermissions().then(logger.d);
+    await checkDefaultPhoneAccount();
+    // TODO uncomment this when callkeep merge our pull request
+    // await checkDefaultPhoneAccount().then((userAccept) {
+    //   // we can use this callback to handle the case where the end user refuse to give the telecom manager permission
+    //   logger.d("User has taped ok the telecom manager permission dialog : " + userAccept.toString());
+    // });
 
     TwilioProgrammableVoice.callStatusStream.listen((event) async {
       logger.d("[TwilioProgrammableVoice Event]");
@@ -80,17 +83,18 @@ class _HomePageState extends State<HomePage> {
     await DotEnv().load('.env');
     final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
-    TwilioProgrammableVoice.setUp(accessTokenUrl).then((isRegistrationValid) {
+    TwilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl, headers : {"TestHeader": "Im a test value"}).then((isRegistrationValid) {
       logger.d("registration is valid: " + isRegistrationValid.toString());
     });
   }
 
-  Future<void> checkDefaultPhoneAccount() async {
+  Future<bool> checkDefaultPhoneAccount() async {
     logger.d('[checkDefaultPhoneAccount]');
     final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
 
     if (!hasPhoneAccount) {
       logger.d("Doesn't have phone account, asking for permission");
+      // TODO return this when callkeep merge our pull request
       await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
         'alertTitle': 'Permissions required',
         'alertDescription':
@@ -99,6 +103,8 @@ class _HomePageState extends State<HomePage> {
         'okButton': 'ok',
       });
     }
+
+    return hasPhoneAccount;
   }
 
   Future<void> displayMakeCallScreen(
@@ -152,7 +158,7 @@ class _HomePageState extends State<HomePage> {
 
             final dataMap = Map<String, String>.from(message["data"]);
 
-            TwilioProgrammableVoice.handleMessage(dataMap);
+            TwilioProgrammableVoice.handleMessage(data: dataMap);
             logger
                 .d("TwilioProgrammableVoice.handleMessage called in main.dart");
           }
