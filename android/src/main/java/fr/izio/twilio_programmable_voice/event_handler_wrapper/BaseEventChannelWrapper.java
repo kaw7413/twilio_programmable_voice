@@ -52,11 +52,7 @@ abstract class BaseEventChannelWrapper  implements EventChannel.StreamHandler {
     }
 
     private Boolean isEventSinkHydrated() {
-        if (eventSink == null) {
-            Log.d("[BaseEventHandler]", "eventSink is null");
-            return false;
-        }
-
-        return true;
+        Log.d("[BaseEventHandler]", "isEventSinkHydrated");
+        return (eventSink == null);
     }
 }
