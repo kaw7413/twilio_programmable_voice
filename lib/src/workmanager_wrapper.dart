@@ -34,7 +34,7 @@ abstract class WorkmanagerWrapper {
         inputData: {
           BG_URL_DATA_KEY: accessTokenUrl
         },
-        initialDelay: WorkmanagerWrapper._getDelayBeforeExec(accessToken: accessToken));
+        initialDelay: _getDelayBeforeExec(accessToken: accessToken));
   }
 
   static Duration _getDelayBeforeExec({@required String accessToken}) {
