@@ -1,17 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:twilio_programmable_voice/models/events.dart';
+import 'package:twilio_programmable_voice/src/events.dart';
 
 void main() {
   group('CallInvite and CancelledCallInvite', () {
-    Map<String, String> mapCallInvite = {"from": "CallInviteFrom", "to": "CallInviteTo", "callSid": "CallInviteCallSid"};
-    Map<String, String> mapCancelledCallInvite = {"from": "CancelledCallInviteFrom", "to": "CancelledCallInviteTo", "callSid": "CancelledCallInviteCallSid"};
+    Map<String, String> mapCallInvite = {"from": "CallInviteFrom", "to": "CallInviteTo", "sid": "CallInviteCallSid"};
+    Map<String, String> mapCancelledCallInvite = {"from": "CancelledCallInviteFrom", "to": "CancelledCallInviteTo", "sid": "CancelledCallInviteCallSid"};
 
     test('from method in CallInvite class should hydrate a CallInvite object', () {
       CallInvite callInvite = CallInvite.from(mapCallInvite);
       expect(callInvite.runtimeType, CallInvite);
       expect(callInvite.from, mapCallInvite['from']);
       expect(callInvite.to, mapCallInvite['to']);
-      expect(callInvite.callSid, mapCallInvite['callSid']);
+      expect(callInvite.sid, mapCallInvite['callSid']);
     });
 
     test('from method in CancelledCallInvite class should hydrate a CancelledCallInvite object', () {
@@ -19,12 +19,12 @@ void main() {
       expect(cancelledCallInvite.runtimeType, CancelledCallInvite);
       expect(cancelledCallInvite.from, mapCancelledCallInvite['from']);
       expect(cancelledCallInvite.to, mapCancelledCallInvite['to']);
-      expect(cancelledCallInvite.callSid, mapCancelledCallInvite['callSid']);
+      expect(cancelledCallInvite.sid, mapCancelledCallInvite['callSid']);
     });
   });
 
   group('Other Call', () {
-    Map<String, dynamic> mapCall = {"from": "CallFrom", "to": "CallTo", "sid": "CallSid", "state": "CallState", "isMuted": false, "isOnHold": false};
+    Map<String, dynamic> mapCall = {"from": "CallFrom", "to": "CallTo", "sid": "sid", "state": "CallState", "isMuted": false, "isOnHold": false};
     test('from method in CallConnectFailure class should hydrate a CallConnectFailure object', () {
       CallConnectFailure callConnectFailure = CallConnectFailure.from(mapCall);
       expect(callConnectFailure.runtimeType, CallConnectFailure);
@@ -101,6 +101,5 @@ void main() {
       expect(callQualityWarningChanged.isMuted, mapCall["isMuted"]);
       expect(callQualityWarningChanged.isOnHold, mapCall["isOnHold"]);
     });
-
   });
 }

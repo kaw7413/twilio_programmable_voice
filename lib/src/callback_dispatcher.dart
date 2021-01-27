@@ -6,6 +6,8 @@ import 'workmanager_wrapper.dart';
 void callbackDispatcher() {
     Workmanager.executeTask((task, inputData) async {
       final bool isRegistrationValid = await TwilioProgrammableVoice.registerVoice(accessTokenUrl : inputData[WorkmanagerWrapper.BG_URL_DATA_KEY]);
+      print('[callbackDispatcher]');
+      print(isRegistrationValid);
       return isRegistrationValid;
     });
 }
