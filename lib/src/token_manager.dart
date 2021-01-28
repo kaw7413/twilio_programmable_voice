@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:meta/meta.dart';
+import 'package:get_it/get_it.dart';
 
 import 'box_utils.dart';
-import 'box_wrapper.dart';
+import 'box_service.dart';
 // This might be a "real" class created by factories
 // Problem is our plugin need to work in background context
 abstract class TokenManager {
@@ -27,7 +28,8 @@ abstract class TokenManager {
   }
   
   static Future<void> _setUpStrategies({@required Map<String, Object> config}) async {
-    await BoxWrapper.getInstance().then((box) {
+
+    await GetIt.I<BoxService>().getBox().then((box) {
       if (config[BoxKeys.ACCESS_TOKEN_STRATEGY] != null) {
         box.put(BoxKeys.ACCESS_TOKEN_STRATEGY, config[BoxKeys.ACCESS_TOKEN_STRATEGY]);
       } else {
@@ -43,13 +45,13 @@ abstract class TokenManager {
   }
 
   static Future<bool> _areStrategiesDefined() async {
-    return await BoxWrapper.getInstance().then((box) {
+    return await GetIt.I<BoxService>().getBox().then((box) {
       return (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) != null && box.get(BoxKeys.FCM_TOKEN_STRATEGY) != null);
     });
   }
 
   static Future<String> getAccessToken({@required String accessTokenUrl}) async {
-    String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.ACCESS_TOKEN));
+    String accessToken = await GetIt.I<BoxService>().getBox().then((box) => box.get(BoxKeys.ACCESS_TOKEN));
     if (accessToken == null) {
       accessToken = await _accessTokenStrategyBinder(accessTokenUrl: accessTokenUrl);
     }
@@ -58,7 +60,7 @@ abstract class TokenManager {
   }
 
   static Future<String> _accessTokenStrategyBinder({@required String accessTokenUrl}) async {
-    return await BoxWrapper.getInstance().then((box) async {
+    return await GetIt.I<BoxService>().getBox().then((box) async {
       if (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) == AccessTokenStrategy.GET) {
         return await _httpGetAccessTokenStrategy(accessTokenUrl: accessTokenUrl);
       } else {
@@ -74,19 +76,19 @@ abstract class TokenManager {
   }
 
   static Future<void> persistAccessToken({@required String accessToken}) async {
-    await BoxWrapper.getInstance().then((box) => box.put(BoxKeys.ACCESS_TOKEN, accessToken));
+    await GetIt.I<BoxService>().getBox().then((box) => box.put(BoxKeys.ACCESS_TOKEN, accessToken));
   }
 
   static Future<void> removeAccessToken() async {
-    await BoxWrapper.getInstance().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
+    await GetIt.I<BoxService>().getBox().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
   }
 
   static Future<void> _setHeaders({@required Map<String, dynamic> headers}) async {
-    await BoxWrapper.getInstance().then((box) => box.put(BoxKeys.HEADERS, headers));
+    await GetIt.I<BoxService>().getBox().then((box) => box.put(BoxKeys.HEADERS, headers));
   }
 
   static Future<Map<String, dynamic>> _getHeaders() async {
-    final headers = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.HEADERS));
+    final headers = await GetIt.I<BoxService>().getBox().then((box) => box.get(BoxKeys.HEADERS));
 
     return Map<String, dynamic>.from(headers);
   }
@@ -96,7 +98,7 @@ abstract class TokenManager {
   }
 
   static Future<String> _fcmTokenStrategyBinder() async {
-    return await BoxWrapper.getInstance().then((box) {
+    return await GetIt.I<BoxService>().getBox().then((box) {
       if (box.get(BoxKeys.FCM_TOKEN_STRATEGY) == FcmTokenStrategy.FIREBASE_MESSAGING) {
         return _firebaseMessagingFcmTokenStrategy();
       } else {

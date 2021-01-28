@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:meta/meta.dart';
+import 'package:get_it/get_it.dart';
 
 import 'box_utils.dart';
 import 'events.dart';
-import 'box_wrapper.dart';
+import 'box_service.dart';
 import 'token_manager.dart';
 import 'workmanager_wrapper.dart';
 
@@ -32,6 +33,7 @@ abstract class TwilioProgrammableVoice {
   ///
   /// [headers] optional headers, use by the GET access token strategy
   static Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
+    GetIt.I.registerSingleton<BoxService>(BoxService());
     _setAccessTokenUrl(accessTokenUrl);
     WorkmanagerWrapper.setUpWorkmanager();
     TokenManager.init(tokenManagerStrategies, headers);
@@ -62,7 +64,7 @@ abstract class TwilioProgrammableVoice {
       WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
     } catch (err) {
       isRegistrationValid = false;
-      await BoxWrapper.getInstance().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
+      await GetIt.I<BoxService>().getBox().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
       registerVoice(accessTokenUrl: accessTokenUrl);
     }
 
