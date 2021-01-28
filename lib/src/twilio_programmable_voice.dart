@@ -35,8 +35,8 @@ abstract class TwilioProgrammableVoice {
     _setAccessTokenUrl(accessTokenUrl);
     WorkmanagerWrapper.setUpWorkmanager();
     TokenManager.init(tokenManagerStrategies, headers);
-
     final bool isRegistrationValid = await registerVoice(accessTokenUrl: accessTokenUrl);
+    
     return isRegistrationValid;
   }
 

@@ -28,6 +28,7 @@ dev_dependencies:
   hive_generator: ^0.8.2
   build_runner: ^1.10.12
   mockito: ^4.1.4
+  start_jwt: ^0.2.0
 
 flutter:
   plugin:
