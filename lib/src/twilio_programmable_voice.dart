@@ -55,24 +55,16 @@ abstract class TwilioProgrammableVoice {
     String accessToken = await TokenManager.getAccessToken(accessTokenUrl: accessTokenUrl);
     String fcmToken = await TokenManager.getFcmToken();
 
-    print('[registerVoice] token getted');
-    print('accessToken : ' + accessToken);
-    print('fcmToken : ' + fcmToken);
-
     try {
-      print('[registerVoice] in try');
       await _methodChannel.invokeMethod(
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       TokenManager.persistAccessToken(accessToken: accessToken);
       WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
     } catch (err) {
-      print('[registerVoice] in catch');
       isRegistrationValid = false;
       await BoxWrapper.getInstance().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
       registerVoice(accessTokenUrl: accessTokenUrl);
     }
-
-    print("[registerVoice] end of function : isRegistrationValid : " + isRegistrationValid.toString());
 
     return isRegistrationValid;
   }
