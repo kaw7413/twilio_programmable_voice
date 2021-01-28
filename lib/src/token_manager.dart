@@ -49,43 +49,27 @@ abstract class TokenManager {
   }
 
   static Future<String> getAccessToken({@required String accessTokenUrl}) async {
-    print('[getAccessToken] getAccessToken called');
-    String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.ACCESS_TOKEN)).catchError(print);
-    print('[getAccessToken] accessToken from hive : $accessToken');
+    String accessToken = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.ACCESS_TOKEN));
     if (accessToken == null) {
-      print('[getAccessToken] accessToken is null');
       accessToken = await _accessTokenStrategyBinder(accessTokenUrl: accessTokenUrl);
     }
 
-    print('[getAccessToken] accessToken returned : ' + accessToken);
     return accessToken;
   }
 
   static Future<String> _accessTokenStrategyBinder({@required String accessTokenUrl}) async {
-    print('[_accessTokenStrategyBinder] _accessTokenStrategyBinder called');
     return await BoxWrapper.getInstance().then((box) async {
-      print('[_accessTokenStrategyBinder] in Hive callback');
       if (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) == AccessTokenStrategy.GET) {
-        print('[_accessTokenStrategyBinder] GET strategy');
         return await _httpGetAccessTokenStrategy(accessTokenUrl: accessTokenUrl);
       } else {
-        print('[_accessTokenStrategyBinder] NO strategy');
         throw(_UNDEFINED_ACCESS_TOKEN_STRATEGY);
       }
     });
   }
 
   static Future<String> _httpGetAccessTokenStrategy({@required String accessTokenUrl}) async {
-    print('[_httpGetAccessTokenStrategy] _httpGetAccessTokenStrategy called');
-    final headers = await getHeaders();
-    print('[_httpGetAccessTokenStrategy] before headers loop');
-    headers.forEach((key, value) {
-      print('[_httpGetAccessTokenStrategy] in headers loop');
-      print('key : ' + key.toString() + 'value : ' + value.toString());
-    });
-
+    final headers = await _getHeaders();
     final tokenResponse = await Dio().get(accessTokenUrl, options: Options(headers: headers));
-    print('[_httpGetAccessTokenStrategy] tokenResponse.data : ' + tokenResponse.data);
     return tokenResponse.data;
   }
 
@@ -93,39 +77,35 @@ abstract class TokenManager {
     await BoxWrapper.getInstance().then((box) => box.put(BoxKeys.ACCESS_TOKEN, accessToken));
   }
 
+  static Future<void> removeAccessToken() async {
+    await BoxWrapper.getInstance().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
+  }
+
   static Future<void> _setHeaders({@required Map<String, dynamic> headers}) async {
     await BoxWrapper.getInstance().then((box) => box.put(BoxKeys.HEADERS, headers));
   }
 
-  static Future<Map<String, dynamic>> getHeaders() async {
-    // typecast to Map<String, dynamic>, box.get isn't type safe
-    final Map<String, dynamic> headers = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.HEADERS));
-    return headers;
+  static Future<Map<String, dynamic>> _getHeaders() async {
+    final headers = await BoxWrapper.getInstance().then((box) => box.get(BoxKeys.HEADERS));
+
+    return Map<String, dynamic>.from(headers);
   }
 
   static Future<String> getFcmToken() async {
-    print('[getFcmToken] getFcmToken called');
-    final tmp = await _fcmTokenStrategyBinder();
-    print('[getFcmToken] fcmToken' + tmp);
-    return tmp;
+    return await _fcmTokenStrategyBinder();
   }
 
   static Future<String> _fcmTokenStrategyBinder() async {
-    print('[_fcmTokenStrategyBinder] _fcmTokenStrategyBinder called');
     return await BoxWrapper.getInstance().then((box) {
-      print('[_fcmTokenStrategyBinder] in Hive callback');
       if (box.get(BoxKeys.FCM_TOKEN_STRATEGY) == FcmTokenStrategy.FIREBASE_MESSAGING) {
-        print('[_fcmTokenStrategyBinder] FIREBASE strategy');
         return _firebaseMessagingFcmTokenStrategy();
       } else {
-        print('[_fcmTokenStrategyBinder] NO strategy');
         throw(_UNDEFINED_FCM_TOKEN_STRATEGY);
       }
     });
   }
 
   static Future<String> _firebaseMessagingFcmTokenStrategy() {
-    print('[ _firebaseMessagingFcmTokenStrategy] FIREBASE strategy');
     return FirebaseMessaging().getToken();
   }
 }

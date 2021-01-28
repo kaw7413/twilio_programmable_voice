@@ -5,7 +5,6 @@ import 'box_utils.dart';
 
 class BoxWrapper {
   static Box _instance;
-  static const _BOX = "TwilioProgrammableVoiceBox";
   static Future _boxCreated;
 
   static Future<Box> getInstance() async {
