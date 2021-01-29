@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:twilio_programmable_voice/src/injector.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:uuid/uuid.dart';
 
@@ -14,16 +15,14 @@ abstract class WorkmanagerWrapper {
   static const BG_URL_DATA_KEY = "accessTokenUrl";
 
   static void setUpWorkmanager([Workmanager mockWorkmanager]) {
-    Workmanager().initialize(
-        callbackDispatcher,
-        isInDebugMode: true
-    );
-    Workmanager().cancelByTag(_BG_TAG);
+    getService<Workmanager>()
+        .initialize(callbackDispatcher, isInDebugMode: true);
+    getService<Workmanager>().cancelByTag(_BG_TAG);
   }
 
   static Future<void> launchJobInBg(
       {@required String accessTokenUrl, @required String accessToken}) async {
-    Workmanager().registerOneOffTask(getUniqueName(), _BG_TASK_NAME,
+    getService<Workmanager>().registerOneOffTask(getUniqueName(), _BG_TASK_NAME,
         tag: _BG_TAG,
         constraints: Constraints(
           networkType: NetworkType.connected,
@@ -31,11 +30,8 @@ abstract class WorkmanagerWrapper {
         existingWorkPolicy: ExistingWorkPolicy.replace,
         backoffPolicy: BackoffPolicy.linear,
         backoffPolicyDelay: BG_BACKOFF_POLICY_DELAY,
-        inputData: {
-          BG_URL_DATA_KEY: accessTokenUrl
-        },
-        initialDelay: getDelayBeforeExec(accessToken: accessToken)
-    );
+        inputData: {BG_URL_DATA_KEY: accessTokenUrl},
+        initialDelay: getDelayBeforeExec(accessToken: accessToken));
   }
 
   @visibleForTesting

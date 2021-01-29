@@ -34,10 +34,12 @@ dynamic servicesFactory(String type) {
 }
 
 @visibleForTesting
-void mockService<T>({@required T mock}) {
+T mockService<T>({@required T mock}) {
   if (GetIt.I.isRegistered<T>()) {
     GetIt.I.unregister<T>();
   }
 
   GetIt.I.registerSingleton<T>(mock);
+
+  return mock;
 }
