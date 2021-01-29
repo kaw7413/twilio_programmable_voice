@@ -13,17 +13,17 @@ abstract class WorkmanagerWrapper {
   static const BG_BACKOFF_POLICY_DELAY = Duration(seconds: 15);
   static const BG_URL_DATA_KEY = "accessTokenUrl";
 
-  static void setUpWorkmanager() {
-    Workmanager.initialize(
+  static void setUpWorkmanager([Workmanager mockWorkmanager]) {
+    Workmanager().initialize(
         callbackDispatcher,
         isInDebugMode: true
     );
-    Workmanager.cancelByTag(_BG_TAG);
+    Workmanager().cancelByTag(_BG_TAG);
   }
 
   static Future<void> launchJobInBg(
       {@required String accessTokenUrl, @required String accessToken}) async {
-    Workmanager.registerOneOffTask(getUniqueName(), _BG_TASK_NAME,
+    Workmanager().registerOneOffTask(getUniqueName(), _BG_TASK_NAME,
         tag: _BG_TAG,
         constraints: Constraints(
           networkType: NetworkType.connected,

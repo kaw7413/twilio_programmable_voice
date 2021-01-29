@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:meta/meta.dart';
-import 'package:get_it/get_it.dart';
 
 import 'box_utils.dart';
-import 'events.dart';
+// TODO make a folder service with proper export
 import 'box_service.dart';
-import 'token_manager.dart';
+import 'events.dart';
+import 'token_service.dart';
 import 'workmanager_wrapper.dart';
+import 'injector.dart';
 
 abstract class TwilioProgrammableVoice {
   static const _ACCESS_TOKEN_URL_IS_NULL = "You must provide a valid accessTokenUrl, null was provided";
@@ -33,12 +34,9 @@ abstract class TwilioProgrammableVoice {
   ///
   /// [headers] optional headers, use by the GET access token strategy
   static Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
-    GetIt.I.registerSingleton<BoxService>(BoxService());
     _setAccessTokenUrl(accessTokenUrl);
     WorkmanagerWrapper.setUpWorkmanager();
-    TokenManager.init(tokenManagerStrategies, headers);
     final bool isRegistrationValid = await registerVoice(accessTokenUrl: accessTokenUrl);
-    
     return isRegistrationValid;
   }
 
@@ -54,17 +52,17 @@ abstract class TwilioProgrammableVoice {
   /// by HTTP GET method
   static Future<bool> registerVoice({@required String accessTokenUrl}) async {
     bool isRegistrationValid = true;
-    String accessToken = await TokenManager.getAccessToken(accessTokenUrl: accessTokenUrl);
-    String fcmToken = await TokenManager.getFcmToken();
+    String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: accessTokenUrl);
+    String fcmToken = await getService<TokenService>().getFcmToken();
 
     try {
       await _methodChannel.invokeMethod(
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
-      TokenManager.persistAccessToken(accessToken: accessToken);
+      getService<TokenService>().persistAccessToken(accessToken: accessToken);
       WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
     } catch (err) {
       isRegistrationValid = false;
-      await GetIt.I<BoxService>().getBox().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
+      await getService<BoxService>().getBox().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
       registerVoice(accessTokenUrl: accessTokenUrl);
     }
 
@@ -76,7 +74,7 @@ abstract class TwilioProgrammableVoice {
   /// [from] this device identity (or number)
   /// [to] the target identity (or number)
   static Future<bool> makeCall({@required String from, @required String to}) async {
-    String accessToken = await TokenManager.getAccessToken(accessTokenUrl: _accessTokenUrl);
+    String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: _accessTokenUrl);
     return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to, "accessToken": accessToken});
   }
 

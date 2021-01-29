@@ -689,9 +689,11 @@ packages:
   workmanager:
     dependency: "direct main"
     description:
-      name: workmanager
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: workmanager-factory
+      resolved-ref: "3afab63c0383c6584f07e4b66e7abb34256c109b"
+      url: "git://github.com/Pierre-Monier/flutter_workmanager.git"
+    source: git
     version: "0.2.3"
   xdg_directories:
     dependency: transitive
