@@ -71,4 +71,14 @@ void main() {
       // @TODO: verify box.delete call
     });
   });
+
+  group('makeCall', () {
+    test('should get the token from token service and call makeCall', () async {
+      when(mockTokenService.getAccessToken(accessTokenUrl: anyNamed("accessTokenUrl"))).thenAnswer((realInvocation) async => token);
+
+      await TwilioProgrammableVoice().makeCall(from: "from", to: "to");
+
+      verify(mockTokenService.getAccessToken(accessTokenUrl: anyNamed("accessTokenUrl")));
+    });
+  });
 }
