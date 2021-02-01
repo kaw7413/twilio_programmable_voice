@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mockito/mockito.dart';
 import 'package:dio/dio.dart';
 
@@ -12,6 +13,8 @@ import 'package:twilio_programmable_voice/src/box_utils.dart';
 import 'package:twilio_programmable_voice/src/token_service.dart';
 import 'package:twilio_programmable_voice/src/injector.dart';
 import 'package:twilio_programmable_voice/src/exceptions.dart';
+
+import 'workmanager_wrapper_test.dart';
 
 class MockBoxService extends Mock implements BoxService {}
 class MockTokenService extends Mock implements TokenService {}
@@ -53,17 +56,19 @@ void main() {
   });
 
   group('accessToken related', () {
-    test('it should execute the httpGet strategy when it s set', () async {
-      final mockDio = MockDio();
-      final serv = TokenService(mock: mockDio);
-      when(mockDio.get(any))
-          .thenAnswer((_) async => Response<String>(data: "some data"));
+    test('it should execute the httpGet strategy when it\'s set', () async {
+      final dio = Dio();
+      final dioAdapter = DioAdapter();
+
+      dio.httpClientAdapter = dioAdapter;
+
+      dioAdapter.onGet("fakeAccessTokenUrl").reply(200, token);
+
+      final serv = TokenService(mock: dio);
 
       final data = await serv.accessTokenStrategyBinder(accessTokenUrl: "fakeAccessTokenUrl");
 
-      // TODO this sadly doesn't work because data = null
-      // people are doing weird things to test Dio... maybe they are right
-      expect(data, "some data");
+      expect(data, token);
     });
 
     test('It should throw an exception with undefined AccessTokenStrategy', () {
