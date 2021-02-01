@@ -23,17 +23,17 @@ Future<void> initCallKeep(FlutterCallkeep callKeep) async {
 }
 
 void didDisplayIncomingCall(CallKeepDidDisplayIncomingCall event) {
-  var callUUID = TwilioProgrammableVoice.getCall.sid;
+  var callUUID = TwilioProgrammableVoice().getCall.sid;
   var number = event.handle;
   print('[displayIncomingCall] $callUUID number: $number');
 }
 
 Future<void> answerCall(CallKeepPerformAnswerCallAction event) async {
-  final String callUUID = TwilioProgrammableVoice.getCall.sid;
-  final String from = TwilioProgrammableVoice.getCall.from;
+  final String callUUID = TwilioProgrammableVoice().getCall.sid;
+  final String from = TwilioProgrammableVoice().getCall.from;
   print('[answerCall] $callUUID, from: $from');
 
-  TwilioProgrammableVoice.answer();
+  TwilioProgrammableVoice().answer();
 
   _callKeep.setCurrentCallActive(callUUID);
 }
@@ -52,11 +52,11 @@ Future<void> didReceiveStartCallAction(
     return;
   }
 
-  final String callUUID = TwilioProgrammableVoice.getCall.sid;
+  final String callUUID = TwilioProgrammableVoice().getCall.sid;
 
   print('[didReceiveStartCallAction] $callUUID, number: ${event.handle}');
 
-  _callKeep.startCall(callUUID, TwilioProgrammableVoice.getCall.from, "Caller Name");
+  _callKeep.startCall(callUUID, TwilioProgrammableVoice().getCall.from, "Caller Name");
 
   Timer(const Duration(seconds: 1), () {
     print('[setCurrentCallActive] $callUUID, number: ${event.handle}');
@@ -67,18 +67,18 @@ Future<void> didReceiveStartCallAction(
 Future<void> didToggleHoldCallAction(
     CallKeepDidToggleHoldAction event) async {
   print(
-      '[didToggleHoldCallAction] ${event.callUUID}, hold (${TwilioProgrammableVoice.getCall.isOnHold})');
+      '[didToggleHoldCallAction] ${event.callUUID}, hold (${TwilioProgrammableVoice().getCall.isOnHold})');
 }
 
 Future<void> didPerformSetMutedCallAction(
     CallKeepDidPerformSetMutedCallAction event) async {
   print(
-      '[didPerformSetMutedCallAction] ${event.callUUID}, muted: ${TwilioProgrammableVoice.getCall.isMuted}');
+      '[didPerformSetMutedCallAction] ${event.callUUID}, muted: ${TwilioProgrammableVoice().getCall.isMuted}');
 }
 
 Future<void> endCall(CallKeepPerformEndCallAction event) async {
   print('endCall: ${event.callUUID}');
-  await TwilioProgrammableVoice.reject();
+  await TwilioProgrammableVoice().reject();
 }
 
 

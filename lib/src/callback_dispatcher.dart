@@ -12,7 +12,7 @@ Future<void> callbackDispatcher() async {
 // @TODO test this function when TwilioProgrammableVoice will be a singleton
 Future<bool> taskHandler(String task, Map<String, dynamic> inputData) async {
   await getService<TokenService>().removeAccessToken();
-  final bool isRegistrationValid = await TwilioProgrammableVoice.registerVoice(
+  final bool isRegistrationValid = await TwilioProgrammableVoice().registerVoice(
       accessTokenUrl: inputData[WorkmanagerWrapper.BG_URL_DATA_KEY]);
   return isRegistrationValid;
 }

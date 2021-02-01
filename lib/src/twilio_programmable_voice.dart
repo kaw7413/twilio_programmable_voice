@@ -12,15 +12,25 @@ import 'token_service.dart';
 import 'workmanager_wrapper.dart';
 import 'injector.dart';
 
-abstract class TwilioProgrammableVoice {
-  static const _ACCESS_TOKEN_URL_IS_NULL = "You must provide a valid accessTokenUrl, null was provided";
-  static CallEvent _currentCallEvent;
-  static String _accessTokenUrl;
+class TwilioProgrammableVoice {
+  String _ACCESS_TOKEN_URL_IS_NULL = "You must provide a valid accessTokenUrl, null was provided";
+  CallEvent _currentCallEvent;
+  String _accessTokenUrl;
 
-  static final MethodChannel _methodChannel =
+  final MethodChannel _methodChannel =
       const MethodChannel('twilio_programmable_voice');
-  static final EventChannel _callStatusEventChannel =
+  final EventChannel _callStatusEventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
+
+  static final TwilioProgrammableVoice _singleton = new TwilioProgrammableVoice._internal();
+
+  factory TwilioProgrammableVoice() {
+    return _singleton;
+  }
+
+  TwilioProgrammableVoice._internal() {
+    // Initialization logic goes here.
+  }
 
   /// Must be the first function you call in the TwilioProgrammableVoice package
   ///
@@ -33,7 +43,7 @@ abstract class TwilioProgrammableVoice {
   /// [tokenManagerStrategies] an optional map where you can set defined the strategies you want to use to retrieve tokens
   ///
   /// [headers] optional headers, use by the GET access token strategy
-  static Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
+  Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
     _setAccessTokenUrl(accessTokenUrl);
     WorkmanagerWrapper.setUpWorkmanager();
     final bool isRegistrationValid = await registerVoice(accessTokenUrl: accessTokenUrl);
@@ -50,7 +60,7 @@ abstract class TwilioProgrammableVoice {
   ///
   /// [accessTokenUrl] an url which returns a valid accessToken when access
   /// by HTTP GET method
-  static Future<bool> registerVoice({@required String accessTokenUrl}) async {
+  Future<bool> registerVoice({@required String accessTokenUrl}) async {
     bool isRegistrationValid = true;
     String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: accessTokenUrl);
     String fcmToken = await getService<TokenService>().getFcmToken();
@@ -73,30 +83,30 @@ abstract class TwilioProgrammableVoice {
   ///
   /// [from] this device identity (or number)
   /// [to] the target identity (or number)
-  static Future<bool> makeCall({@required String from, @required String to}) async {
+  Future<bool> makeCall({@required String from, @required String to}) async {
     String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: _accessTokenUrl);
     return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to, "accessToken": accessToken});
   }
 
   /// Answer the current call invite
-  static Future<String> answer() {
+  Future<String> answer() {
     return _methodChannel.invokeMethod('answer');
   }
 
   /// Handle Fcm Message and delegate to Twilio
-  static Future<bool> handleMessage({@required Map<String, String> data}) {
+  Future<bool> handleMessage({@required Map<String, String> data}) {
     return _methodChannel.invokeMethod('handleMessage', {"messageData": data});
   }
 
   /// Reject the current call invite
-  static Future<void> reject() {
+  Future<void> reject() {
     return _methodChannel.invokeMethod('reject');
   }
 
   /// Request microphone permission on the platform
   ///
   /// Return the microphone [PermissionStatus] after trying to request permissions.
-  static Future<PermissionStatus> requestMicrophonePermissions() async {
+  Future<PermissionStatus> requestMicrophonePermissions() async {
     final microphonePermissionStatus = await Permission.microphone.status;
 
     if (!microphonePermissionStatus.isGranted) {
@@ -107,7 +117,7 @@ abstract class TwilioProgrammableVoice {
   }
 
   /// Get the incoming calls stream
-  static Stream<CallEvent> get callStatusStream {
+  Stream<CallEvent> get callStatusStream {
     CallEvent currentCallEvent;
 
     return _callStatusEventChannel.receiveBroadcastStream().where((data) => _containsCall(data['type'])).map((data) {
@@ -157,7 +167,7 @@ abstract class TwilioProgrammableVoice {
     });
   }
 
-  static void _setAccessTokenUrl([String accessTokenUrl]) {
+  void _setAccessTokenUrl([String accessTokenUrl]) {
     if (accessTokenUrl == null) {
       throw(_ACCESS_TOKEN_URL_IS_NULL);
     }
@@ -165,13 +175,13 @@ abstract class TwilioProgrammableVoice {
     _accessTokenUrl = accessTokenUrl;
   }
 
-  static bool _containsCall(dynamic value) {
+  bool _containsCall(dynamic value) {
     if (value is String) {
       return value.contains("Call");
     }
     return false;
   }
 
-  static get getCall => _currentCallEvent;
+  get getCall => _currentCallEvent;
 }
 

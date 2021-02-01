@@ -18,18 +18,18 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
       print("Message is a Twilio Message");
 
       final dataMap = Map<String, String>.from(message["data"]);
-      final callUUID = TwilioProgrammableVoice.getCall.sid;
+      final callUUID = TwilioProgrammableVoice().getCall.sid;
 
       _callKeep.on(CallKeepPerformAnswerCallAction(),
               (CallKeepPerformAnswerCallAction event) async {
             print(
                 'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
 
-            _callKeep.startCall(event.callUUID, TwilioProgrammableVoice.getCall.from, "callerName");
+            _callKeep.startCall(event.callUUID, TwilioProgrammableVoice().getCall.from, "callerName");
 
-            await TwilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl);
-            await TwilioProgrammableVoice.handleMessage(data: dataMap);
-            await TwilioProgrammableVoice.answer();
+            await TwilioProgrammableVoice().setUp(accessTokenUrl: accessTokenUrl);
+            await TwilioProgrammableVoice().handleMessage(data: dataMap);
+            await TwilioProgrammableVoice().answer();
 
             _callKeep.setCurrentCallActive(callUUID);
           });
@@ -39,9 +39,9 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
             print(
                 'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
 
-            await TwilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl);
-            await TwilioProgrammableVoice.handleMessage(data: dataMap);
-            await TwilioProgrammableVoice.reject();
+            await TwilioProgrammableVoice().setUp(accessTokenUrl: accessTokenUrl);
+            await TwilioProgrammableVoice().handleMessage(data: dataMap);
+            await TwilioProgrammableVoice().reject();
           });
 
       if (!_callKeepInited) {
@@ -54,7 +54,7 @@ Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
 
       // TODO: Make sure the accessToken is still valid ?
       // We can't handle message here, need to create the call screen first
-      // TwilioProgrammableVoice.handleMessage(dataMap);
+      // TwilioProgrammableVoice().handleMessage(dataMap);
       print("handleMessage called in main.dart");
     }
   }
