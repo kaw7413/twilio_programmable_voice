@@ -14,7 +14,7 @@ abstract class WorkmanagerWrapper {
   static const BG_BACKOFF_POLICY_DELAY = Duration(seconds: 15);
   static const BG_URL_DATA_KEY = "accessTokenUrl";
 
-  static void setUpWorkmanager([Workmanager mockWorkmanager]) {
+  static void setUpWorkmanager() {
     getService<Workmanager>()
         .initialize(callbackDispatcher, isInDebugMode: true);
     getService<Workmanager>().cancelByTag(_BG_TAG);

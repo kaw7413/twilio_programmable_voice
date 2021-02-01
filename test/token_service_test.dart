@@ -31,7 +31,7 @@ void main() {
   setUp(() {
     TestWidgetsFlutterBinding.ensureInitialized();
     mockBox = MockBox();
-    final mockBoxService = mockService<BoxService>(mock: MockBoxService());
+    mockService<BoxService>(mock: MockBoxService());
     when(mockBox.get(BoxKeys.FCM_TOKEN_STRATEGY))
         .thenReturn(FcmTokenStrategy.FIREBASE_MESSAGING);
     when(mockBox.get(BoxKeys.ACCESS_TOKEN_STRATEGY))
