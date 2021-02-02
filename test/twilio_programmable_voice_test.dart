@@ -39,6 +39,14 @@ void main() {
         }
         return true;
       }
+
+      if (methodCall.method == 'answer') {
+        return "ok";
+      }
+
+      if (methodCall.method == 'handleMessage') {
+        return true;
+      }
     });
 
     mockWorkmanager = mockService<Workmanager>(mock: MockWorkmanager());
@@ -79,6 +87,25 @@ void main() {
       await TwilioProgrammableVoice().makeCall(from: "from", to: "to");
 
       verify(mockTokenService.getAccessToken(accessTokenUrl: anyNamed("accessTokenUrl")));
+    });
+  });
+
+  group('answer', () {
+    test('it should return the method channel <String> response', () async {
+      expect(await TwilioProgrammableVoice().answer(), "ok");
+    });
+  });
+
+  group('reject', () {
+    test('it should return the method channel <String> response', () async {
+      // @TODO: make the test useful ?
+      await TwilioProgrammableVoice().reject();
+    });
+  });
+
+  group('handleMessage', () {
+    test('it should return the method channel <Boolean> response', () async {
+      expect(await TwilioProgrammableVoice().handleMessage(data: {}), true);
     });
   });
 }
