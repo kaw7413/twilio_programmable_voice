@@ -3,11 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mockito/mockito.dart';
 import 'package:start_jwt/json_web_token.dart';
+import 'package:workmanager/workmanager.dart';
+
+import 'package:twilio_programmable_voice/src/box_utils.dart';
 import 'package:twilio_programmable_voice/src/box_service.dart';
 import 'package:twilio_programmable_voice/src/injector.dart';
 import 'package:twilio_programmable_voice/src/token_service.dart';
 import 'package:twilio_programmable_voice/src/twilio_programmable_voice.dart';
-import 'package:workmanager/workmanager.dart';
 
 class MockWorkmanager extends Mock implements Workmanager {}
 class MockTokenService extends Mock implements TokenService {}
@@ -75,8 +77,7 @@ void main() {
       when(mockTokenService.getAccessToken(accessTokenUrl: anyNamed("accessTokenUrl"))).thenAnswer((realInvocation) async => "throw");
 
       expect(await TwilioProgrammableVoice().setUp(accessTokenUrl: "fakeAccessToken"), false);
-
-      // @TODO: verify box.delete call
+      verify(mockBox.delete(BoxKeys.ACCESS_TOKEN));
     });
   });
 
@@ -97,8 +98,7 @@ void main() {
   });
 
   group('reject', () {
-    test('it should return the method channel <String> response', () async {
-      // @TODO: make the test useful ?
+    test('it should execute without exception', () async {
       await TwilioProgrammableVoice().reject();
     });
   });

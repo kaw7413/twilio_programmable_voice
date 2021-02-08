@@ -4,7 +4,7 @@ class UndefinedFcmTokenStrategyException implements Exception {
   UndefinedFcmTokenStrategyException();
 
   @override
-  String toString() => 'UndefinedFcmTokenStrategy($message)';
+  String toString() => 'UndefinedFcmTokenStrategyException($message)';
 }
 
 class UndefinedAccessTokenStrategyException implements Exception {
@@ -13,7 +13,7 @@ class UndefinedAccessTokenStrategyException implements Exception {
   UndefinedAccessTokenStrategyException();
 
   @override
-  String toString() => 'UndefinedAccessTokenStrategy($message)';
+  String toString() => 'UndefinedAccessTokenStrategyException($message)';
 }
 
 class NoValuePassToAccessTokenStrategyException implements Exception {
@@ -34,11 +34,29 @@ class NoValuePassFcmTokenStrategyException implements Exception {
   String toString() => 'NoValuePassFcmTokenStrategyException($message)';
 }
 
-class SettingNonExistingStrategies {
+class SettingNonExistingStrategiesException {
   final String message = "The only strategies you can set are the BoxKeys.FCM_TOKEN_STRATEGY and the BoxKeys.ACCESS_TOKEN_STRATEGY";
 
-  SettingNonExistingStrategies();
+  SettingNonExistingStrategiesException();
 
   @override
-  String toString() => 'SettingNonExistingStrategies($message)';
+  String toString() => 'SettingNonExistingStrategiesException($message)';
+}
+
+class GettingUnknownServiceException {
+  final String message = "You try to instantiate an unknown service, you can only instantiate services of type: BoxService, TokenService or WorkManager";
+
+  GettingUnknownServiceException();
+
+  @override
+  String toString() => 'GettingUnknownServiceException($message)';
+}
+
+class AccessTokenUrlIsNullException {
+  final String message = "You must provide a valid accessTokenUrl, null was provided";
+
+  AccessTokenUrlIsNullException();
+
+  @override
+  String toString() => 'AccessTokenUrlIsNullException($message)';
 }

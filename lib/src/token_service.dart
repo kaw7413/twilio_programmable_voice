@@ -12,15 +12,10 @@ class TokenService {
   // This is wip, it might not be necessary
   Dio client;
 
-  TokenService(
-      {Map<String, String> strategies,
-      Map<String, dynamic> headers,
-      Dio mock}) {
-    init(strategies : strategies, headers : headers);
+  TokenService({Dio mock}) {
     this.client = mock ?? Dio();
   }
 
-  @visibleForTesting
   Future<void> init(
       {Map<String, String> strategies,
       Map<String, dynamic> headers}) async {
@@ -32,7 +27,7 @@ class TokenService {
     }
 
     if (headers != null) {
-      setHeaders(headers: headers);
+      await setHeaders(headers: headers);
     }
   }
   
@@ -40,7 +35,7 @@ class TokenService {
   Future<void> setUpStrategies({@required Map<String, Object> strategies}) async {
     if (!strategies.containsKey(BoxKeys.ACCESS_TOKEN_STRATEGY)
         && !strategies.containsKey(BoxKeys.FCM_TOKEN_STRATEGY)) {
-      throw(SettingNonExistingStrategies());
+      throw SettingNonExistingStrategiesException();
     }
 
     await getService<BoxService>().getBox().then((box) {
@@ -80,7 +75,7 @@ class TokenService {
       if (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) == AccessTokenStrategy.GET) {
         return await _httpGetAccessTokenStrategy(accessTokenUrl: accessTokenUrl);
       } else {
-        throw(UndefinedAccessTokenStrategyException());
+        throw UndefinedAccessTokenStrategyException();
       }
     });
   }
@@ -112,16 +107,15 @@ class TokenService {
   }
 
   Future<String> getFcmToken() async {
-    return await fcmTokenStrategyBinder();
+    return await _fcmTokenStrategyBinder();
   }
-
-  @visibleForTesting
-  Future<String> fcmTokenStrategyBinder() async {
+  
+  Future<String> _fcmTokenStrategyBinder() async {
     return await getService<BoxService>().getBox().then((box) {
       if (box.get(BoxKeys.FCM_TOKEN_STRATEGY) == FcmTokenStrategy.FIREBASE_MESSAGING) {
         return _firebaseMessagingFcmTokenStrategy();
       } else {
-        throw(UndefinedFcmTokenStrategyException());
+        throw UndefinedFcmTokenStrategyException();
       }
     });
   }

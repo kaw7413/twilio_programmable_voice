@@ -5,15 +5,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:meta/meta.dart';
 
 import 'box_utils.dart';
-// TODO make a folder service with proper export
 import 'box_service.dart';
 import 'events.dart';
 import 'token_service.dart';
+import 'exceptions.dart';
 import 'workmanager_wrapper.dart';
 import 'injector.dart';
 
 class TwilioProgrammableVoice {
-  String _ACCESS_TOKEN_URL_IS_NULL = "You must provide a valid accessTokenUrl, null was provided";
   CallEvent _currentCallEvent;
   String _accessTokenUrl;
 
@@ -45,6 +44,7 @@ class TwilioProgrammableVoice {
   /// [headers] optional headers, use by the GET access token strategy
   Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
     _setAccessTokenUrl(accessTokenUrl);
+    getService<TokenService>().init(strategies: tokenManagerStrategies, headers: headers);
     WorkmanagerWrapper.setUpWorkmanager();
     final bool isRegistrationValid = await registerVoice(accessTokenUrl: accessTokenUrl);
     return isRegistrationValid;
@@ -169,7 +169,7 @@ class TwilioProgrammableVoice {
 
   void _setAccessTokenUrl([String accessTokenUrl]) {
     if (accessTokenUrl == null) {
-      throw(_ACCESS_TOKEN_URL_IS_NULL);
+      throw AccessTokenUrlIsNullException();
     }
 
     _accessTokenUrl = accessTokenUrl;

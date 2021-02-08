@@ -1,10 +1,10 @@
 import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
-
-import 'package:twilio_programmable_voice/src/token_service.dart';
 import 'package:workmanager/workmanager.dart';
-import 'box_service.dart';
+
 import 'token_service.dart';
+import 'box_service.dart';
+import 'exceptions.dart';
 
 abstract class PluginServices {
   static const BoxService = "BoxService";
@@ -29,7 +29,7 @@ dynamic servicesFactory(String type) {
     case PluginServices.WorkManager:
       return Workmanager();
     default:
-      throw ('You try to instantiate a non existing service');
+      throw GettingUnknownServiceException();
   }
 }
 
