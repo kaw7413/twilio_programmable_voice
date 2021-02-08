@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   final FlutterCallkeep _callKeep = FlutterCallkeep();
 
   Future<void> setUpTwilioProgrammableVoice() async {
-    await TwilioProgrammableVoice.requestMicrophonePermissions().then(logger.d);
+    await TwilioProgrammableVoice().requestMicrophonePermissions().then(logger.d);
     await checkDefaultPhoneAccount();
     // TODO uncomment this when callkeep merge our pull request
     // await checkDefaultPhoneAccount().then((userAccept) {
@@ -39,8 +39,8 @@ class _HomePageState extends State<HomePage> {
     //   logger.d("User has taped ok the telecom manager permission dialog : " + userAccept.toString());
     // });
 
-    TwilioProgrammableVoice.callStatusStream.listen((event) async {
-      logger.d("[TwilioProgrammableVoice Event]");
+    TwilioProgrammableVoice().callStatusStream.listen((event) async {
+      logger.d("[TwilioProgrammableVoice() Event]");
 
       // TODO: make this readable
       if (event is CallInvite) {
@@ -57,8 +57,8 @@ class _HomePageState extends State<HomePage> {
       } else if (event is CallRinging) {
         logger.d("CALL_RINGING", event);
         SoundPoolManager.getInstance().stopRinging();
-        // TwilioProgrammableVoice.getCall.to and TwilioProgrammableVoice.getCall.from are always null when making a call
-        // TODO replace brut phone number with TwilioProgrammableVoice.getCall.to
+        // TwilioProgrammableVoice().getCall.to and TwilioProgrammableVoice().getCall.from are always null when making a call
+        // TODO replace brut phone number with TwilioProgrammableVoice().getCall.to
         await displayMakeCallScreen("+33787934070", "Display Caller Name");
       } else if (event is CallConnected) {
         logger.d("CALL_CONNECTED", event);
@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
     await DotEnv().load('.env');
     final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
-    TwilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl, headers : {"TestHeader": "I'm a test header"}).then((isRegistrationValid) {
+    TwilioProgrammableVoice().setUp(accessTokenUrl: accessTokenUrl, headers : {"TestHeader": "I'm a test header"}).then((isRegistrationValid) {
       logger.d("registration is valid: " + isRegistrationValid.toString());
     });
   }
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
       String targetNumber, String callerDisplayName) async {
     logger.d('[displayMakeCallScreen] called');
 
-    final String callUUID = TwilioProgrammableVoice.getCall.sid;
+    final String callUUID = TwilioProgrammableVoice().getCall.sid;
     await checkDefaultPhoneAccount();
 
     logger.d(
@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
     logger.d('[displayIncomingCallInvite] called');
 
     // TODO: review how getCall works to separate calls and call invites
-    final String callUUID = TwilioProgrammableVoice.getCall.sid;
+    final String callUUID = TwilioProgrammableVoice().getCall.sid;
     await checkDefaultPhoneAccount();
 
     logger.d(
@@ -158,9 +158,9 @@ class _HomePageState extends State<HomePage> {
 
             final dataMap = Map<String, String>.from(message["data"]);
 
-            TwilioProgrammableVoice.handleMessage(data: dataMap);
+            TwilioProgrammableVoice().handleMessage(data: dataMap);
             logger
-                .d("TwilioProgrammableVoice.handleMessage called in main.dart");
+                .d("TwilioProgrammableVoice().handleMessage called in main.dart");
           }
         }
       },
@@ -187,7 +187,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               FlatButton(
                   onPressed: () {
-                    TwilioProgrammableVoice.makeCall(
+                    TwilioProgrammableVoice().makeCall(
                         from: "+33644645795", to: "+33787934070");
                   },
                   child: Text('Call'))

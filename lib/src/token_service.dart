@@ -12,27 +12,22 @@ class TokenService {
   // This is wip, it might not be necessary
   Dio client;
 
-  TokenService(
-      {Map<String, String> strategies,
-      Map<String, dynamic> headers,
-      Dio mock}) {
-    init(strategies : strategies, headers : headers);
+  TokenService({Dio mock}) {
     this.client = mock ?? Dio();
   }
 
-  @visibleForTesting
   Future<void> init(
       {Map<String, String> strategies,
       Map<String, dynamic> headers}) async {
     bool strategiesDefined = await areStrategiesDefined();
     if (strategies != null) {
-      setUpStrategies(strategies: strategies);
+      return setUpStrategies(strategies: strategies);
     } else if (!strategiesDefined) {
-      setUpStrategies(strategies: _DEFAULT_CONFIG);
+      return setUpStrategies(strategies: _DEFAULT_CONFIG);
     }
 
     if (headers != null) {
-      setHeaders(headers: headers);
+      await setHeaders(headers: headers);
     }
   }
   
@@ -40,20 +35,20 @@ class TokenService {
   Future<void> setUpStrategies({@required Map<String, Object> strategies}) async {
     if (!strategies.containsKey(BoxKeys.ACCESS_TOKEN_STRATEGY)
         && !strategies.containsKey(BoxKeys.FCM_TOKEN_STRATEGY)) {
-      throw(SettingNonExistingStrategies());
+      throw SettingNonExistingStrategiesException();
     }
 
     await getService<BoxService>().getBox().then((box) {
       if (strategies[BoxKeys.ACCESS_TOKEN_STRATEGY] != null) {
         box.put(BoxKeys.ACCESS_TOKEN_STRATEGY, strategies[BoxKeys.ACCESS_TOKEN_STRATEGY]);
       } else if (strategies.containsKey(BoxKeys.ACCESS_TOKEN_STRATEGY)) {
-        throw(NoValuePassToAccessTokenStrategyException());
+        throw NoValuePassToAccessTokenStrategyException();
       }
 
       if (strategies[BoxKeys.FCM_TOKEN_STRATEGY] != null) {
         box.put(BoxKeys.FCM_TOKEN_STRATEGY, strategies[BoxKeys.FCM_TOKEN_STRATEGY]);
       } else if (strategies.containsKey(BoxKeys.FCM_TOKEN_STRATEGY)) {
-        throw(NoValuePassFcmTokenStrategyException());
+        throw NoValuePassFcmTokenStrategyException();
       }
     });
   }
@@ -77,10 +72,10 @@ class TokenService {
   @visibleForTesting
   Future<String> accessTokenStrategyBinder({@required String accessTokenUrl}) async {
     return await getService<BoxService>().getBox().then((box) async {
-      if (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) == AccessTokenStrategy.GET) {;
+      if (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) == AccessTokenStrategy.GET) {
         return await _httpGetAccessTokenStrategy(accessTokenUrl: accessTokenUrl);
       } else {
-        throw(UndefinedAccessTokenStrategyException());
+        throw UndefinedAccessTokenStrategyException();
       }
     });
   }
@@ -112,16 +107,15 @@ class TokenService {
   }
 
   Future<String> getFcmToken() async {
-    return await fcmTokenStrategyBinder();
+    return await _fcmTokenStrategyBinder();
   }
-
-  @visibleForTesting
-  Future<String> fcmTokenStrategyBinder() async {
+  
+  Future<String> _fcmTokenStrategyBinder() async {
     return await getService<BoxService>().getBox().then((box) {
       if (box.get(BoxKeys.FCM_TOKEN_STRATEGY) == FcmTokenStrategy.FIREBASE_MESSAGING) {
         return _firebaseMessagingFcmTokenStrategy();
       } else {
-        throw(UndefinedFcmTokenStrategyException());
+        throw UndefinedFcmTokenStrategyException();
       }
     });
   }

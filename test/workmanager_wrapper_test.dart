@@ -1,12 +1,11 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:start_jwt/json_web_token.dart';
-import 'package:twilio_programmable_voice/src/callback_dispatcher.dart';
-import 'package:twilio_programmable_voice/src/injector.dart';
-
-import 'package:twilio_programmable_voice/src/workmanager_wrapper.dart';
 import 'package:workmanager/workmanager.dart';
+
+import 'package:twilio_programmable_voice/src/injector.dart';
+import 'package:twilio_programmable_voice/src/callback_dispatcher.dart';
+import 'package:twilio_programmable_voice/src/workmanager_wrapper.dart';
 
 class WorkmanagerMock extends Mock implements Workmanager {}
 

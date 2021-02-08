@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mockito/mockito.dart';
 import 'package:dio/dio.dart';
-
 
 import 'package:twilio_programmable_voice/src/box_service.dart';
 import 'package:twilio_programmable_voice/src/box_utils.dart';
@@ -18,59 +16,76 @@ class MockTokenService extends Mock implements TokenService {}
 class MockBox extends Mock implements Box {}
 class MockDio extends Mock implements Dio {}
 
-MockBox mockBox;
 final headers = {"data": "test"};
 final token = "fakeToken";
 final fakeDioResponse = headers;
 final fakeStrategy = "FakeStrategy";
 
 void main() {
-  setUpAll(() {
+  MockBox mockBox = MockBox();
+
+  setUp(() {
     TestWidgetsFlutterBinding.ensureInitialized();
-    mockBox = MockBox();
     mockService<BoxService>(mock: MockBoxService());
-    when(mockBox.get(BoxKeys.FCM_TOKEN_STRATEGY)).thenReturn(FcmTokenStrategy.FIREBASE_MESSAGING);
-    when(mockBox.get(BoxKeys.ACCESS_TOKEN_STRATEGY)).thenReturn(AccessTokenStrategy.GET);
+    when(mockBox.get(BoxKeys.FCM_TOKEN_STRATEGY))
+        .thenReturn(FcmTokenStrategy.FIREBASE_MESSAGING);
+    when(mockBox.get(BoxKeys.ACCESS_TOKEN_STRATEGY))
+        .thenReturn(AccessTokenStrategy.GET);
     when(mockBox.get(BoxKeys.HEADERS)).thenReturn(headers);
-    when(getService<BoxService>().getBox())
-        .thenAnswer((_) async => mockBox);
+    when(getService<BoxService>().getBox()).thenAnswer((_) async => mockBox);
   });
 
   group('fcmToken related', () {
-    test('It should execute the firebaseMessaging strategy when this strategy is set', () async {
+    test(
+        'It should execute the firebaseMessaging strategy when this strategy is set',
+        () async {
       // sadly we can't make something more clever than that because of the mock limitation
-      expect(() async => await getService<TokenService>().fcmTokenStrategyBinder(),
-          throwsA(predicate((err) => err is MissingPluginException
-          && err.message == 'No implementation found for method getToken on channel plugins.flutter.io/firebase_messaging')));
+      // only work on vm runner
+      expect(
+          () async => await getService<TokenService>().getFcmToken(),
+          throwsA(predicate((err) =>
+              err is MissingPluginException &&
+              err.message ==
+                  'No implementation found for method getToken on channel plugins.flutter.io/firebase_messaging')));
     });
 
-    test('It should throw an exception with an undefined FcmTokenStrategy', () async {
-      when(mockBox.get(BoxKeys.FCM_TOKEN_STRATEGY)).thenReturn("Undefined strategy");
+    test('It should throw an exception with an undefined FcmTokenStrategy',
+        () async {
+      when(mockBox.get(BoxKeys.FCM_TOKEN_STRATEGY))
+          .thenReturn("Undefined strategy");
 
-      expect(() async => await getService<TokenService>().fcmTokenStrategyBinder(),
-          throwsA(predicate((err) => err is UndefinedFcmTokenStrategyException)));
+      expect(
+          () async => await getService<TokenService>().getFcmToken(),
+          throwsA(isInstanceOf<UndefinedFcmTokenStrategyException>()));
     });
   });
 
   group('accessToken related', () {
-    test('it should execute the httpGet strategy when it s set', () async {
-      final mockDio = MockDio();
-      final serv = TokenService(mock: mockDio);
-      when(mockDio.get(any))
-          .thenAnswer((_) async => Response<String>(data: "some data"));
+    test('it should execute the httpGet strategy when it\'s set', () async {
+      final dio = Dio();
+      final dioAdapter = DioAdapter();
 
-      final data = await serv.accessTokenStrategyBinder(accessTokenUrl: "fakeAccessTokenUrl");
+      dio.httpClientAdapter = dioAdapter;
 
-      // TODO this sadly doesn't work because data = null
-      // people are doing weird things to test Dio... maybe they are right
-      expect(data, "some data");
+      dioAdapter.onGet("fakeAccessTokenUrl").reply(200, token);
+
+      final tokenService = TokenService(mock: dio);
+
+      final generatedAccessToken = await tokenService.accessTokenStrategyBinder(
+          accessTokenUrl: "fakeAccessTokenUrl");
+
+      expect(generatedAccessToken, token);
     });
 
     test('It should throw an exception with undefined AccessTokenStrategy', () {
-      when(mockBox.get(BoxKeys.ACCESS_TOKEN_STRATEGY)).thenReturn("Undefined strategy");
+      when(mockBox.get(BoxKeys.ACCESS_TOKEN_STRATEGY))
+          .thenReturn("Undefined strategy");
 
-    expect(() async => await getService<TokenService>().accessTokenStrategyBinder(accessTokenUrl: "fakeAccessTokenUrl"),
-        throwsA(predicate((err) => err is UndefinedAccessTokenStrategyException)));
+      expect(
+          () async => await getService<TokenService>()
+              .accessTokenStrategyBinder(accessTokenUrl: "fakeAccessTokenUrl"),
+          throwsA(predicate(
+              (err) => err is UndefinedAccessTokenStrategyException)));
     });
   });
 
@@ -107,37 +122,103 @@ void main() {
   });
 
   group('strategies utils related', () {
+    group('init on token service when no strategies are defined', () {
+      test("should setup the default strategy", () async {
+        // we override our previous mock so it
+        // make the areStrategiesDefined method return false
+        // so it can call the setUpStrategies with default config
+        when(mockBox.get(BoxKeys.ACCESS_TOKEN_STRATEGY)).thenReturn(null);
+
+        await getService<TokenService>().init();
+
+        verify(getService<BoxService>().getBox());
+
+        verify(mockBox.put(BoxKeys.ACCESS_TOKEN_STRATEGY, AccessTokenStrategy.GET));
+        verify(mockBox.put(BoxKeys.FCM_TOKEN_STRATEGY, FcmTokenStrategy.FIREBASE_MESSAGING));
+      });
+    });
+
+    group('init when strategy is null', () {
+      test(
+          "should Throws NoValuePassToAccessTokenStrategyException when stategy is null",
+          () {
+        expect(
+            () async => await getService<TokenService>().init(strategies: {
+                  BoxKeys.ACCESS_TOKEN_STRATEGY: null,
+                  BoxKeys.FCM_TOKEN_STRATEGY: fakeStrategy
+                }),
+            throwsA(isA<NoValuePassToAccessTokenStrategyException>()));
+      });
+
+      test(
+          "should Throws NoValuePassFcmTokenStrategyException when stategy is null",
+              () {
+            expect(
+                    () async => await getService<TokenService>().init(strategies: {
+                  BoxKeys.ACCESS_TOKEN_STRATEGY: fakeStrategy,
+                  BoxKeys.FCM_TOKEN_STRATEGY: null
+                }),
+                throwsA(isA<NoValuePassFcmTokenStrategyException>()));
+          });
+    });
+
     test('optional header should be set if specify', () async {
       await getService<TokenService>().init(headers: headers);
 
       verify(getService<BoxService>().getBox());
-      // Sadly, we can't check with this level of precision
-      // verify(mockBox.put(BoxKeys.HEADERS, headers));
-      // this test is already in setHeader test so it's ok
-
-      // Also we can't write something like that
-      // verify(getService<TokenService>().setHeaders(headers: headers));
-      // because the TokenService isn't mock (and we shouldn't mock it)...
+      verify(mockBox.put(BoxKeys.HEADERS, headers));
     });
 
     test('optional strategies should be set if specify', () async {
-      await getService<TokenService>().init(strategies : { BoxKeys.ACCESS_TOKEN_STRATEGY : fakeStrategy, BoxKeys.FCM_TOKEN_STRATEGY : fakeStrategy });
+      await getService<TokenService>().init(strategies: {
+        BoxKeys.ACCESS_TOKEN_STRATEGY: fakeStrategy,
+        BoxKeys.FCM_TOKEN_STRATEGY: fakeStrategy
+      });
 
       verify(getService<BoxService>().getBox());
-      // Same here, we can't write that
-      // verify(mockBox.put(BoxKeys.ACCESS_TOKEN_STRATEGY, "FakeStrategy"));
+      verify(mockBox.put(BoxKeys.ACCESS_TOKEN_STRATEGY, fakeStrategy));
+      verify(mockBox.put(BoxKeys.FCM_TOKEN_STRATEGY, fakeStrategy));
     });
 
-    test('setStrategies should throw an exception if we set an unknow strategy', () async {
-      expect(() async => await getService<TokenService>().setUpStrategies(strategies: {
-        fakeStrategy: fakeStrategy
-      }),
-          throwsA(predicate((err) => err is SettingNonExistingStrategies)));
+    test('setStrategies should throw an exception if we set an unknow strategy',
+        () async {
+      expect(
+          () async => await getService<TokenService>()
+              .setUpStrategies(strategies: {fakeStrategy: fakeStrategy}),
+          throwsA(predicate((err) => err is SettingNonExistingStrategiesException)));
     });
 
     test('Strategies should be defined by default at init time', () async {
       final areStrategiesDefined = await TokenService().areStrategiesDefined();
       expect(areStrategiesDefined, true);
+    });
+  });
+
+  group("getAccessToken", ()
+  {
+    test(
+        "should returns what the box contains if the box has something in", () async {
+      when(mockBox.get(BoxKeys.ACCESS_TOKEN)).thenReturn(token);
+
+      expect(await getService<TokenService>().getAccessToken(accessTokenUrl: "fakeAccessTokenUrl"), token);
+    });
+
+    test("should use strategy to generate an accesstoken and return the dio response", () async {
+      when(mockBox.get(BoxKeys.ACCESS_TOKEN)).thenReturn(null);
+
+      final dio = Dio();
+      final dioAdapter = DioAdapter();
+
+      dio.httpClientAdapter = dioAdapter;
+
+      dioAdapter.onGet("fakeAccessTokenUrl").reply(200, token);
+
+      final tokenService = TokenService(mock: dio);
+
+      final generatedAccessToken = await tokenService.getAccessToken(
+          accessTokenUrl: "fakeAccessTokenUrl");
+
+      expect(generatedAccessToken, token);
     });
   });
 }
