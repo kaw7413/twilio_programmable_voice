@@ -9,7 +9,7 @@ import 'injector.dart';
 
 class TokenService {
   static const _DEFAULT_CONFIG = { BoxKeys.ACCESS_TOKEN_STRATEGY : AccessTokenStrategy.GET, BoxKeys.FCM_TOKEN_STRATEGY : FcmTokenStrategy.FIREBASE_MESSAGING };
-  // This is wip, it might not be necessary
+
   Dio client;
 
   TokenService({Dio mock}) {
