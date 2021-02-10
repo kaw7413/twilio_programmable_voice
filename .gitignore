@@ -11,3 +11,5 @@ build/
 coverage
 
 example/.env
+
+example/ios/GoogleService-Info.plist
