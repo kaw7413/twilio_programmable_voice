@@ -9,6 +9,24 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    
+    if (call.method == "getBatteryLevel") {
+        self.receiveBatteryLevel(result: result);
+        return;
+    }
+
     result("iOS " + UIDevice.current.systemVersion)
+  }
+    
+  private func receiveBatteryLevel(result: FlutterResult) {
+    let device = UIDevice.current
+    device.isBatteryMonitoringEnabled = true
+      if device.batteryState == UIDevice.BatteryState.unknown {
+        result(FlutterError(code: "UNAVAILABLE",
+                            message: "Battery info unavailable",
+                            details: nil))
+      } else {
+      result(Int(device.batteryLevel * 100))
+    }
   }
 }

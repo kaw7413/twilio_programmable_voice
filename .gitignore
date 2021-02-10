@@ -13,3 +13,5 @@ coverage
 example/.env
 
 example/ios/GoogleService-Info.plist
+
+example/ios/Runner/GoogleService-Info.plist

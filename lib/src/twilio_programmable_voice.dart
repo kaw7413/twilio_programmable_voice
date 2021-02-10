@@ -183,5 +183,9 @@ class TwilioProgrammableVoice {
   }
 
   get getCall => _currentCallEvent;
+  
+  dynamic testIos() async {
+    return await _methodChannel.invokeMethod('getBatteryLevel');
+  }
 }
 

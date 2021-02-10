@@ -70,16 +70,17 @@ PODS:
     - Flutter
   - "permission_handler (5.0.1+1)":
     - Flutter
-  - PromisesObjC (1.2.11)
-  - Protobuf (3.13.0)
+  - PromisesObjC (1.2.12)
+  - Protobuf (3.14.0)
   - soundpool (0.0.1):
     - Flutter
   - twilio_programmable_voice (0.0.1):
     - Flutter
+    - TwilioVoice (~> 6.2.1)
+  - TwilioVoice (6.2.1)
 
 DEPENDENCIES:
   - callkeep (from `.symlinks/plugins/callkeep/ios`)
-  - Firebase/Messaging
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
@@ -101,6 +102,7 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - Protobuf
+    - TwilioVoice
 
 EXTERNAL SOURCES:
   callkeep:
@@ -136,11 +138,12 @@ SPEC CHECKSUMS:
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
-  PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
-  Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
+  PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
+  Protobuf: 0cde852566359049847168e51bd1c690e0f70056
   soundpool: c7f4422ca206e77f8900ed3c4ee6a6ff5a0e38a9
-  twilio_programmable_voice: 4809c978551ba2f76b5c4f8748f5997acd67e8f7
+  twilio_programmable_voice: dca2bfeec3378c98114650204886fe63171fc2fd
+  TwilioVoice: f177692c452dc1d84d9ad0f039f74aa6f4ecafc0
 
-PODFILE CHECKSUM: c0fe516e99220e04bc1d0009147f608c9c0839c1
+PODFILE CHECKSUM: 9b7858df1d789c54143ff990ed1700811be46d3b
 
 COCOAPODS: 1.10.0

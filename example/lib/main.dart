@@ -28,8 +28,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  final FlutterCallkeep _callKeep = FlutterCallkeep();
-
+  // final FlutterCallkeep _callKeep = FlutterCallkeep();
+/*
   Future<void> setUpTwilioProgrammableVoice() async {
     await TwilioProgrammableVoice().requestMicrophonePermissions().then(logger.d);
     await checkDefaultPhoneAccount();
@@ -80,6 +80,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
+
     await DotEnv().load('.env');
     final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
@@ -88,9 +89,11 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+
+
   Future<bool> checkDefaultPhoneAccount() async {
     logger.d('[checkDefaultPhoneAccount]');
-    final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+    // final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
 
     if (!hasPhoneAccount) {
       logger.d("Doesn't have phone account, asking for permission");
@@ -103,6 +106,7 @@ class _HomePageState extends State<HomePage> {
         'okButton': 'ok',
       });
     }
+
 
     return hasPhoneAccount;
   }
@@ -137,10 +141,12 @@ class _HomePageState extends State<HomePage> {
         hasVideo: false,
         localizedCallerName: callerDisplayName);
   }
-
+*/
   @override
   void initState() {
     super.initState();
+    print(_firebaseMessaging.getToken());
+    /*
     initCallKeep(_callKeep);
 
     _firebaseMessaging.configure(
@@ -158,7 +164,7 @@ class _HomePageState extends State<HomePage> {
 
             final dataMap = Map<String, String>.from(message["data"]);
 
-            TwilioProgrammableVoice().handleMessage(data: dataMap);
+           // TwilioProgrammableVoice().handleMessage(data: dataMap);
             logger
                 .d("TwilioProgrammableVoice().handleMessage called in main.dart");
           }
@@ -174,6 +180,7 @@ class _HomePageState extends State<HomePage> {
     );
 
   setUpTwilioProgrammableVoice();
+  */
   }
 
   @override
@@ -186,9 +193,11 @@ class _HomePageState extends State<HomePage> {
           body: Column(
             children: [
               FlatButton(
-                  onPressed: () {
-                    TwilioProgrammableVoice().makeCall(
-                        from: "+33644645795", to: "+33787934070");
+                  onPressed: () async {
+                    //TwilioProgrammableVoice().makeCall(
+                    //    from: "+33644645795", to: "+33787934070");
+                    final battery = await TwilioProgrammableVoice().testIos();
+                    print(battery);
                   },
                   child: Text('Call'))
             ],

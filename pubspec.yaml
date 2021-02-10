@@ -42,7 +42,7 @@ flutter:
         package: fr.izio.twilio_programmable_voice
         pluginClass: TwilioProgrammableVoicePlugin
       ios:
-        pluginClass: TwilioProgrammableVoicePlugin
+        pluginClass: SwiftTwilioProgrammableVoicePlugin
   assets:
     - packages/twilio_programmable_voice/assets/sounds/disconnect.wav
     - packages/twilio_programmable_voice/assets/sounds/incoming.wav

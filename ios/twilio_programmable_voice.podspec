@@ -15,7 +15,12 @@ Non-official Flutter Twilio API for Twilio Programmable Voice Resource
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform = :ios, '8.0'
+  # here
+  s.dependency 'TwilioVoice', '~> 6.2.1'
+  # we will need to add TwilioDependencies here !
+
+  # because callkeep min ios version is 10.0
+  s.platform = :ios, '10.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

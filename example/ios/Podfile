@@ -32,9 +32,9 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
 # Add the pod for Firebase Cloud Messaging 
-  pod 'Firebase/Messaging'
-
+#  pod 'Firebase/Messaging'
 end
 
 post_install do |installer|
