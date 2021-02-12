@@ -68,7 +68,7 @@ PODS:
   - nanopb/encode (1.30906.0)
   - path_provider (0.0.1):
     - Flutter
-  - "permission_handler (5.0.1+1)":
+  - "permission_handler (5.1.0+2)":
     - Flutter
   - PromisesObjC (1.2.12)
   - Protobuf (3.14.0)
@@ -78,6 +78,8 @@ PODS:
     - Flutter
     - TwilioVoice (~> 6.2.1)
   - TwilioVoice (6.2.1)
+  - workmanager (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - callkeep (from `.symlinks/plugins/callkeep/ios`)
@@ -88,6 +90,7 @@ DEPENDENCIES:
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - soundpool (from `.symlinks/plugins/soundpool/ios`)
   - twilio_programmable_voice (from `.symlinks/plugins/twilio_programmable_voice/ios`)
+  - workmanager (from `.symlinks/plugins/workmanager/ios`)
 
 SPEC REPOS:
   trunk:
@@ -121,6 +124,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/soundpool/ios"
   twilio_programmable_voice:
     :path: ".symlinks/plugins/twilio_programmable_voice/ios"
+  workmanager:
+    :path: ".symlinks/plugins/workmanager/ios"
 
 SPEC CHECKSUMS:
   callkeep: 6b21abbd46786a36e482190816db99b391ada1e3
@@ -137,13 +142,14 @@ SPEC CHECKSUMS:
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
-  permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
+  permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   Protobuf: 0cde852566359049847168e51bd1c690e0f70056
   soundpool: c7f4422ca206e77f8900ed3c4ee6a6ff5a0e38a9
   twilio_programmable_voice: dca2bfeec3378c98114650204886fe63171fc2fd
   TwilioVoice: f177692c452dc1d84d9ad0f039f74aa6f4ecafc0
+  workmanager: 0afdcf5628bbde6924c21af7836fed07b42e30e6
 
-PODFILE CHECKSUM: 9b7858df1d789c54143ff990ed1700811be46d3b
+PODFILE CHECKSUM: e680f4b545f4eae449981959d9a4671bfc280ac8
 
 COCOAPODS: 1.10.0

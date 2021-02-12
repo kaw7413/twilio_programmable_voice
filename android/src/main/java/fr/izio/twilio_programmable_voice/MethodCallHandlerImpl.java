@@ -36,14 +36,14 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             final String accessToken = call.argument("accessToken");
             final String fcmToken = call.argument("fcmToken");
             this.registerVoice(accessToken, fcmToken, result);
-        } else if (call.method.equals("handleMessage")) {
-            final Map<String, String> data = call.argument("messageData");
-            this.handleMessage(data, result);
         } else if (call.method.equals("makeCall")) {
             final String from = call.argument("from");
             final String to = call.argument("to");
             final String accessToken = call.argument("accessToken");
             this.makeCall(from, to, accessToken, result);
+        } else if (call.method.equals("handleMessage")) {
+            final Map<String, String> data = call.argument("messageData");
+            this.handleMessage(data, result);
         } else if (call.method.equals("answer")) {
             this.answer(result);
         } else if (call.method.equals("reject")) {

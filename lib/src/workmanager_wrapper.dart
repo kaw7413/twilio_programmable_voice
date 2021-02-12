@@ -1,10 +1,13 @@
+import 'dart:io' show Platform;
+
 import 'package:meta/meta.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:twilio_programmable_voice/src/injector.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:uuid/uuid.dart';
 
 import 'callback_dispatcher.dart';
+import 'injector.dart';
+
 
 abstract class WorkmanagerWrapper {
   static const _BG_UNIQUE_NAME = "registrationJob";
@@ -17,21 +20,25 @@ abstract class WorkmanagerWrapper {
   static void setUpWorkmanager() {
     getService<Workmanager>()
         .initialize(callbackDispatcher, isInDebugMode: true);
-    getService<Workmanager>().cancelByTag(_BG_TAG);
+    if (Platform.isAndroid) {
+      getService<Workmanager>().cancelByTag(_BG_TAG);
+    }
   }
 
   static Future<void> launchJobInBg(
       {@required String accessTokenUrl, @required String accessToken}) async {
-    getService<Workmanager>().registerOneOffTask(getUniqueName(), _BG_TASK_NAME,
-        tag: _BG_TAG,
-        constraints: Constraints(
-          networkType: NetworkType.connected,
-        ),
-        existingWorkPolicy: ExistingWorkPolicy.replace,
-        backoffPolicy: BackoffPolicy.linear,
-        backoffPolicyDelay: BG_BACKOFF_POLICY_DELAY,
-        inputData: {BG_URL_DATA_KEY: accessTokenUrl},
-        initialDelay: getDelayBeforeExec(accessToken: accessToken));
+    if (Platform.isAndroid) {
+      getService<Workmanager>().registerOneOffTask(getUniqueName(), _BG_TASK_NAME,
+          tag: _BG_TAG,
+          constraints: Constraints(
+            networkType: NetworkType.connected,
+          ),
+          existingWorkPolicy: ExistingWorkPolicy.replace,
+          backoffPolicy: BackoffPolicy.linear,
+          backoffPolicyDelay: BG_BACKOFF_POLICY_DELAY,
+          inputData: {BG_URL_DATA_KEY: accessTokenUrl},
+          initialDelay: getDelayBeforeExec(accessToken: accessToken));
+    }
   }
 
   @visibleForTesting

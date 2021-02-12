@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:dio/dio.dart';
 import 'package:callkeep/callkeep.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +30,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final TwilioProgrammableVoice _twilioProgrammableVoice = TwilioProgrammableVoice();
   // final FlutterCallkeep _callKeep = FlutterCallkeep();
 /*
   Future<void> setUpTwilioProgrammableVoice() async {
@@ -146,9 +149,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     print(_firebaseMessaging.getToken());
-    /*
-    initCallKeep(_callKeep);
 
+  //  initCallKeep(_callKeep);
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         logger.d('[onFirebaseMessage]', message);
@@ -170,7 +172,8 @@ class _HomePageState extends State<HomePage> {
           }
         }
       },
-      onBackgroundMessage: myBackgroundMessageHandler,
+      // onBackgroundMessage: myBackgroundMessageHandler,
+      onBackgroundMessage: Platform.isIOS ? null : myBackgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {
         logger.d("onLaunch: $message");
       },
@@ -179,8 +182,14 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-  setUpTwilioProgrammableVoice();
-  */
+  //setUpTwilioProgrammableVoice();
+
+  }
+
+  // TODO remove when iOS part is good
+  void testIosMethodChannel() async {
+    final battery = await TwilioProgrammableVoice().testIos();
+    print(battery);
   }
 
   @override
@@ -194,12 +203,19 @@ class _HomePageState extends State<HomePage> {
             children: [
               FlatButton(
                   onPressed: () async {
-                    //TwilioProgrammableVoice().makeCall(
-                    //    from: "+33644645795", to: "+33787934070");
-                    final battery = await TwilioProgrammableVoice().testIos();
-                    print(battery);
+                    await DotEnv().load('.env');
+                    final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
+
+                    final isRegistrationValid = await _twilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl);
+                    print("register c'est bien passé : " + isRegistrationValid.toString());
                   },
-                  child: Text('Call'))
+                  child: Text('Register')),
+              FlatButton(
+                  onPressed: () async {
+                    final makeCall = await _twilioProgrammableVoice.makeCall(from: "testId", to: "+33787934070");
+                    print("makeCall c'est bien passé : " + makeCall.toString());
+                  },
+                  child: Text('Make call')),
             ],
           )),
     );
