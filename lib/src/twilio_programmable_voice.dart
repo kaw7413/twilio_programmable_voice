@@ -124,6 +124,9 @@ class TwilioProgrammableVoice {
     CallEvent currentCallEvent;
 
     return _callStatusEventChannel.receiveBroadcastStream().where((data) => _containsCall(data['type'])).map((data) {
+      print("inside _callStatusEventChannel");
+      print(data.toString());
+
       switch (data['type']) {
         case 'CallInvite':
           currentCallEvent = CallInvite.from(data);
@@ -162,6 +165,8 @@ class TwilioProgrammableVoice {
           break;
 
         default:
+          print("default called in stream");
+          print(data.toString());
           break;
       }
 
@@ -193,7 +198,7 @@ class TwilioProgrammableVoice {
 
   // TODO remove this when eventChannel works on iOS
   Future<bool> testEventChannel({@required Map<String, String> data}) {
-    return _methodChannel.invokeMethod('testEventChannel', data});
+    return _methodChannel.invokeMethod('testEventChannel', {"data": data, "type": "CallTest"});
   }
 }
 

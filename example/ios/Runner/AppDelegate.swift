@@ -19,7 +19,7 @@ import PushKit
     if #available(iOS 10.0, *) {
       UNUserNotificationCenter.current().delegate = self
     }
-    
+		
     GeneratedPluginRegistrant.register(with: self)
     WorkmanagerPlugin.setPluginRegistrantCallback { registry in
         // registry in this case is the FlutterEngine that is created in Workmanager's performFetchWithCompletionHandler

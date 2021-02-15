@@ -71,14 +71,14 @@ class _HomePageState extends State<HomePage> {
         logger.d("CALL_RECONNECTED", event);
       } else if (event is CallDisconnected) {
         logger.d("CALL_DISCONNECTED", event);
-
         // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
         SoundPoolManager.getInstance().playDisconnect();
-
         // TODO: only end the current active call
         _callKeep.endAllCalls();
       } else if (event is CallQualityWarningChanged) {
         logger.d("CALL_QUALITY_WARNING_CHANGED", event);
+      } else {
+        logger.d("DEFAULT CASE in stream", event);
       }
     });
 
@@ -208,9 +208,8 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: Text('Make call')),
               FlatButton(
-                  onPressed: () async {
-                    final makeCall = await _twilioProgrammableVoice.testEventChannel(data: {"data": "test"});
-                    print("makeCall c'est bien passé : " + makeCall.toString());
+                  onPressed: () {
+                    _twilioProgrammableVoice.testEventChannel(data: {"data": "test"});
                   },
                   child: Text('Test EventChannel')),
             ],

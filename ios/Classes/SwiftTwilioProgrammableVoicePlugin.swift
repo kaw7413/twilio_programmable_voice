@@ -6,8 +6,8 @@ import TwilioVoice
 public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 	private var twilioProgrammableVoice : TwilioProgrammableVoice;
 	
-	override init() {
-		twilioProgrammableVoice = TwilioProgrammableVoice();
+	init(messenger: FlutterBinaryMessenger) {
+		twilioProgrammableVoice = TwilioProgrammableVoice(messenger: messenger);
 		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.core);
 		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.platform);
 		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.signaling);
@@ -17,9 +17,10 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 	}
     
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "twilio_programmable_voice", binaryMessenger: registrar.messenger())
-    let instance = SwiftTwilioProgrammableVoicePlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
+		let messenger = registrar.messenger();
+		let channel = FlutterMethodChannel(name: "twilio_programmable_voice", binaryMessenger: messenger);
+		let instance = SwiftTwilioProgrammableVoicePlugin(messenger: messenger);
+		registrar.addMethodCallDelegate(instance, channel: channel);
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -35,6 +36,10 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 			answer(result: result);
 		} else if (call.method == "reject") {
 			reject(result: result);
+		} else if (call.method == "testEventChannel") {
+			print("call.method == testEventChannel");
+			// TODO: remove this when eventChannel works
+			testEventChannel(args: args, result: result)
 		} else {
         result(FlutterMethodNotImplemented);
     }
@@ -69,7 +74,7 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
  	}
 	
 	private func answer(result: FlutterResult) {
-		// TODO
+		// TODO:
 		// get the current callInvite stock in twilioProgrammableVoice class
 		// callInvite: CallInvite = twilioProgrammableVoice.getCurrentCallInvite();
 		// then accept the call
@@ -78,7 +83,7 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 	}
 	
 	private func reject(result: FlutterResult) {
-		// TODO
+		// TODO:
 		// get current callInvite and current call
 		// callInvite: CallInvite = twilioProgrammableVoice.getCurrentCallInvite();
 		// call: Call = twilioProgrammableVoice.getCurrentCall();
@@ -88,5 +93,16 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 		// }
 		// same with call
 		result(nil);
+	}
+	
+	private func testEventChannel(args: Dictionary<String, Any>?, result: FlutterResult) {
+		print("testEventChannel called");
+		
+		guard args != nil, let data = args!["data"] as? Dictionary<String, String> else {
+			result(FlutterError(code: PluginExceptionRessource.handleMessageArgsErrorCode, message: PluginExceptionRessource.handleMessageArgsErrorMessage, details: args))
+				return;
+		}
+		
+		twilioProgrammableVoice.testEventChannel(data: data);
 	}
 }
