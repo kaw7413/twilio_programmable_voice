@@ -8,6 +8,11 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 	
 	override init() {
 		twilioProgrammableVoice = TwilioProgrammableVoice();
+		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.core);
+		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.platform);
+		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.signaling);
+		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.webRTC);
+
 		super.init();
 	}
     
@@ -23,14 +28,20 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 		if (call.method == "registerVoice") {
 			registerVoice(args: args, result: result);
 		} else if (call.method == "makeCall") {
-			makeCall(args: args, result: result)
+			makeCall(args: args, result: result);
+		} else if (call.method == "handleMessage") {
+			handleMessage(args: args, result: result)
+		} else if (call.method == "answer") {
+			answer(result: result);
+		} else if (call.method == "reject") {
+			reject(result: result);
 		} else {
         result(FlutterMethodNotImplemented);
     }
   }
     
 	private func registerVoice(args: Dictionary<String, Any>?, result: @escaping FlutterResult) {
-		guard args != nil, let accessToken: String = args!["accessToken"] as? String, let deviceToken: String = args!["fcmToken"] as? String else {
+		guard args != nil, let accessToken = args!["accessToken"] as? String, let deviceToken = args!["fcmToken"] as? String else {
 			result(FlutterError(code: PluginExceptionRessource.registerVoiceArgsErrorCode, message: PluginExceptionRessource.registerVoiceArgsErrorMessage, details: args))
 				return;
 		}
@@ -46,7 +57,36 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 
 		twilioProgrammableVoice.makeCall(accessToken: accessToken, from: from, to: to, result: result);
 	}
+	
+	private func handleMessage(args: Dictionary<String, Any>?, result: @escaping FlutterResult) {
+		guard args != nil, let data = args!["messageData"] as? Dictionary<String, String> else {
+			result(FlutterError(code: PluginExceptionRessource.handleMessageArgsErrorCode, message: PluginExceptionRessource.handleMessageArgsErrorMessage, details: args))
+				return;
+		}
+		
+		result(true);
+//		twilioProgrammableVoice.handleMessage();
+ 	}
+	
+	private func answer(result: FlutterResult) {
+		// TODO
+		// get the current callInvite stock in twilioProgrammableVoice class
+		// callInvite: CallInvite = twilioProgrammableVoice.getCurrentCallInvite();
+		// then accept the call
+		//callInvite.accept();
+		result(true);
+	}
+	
+	private func reject(result: FlutterResult) {
+		// TODO
+		// get current callInvite and current call
+		// callInvite: CallInvite = twilioProgrammableVoice.getCurrentCallInvite();
+		// call: Call = twilioProgrammableVoice.getCurrentCall();
+		// then check nil, if not nil reject it ex:
+		// if (callInvite != nil) {
+		// 	callInvite.reject(..)
+		// }
+		// same with call
+		result(nil);
+	}
 }
-
-
-

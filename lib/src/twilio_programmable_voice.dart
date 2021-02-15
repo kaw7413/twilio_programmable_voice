@@ -61,16 +61,19 @@ class TwilioProgrammableVoice {
   /// [accessTokenUrl] an url which returns a valid accessToken when access
   /// by HTTP GET method
   Future<bool> registerVoice({@required String accessTokenUrl}) async {
+    print("registerVoice called");
     bool isRegistrationValid = true;
     String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: accessTokenUrl);
     String fcmToken = await getService<TokenService>().getFcmToken();
 
     try {
+      print("trying to register");
       await _methodChannel.invokeMethod(
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       getService<TokenService>().persistAccessToken(accessToken: accessToken);
       WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
     } catch (err) {
+      print("registration failed");
       isRegistrationValid = false;
       await getService<BoxService>().getBox().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
       registerVoice(accessTokenUrl: accessTokenUrl);
@@ -186,6 +189,11 @@ class TwilioProgrammableVoice {
   
   dynamic testIos() async {
     return await _methodChannel.invokeMethod('getBatteryLevel');
+  }
+
+  // TODO remove this when eventChannel works on iOS
+  Future<bool> testEventChannel({@required Map<String, String> data}) {
+    return _methodChannel.invokeMethod('testEventChannel', data});
   }
 }
 

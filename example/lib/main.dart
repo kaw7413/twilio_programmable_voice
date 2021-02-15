@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
-import 'package:dio/dio.dart';
 import 'package:callkeep/callkeep.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +30,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final TwilioProgrammableVoice _twilioProgrammableVoice = TwilioProgrammableVoice();
-  // final FlutterCallkeep _callKeep = FlutterCallkeep();
-/*
+  final FlutterCallkeep _callKeep = FlutterCallkeep();
+
   Future<void> setUpTwilioProgrammableVoice() async {
     await TwilioProgrammableVoice().requestMicrophonePermissions().then(logger.d);
     await checkDefaultPhoneAccount();
@@ -96,7 +95,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<bool> checkDefaultPhoneAccount() async {
     logger.d('[checkDefaultPhoneAccount]');
-    // final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+    final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
 
     if (!hasPhoneAccount) {
       logger.d("Doesn't have phone account, asking for permission");
@@ -144,13 +143,13 @@ class _HomePageState extends State<HomePage> {
         hasVideo: false,
         localizedCallerName: callerDisplayName);
   }
-*/
+
   @override
   void initState() {
     super.initState();
     print(_firebaseMessaging.getToken());
 
-  //  initCallKeep(_callKeep);
+   initCallKeep(_callKeep);
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         logger.d('[onFirebaseMessage]', message);
@@ -166,13 +165,12 @@ class _HomePageState extends State<HomePage> {
 
             final dataMap = Map<String, String>.from(message["data"]);
 
-           // TwilioProgrammableVoice().handleMessage(data: dataMap);
+            TwilioProgrammableVoice().handleMessage(data: dataMap);
             logger
                 .d("TwilioProgrammableVoice().handleMessage called in main.dart");
           }
         }
       },
-      // onBackgroundMessage: myBackgroundMessageHandler,
       onBackgroundMessage: Platform.isIOS ? null : myBackgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {
         logger.d("onLaunch: $message");
@@ -182,14 +180,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-  //setUpTwilioProgrammableVoice();
-
-  }
-
-  // TODO remove when iOS part is good
-  void testIosMethodChannel() async {
-    final battery = await TwilioProgrammableVoice().testIos();
-    print(battery);
+  setUpTwilioProgrammableVoice();
   }
 
   @override
@@ -216,6 +207,12 @@ class _HomePageState extends State<HomePage> {
                     print("makeCall c'est bien passé : " + makeCall.toString());
                   },
                   child: Text('Make call')),
+              FlatButton(
+                  onPressed: () async {
+                    final makeCall = await _twilioProgrammableVoice.testEventChannel(data: {"data": "test"});
+                    print("makeCall c'est bien passé : " + makeCall.toString());
+                  },
+                  child: Text('Test EventChannel')),
             ],
           )),
     );

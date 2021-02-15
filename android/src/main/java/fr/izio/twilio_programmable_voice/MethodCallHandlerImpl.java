@@ -92,12 +92,11 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
         final boolean isValid = Voice.handleMessage(twilioProgrammableVoice.getActivity().getApplicationContext(), data, this.twilioProgrammableVoice);
 
-        if (!isValid) {
+        if (isValid) {
+            result.success(isValid);
+        } else {
             result.error("NOT_TWILIO_MESSAGE", "Message Data isn't a valid twilio message", null);
-            return;
         }
-
-        result.success(true);
     }
 
     private void makeCall(String from, String to, String accessToken, MethodChannel.Result result) {
