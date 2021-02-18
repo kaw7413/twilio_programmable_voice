@@ -8,10 +8,10 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 	
 	init(messenger: FlutterBinaryMessenger) {
 		twilioProgrammableVoice = TwilioProgrammableVoice(messenger: messenger);
-		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.core);
-		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.platform);
-		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.signaling);
-		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.all, module: TwilioVoiceSDK.LogModule.webRTC);
+		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.error, module: TwilioVoiceSDK.LogModule.core);
+		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.error, module: TwilioVoiceSDK.LogModule.platform);
+		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.error, module: TwilioVoiceSDK.LogModule.signaling);
+		TwilioVoiceSDK.setLogLevel(TwilioVoiceSDK.LogLevel.error, module: TwilioVoiceSDK.LogModule.webRTC);
 
 		super.init();
 	}
@@ -29,6 +29,7 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 		if (call.method == "registerVoice") {
 			registerVoice(args: args, result: result);
 		} else if (call.method == "makeCall") {
+			print("[SwiftEntryPoint] makeCall called");
 			makeCall(args: args, result: result);
 		} else if (call.method == "handleMessage") {
 			handleMessage(args: args, result: result)
@@ -55,10 +56,14 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
   }
 	
 	private func makeCall(args: Dictionary<String, Any>?, result: @escaping FlutterResult) {
+		print("[SwiftEntryPoint] inside makeCall");
+		
 		guard args != nil, let accessToken: String = args!["accessToken"] as? String, let from: String = args!["from"] as? String, let to: String = args!["to"] as? String else {
 			result(FlutterError(code: PluginExceptionRessource.makeCallArgsErrorCode, message: PluginExceptionRessource.makeCallArgsErrorMessage, details: args))
 				return;
 		}
+		
+		print("accessToken : ", accessToken, " from : ", from, " to : ", to);
 
 		twilioProgrammableVoice.makeCall(accessToken: accessToken, from: from, to: to, result: result);
 	}

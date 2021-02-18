@@ -55,12 +55,11 @@ internal class TwilioProgrammableVoice: NSObject, CallDelegate, NotificationDele
 	}
 
 	internal func registerVoice(accessToken: String, deviceToken: Data, result: @escaping FlutterResult) {
-		// TODO: verify the invalid token case
 		TwilioVoiceSDK.register(accessToken: accessToken, deviceToken: deviceToken) { (error) in
 			if (error != nil) {
 				result(FlutterError(code: PluginExceptionRessource.registerVoiceRegisterErrorCode,
 				message: PluginExceptionRessource.registerVoiceRegisterErrorMessage,
-				details: error))
+				details: nil))
 			} else {
 				result(true);
 			}
@@ -68,18 +67,27 @@ internal class TwilioProgrammableVoice: NSObject, CallDelegate, NotificationDele
   }
 	
 	internal func makeCall(accessToken: String, from: String, to: String, result: FlutterResult) {
+		print("Inside TwilioPr..Voice makeCall");
 		// this doesn't work, no callback call,
 		// BuiltInNSIsAvailable: Not supported on this platform and
 		// BuiltInAECIsAvailable: Not supported on this platform
-		let connectionOptions = ConnectOptions(accessToken: accessToken) { (builder) in
-			builder.params = ["To": to, "From": from];
+		let connectOptions = ConnectOptions(accessToken: accessToken) { (builder) in
+			builder.params = ["to": to, "from": from];
 		}
-
+		
+		
+//		this is in the VoiceExample app, I don't think it's necesary to specify the uuid but keep it here until it work
+//		let connectOptions = ConnectOptions(accessToken: accessToken) { builder in
+//			builder.params = ["to": to]
+//			builder.uuid = UUID();
+//		}
+		
+		print("ConnectionOptions : ", connectOptions);
 		// TODO: delegate to twilioVoiceCallListener, currently delegating to self for debuggin purpose
 		// let call = TwilioVoiceSDK.connect(options: connectionOptions, delegate: twilioVoiceCallListener);
-		let call = TwilioVoiceSDK.connect(options: connectionOptions, delegate: self);
+		let call = TwilioVoiceSDK.connect(options: connectOptions, delegate: self);
 
-		print("this is the returned call object : ", call, call.state);
+		print("this is the returned call object : ", call, call.state.rawValue);
 		result(true);
 	}
 	

@@ -88,6 +88,7 @@ class TwilioProgrammableVoice {
   /// [to] the target identity (or number)
   Future<bool> makeCall({@required String from, @required String to}) async {
     String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: _accessTokenUrl);
+    print("[TwilioProgrammableVoice] making call to : $to | from : $from | accessToken : $accessToken");
     return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to, "accessToken": accessToken});
   }
 

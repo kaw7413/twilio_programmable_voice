@@ -84,7 +84,8 @@ class _HomePageState extends State<HomePage> {
 
 
     await DotEnv().load('.env');
-    final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
+    final platform =  Platform.isAndroid ? "android" : "ios";
+    final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'] + "/$platform";
 
     TwilioProgrammableVoice().setUp(accessTokenUrl: accessTokenUrl, headers : {"TestHeader": "I'm a test header"}).then((isRegistrationValid) {
       logger.d("registration is valid: " + isRegistrationValid.toString());
