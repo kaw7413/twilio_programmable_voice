@@ -84,5 +84,5 @@ Future<void> endCall(CallKeepPerformEndCallAction event) async {
 
 
 void onPushKitToken(CallKeepPushKitToken event) {
-  print('[onPushKitToken] token => ${event.token}');
+  // print('[onPushKitToken] token => ${event.token}');
 }

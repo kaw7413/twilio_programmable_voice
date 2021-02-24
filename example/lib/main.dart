@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:callkeep/callkeep.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -29,11 +28,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  final TwilioProgrammableVoice _twilioProgrammableVoice = TwilioProgrammableVoice();
   final FlutterCallkeep _callKeep = FlutterCallkeep();
+  final TwilioProgrammableVoice _twilioProgrammableVoice = TwilioProgrammableVoice();
 
   Future<void> setUpTwilioProgrammableVoice() async {
-    await TwilioProgrammableVoice().requestMicrophonePermissions().then(logger.d);
+    await _twilioProgrammableVoice.requestMicrophonePermissions().then(logger.d);
     await checkDefaultPhoneAccount();
     // TODO uncomment this when callkeep merge our pull request
     // await checkDefaultPhoneAccount().then((userAccept) {
@@ -41,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     //   logger.d("User has taped ok the telecom manager permission dialog : " + userAccept.toString());
     // });
 
-    TwilioProgrammableVoice().callStatusStream.listen((event) async {
+    _twilioProgrammableVoice.callStatusStream.listen((event) async {
       logger.d("[TwilioProgrammableVoice() Event]");
 
       // TODO: make this readable
@@ -71,28 +70,24 @@ class _HomePageState extends State<HomePage> {
         logger.d("CALL_RECONNECTED", event);
       } else if (event is CallDisconnected) {
         logger.d("CALL_DISCONNECTED", event);
+
         // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
         SoundPoolManager.getInstance().playDisconnect();
+
         // TODO: only end the current active call
         _callKeep.endAllCalls();
       } else if (event is CallQualityWarningChanged) {
         logger.d("CALL_QUALITY_WARNING_CHANGED", event);
-      } else {
-        logger.d("DEFAULT CASE in stream", event);
       }
     });
 
-
     await DotEnv().load('.env');
-    final platform =  Platform.isAndroid ? "android" : "ios";
-    final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'] + "/$platform";
+    final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
-    TwilioProgrammableVoice().setUp(accessTokenUrl: accessTokenUrl, headers : {"TestHeader": "I'm a test header"}).then((isRegistrationValid) {
+    _twilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl + "/ios", headers : {"TestHeader": "I'm a test header"}).then((isRegistrationValid) {
       logger.d("registration is valid: " + isRegistrationValid.toString());
     });
   }
-
-
 
   Future<bool> checkDefaultPhoneAccount() async {
     logger.d('[checkDefaultPhoneAccount]');
@@ -104,12 +99,11 @@ class _HomePageState extends State<HomePage> {
       await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
         'alertTitle': 'Permissions required',
         'alertDescription':
-            'This application needs to access your phone accounts',
+        'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
       });
     }
-
 
     return hasPhoneAccount;
   }
@@ -118,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       String targetNumber, String callerDisplayName) async {
     logger.d('[displayMakeCallScreen] called');
 
-    final String callUUID = TwilioProgrammableVoice().getCall.sid;
+    final String callUUID = _twilioProgrammableVoice.getCall.sid;
     await checkDefaultPhoneAccount();
 
     logger.d(
@@ -133,7 +127,7 @@ class _HomePageState extends State<HomePage> {
     logger.d('[displayIncomingCallInvite] called');
 
     // TODO: review how getCall works to separate calls and call invites
-    final String callUUID = TwilioProgrammableVoice().getCall.sid;
+    final String callUUID = _twilioProgrammableVoice.getCall.sid;
     await checkDefaultPhoneAccount();
 
     logger.d(
@@ -148,9 +142,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    print(_firebaseMessaging.getToken());
+    initCallKeep(_callKeep);
 
-   initCallKeep(_callKeep);
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         logger.d('[onFirebaseMessage]', message);
@@ -172,7 +165,7 @@ class _HomePageState extends State<HomePage> {
           }
         }
       },
-      onBackgroundMessage: Platform.isIOS ? null : myBackgroundMessageHandler,
+      onBackgroundMessage: myBackgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {
         logger.d("onLaunch: $message");
       },
@@ -181,7 +174,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-  setUpTwilioProgrammableVoice();
+    setUpTwilioProgrammableVoice();
   }
 
   @override
@@ -193,15 +186,6 @@ class _HomePageState extends State<HomePage> {
           ),
           body: Column(
             children: [
-              FlatButton(
-                  onPressed: () async {
-                    await DotEnv().load('.env');
-                    final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
-
-                    final isRegistrationValid = await _twilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl);
-                    print("register c'est bien passé : " + isRegistrationValid.toString());
-                  },
-                  child: Text('Register')),
               FlatButton(
                   onPressed: () async {
                     final makeCall = await _twilioProgrammableVoice.makeCall(from: "testId", to: "+33787934070");

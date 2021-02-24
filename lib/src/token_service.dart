@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/src/box_service.dart';
+import 'package:flutter_apns/flutter_apns.dart';
 
 import 'box_utils.dart';
 import 'exceptions.dart';
@@ -107,10 +108,12 @@ class TokenService {
   }
 
   Future<String> getFcmToken() async {
+    print("[TokenService] getFcmToken called");
     return await _fcmTokenStrategyBinder();
   }
   
   Future<String> _fcmTokenStrategyBinder() async {
+    print("[TokenService] _fcmTokenStrategyBinder called");
     return await getService<BoxService>().getBox().then((box) {
       if (box.get(BoxKeys.FCM_TOKEN_STRATEGY) == FcmTokenStrategy.FIREBASE_MESSAGING) {
         return _firebaseMessagingFcmTokenStrategy();
@@ -120,7 +123,10 @@ class TokenService {
     });
   }
 
-  Future<String> _firebaseMessagingFcmTokenStrategy() {
-    return FirebaseMessaging().getToken();
+  String _firebaseMessagingFcmTokenStrategy() {
+    final connector = createPushConnector();
+    final token = connector.token.value;
+    print("[TokenService] deviceToken : $token");
+    return token;
   }
 }

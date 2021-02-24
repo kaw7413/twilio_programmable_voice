@@ -44,6 +44,7 @@ class TwilioProgrammableVoice {
   /// [headers] optional headers, use by the GET access token strategy
   Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
     _setAccessTokenUrl(accessTokenUrl);
+    print("SetUp called");
     getService<TokenService>().init(strategies: tokenManagerStrategies, headers: headers);
     WorkmanagerWrapper.setUpWorkmanager();
     final bool isRegistrationValid = await registerVoice(accessTokenUrl: accessTokenUrl);
@@ -63,15 +64,18 @@ class TwilioProgrammableVoice {
   Future<bool> registerVoice({@required String accessTokenUrl}) async {
     print("registerVoice called");
     bool isRegistrationValid = true;
+
     String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: accessTokenUrl);
-    String fcmToken = await getService<TokenService>().getFcmToken();
+    // String fcmToken = await getService<TokenService>().getFcmToken();
+
 
     try {
-      print("trying to register");
+      print("trying to register | accessToken : $accessToken");
       await _methodChannel.invokeMethod(
-          'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
+          'registerVoice', {"accessToken": accessToken, "fcmToken": "deviceToken"});
       getService<TokenService>().persistAccessToken(accessToken: accessToken);
-      WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
+      // TODO
+      // WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
     } catch (err) {
       print("registration failed");
       isRegistrationValid = false;
@@ -79,6 +83,7 @@ class TwilioProgrammableVoice {
       registerVoice(accessTokenUrl: accessTokenUrl);
     }
 
+    print("La registration c'est bien passé : " + isRegistrationValid.toString());
     return isRegistrationValid;
   }
 
@@ -88,7 +93,6 @@ class TwilioProgrammableVoice {
   /// [to] the target identity (or number)
   Future<bool> makeCall({@required String from, @required String to}) async {
     String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: _accessTokenUrl);
-    print("[TwilioProgrammableVoice] making call to : $to | from : $from | accessToken : $accessToken");
     return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to, "accessToken": accessToken});
   }
 
@@ -122,6 +126,7 @@ class TwilioProgrammableVoice {
 
   /// Get the incoming calls stream
   Stream<CallEvent> get callStatusStream {
+    print("callStatusStream called");
     CallEvent currentCallEvent;
 
     return _callStatusEventChannel.receiveBroadcastStream().where((data) => _containsCall(data['type'])).map((data) {
@@ -185,6 +190,7 @@ class TwilioProgrammableVoice {
   }
 
   bool _containsCall(dynamic value) {
+    print("_containsCall called");
     if (value is String) {
       return value.contains("Call");
     }
