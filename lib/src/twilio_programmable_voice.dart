@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -66,16 +67,16 @@ class TwilioProgrammableVoice {
     bool isRegistrationValid = true;
 
     String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: accessTokenUrl);
-    // String fcmToken = await getService<TokenService>().getFcmToken();
+    String fcmToken = Platform.isAndroid ? await getService<TokenService>().getFcmToken() : null;
 
 
     try {
       print("trying to register | accessToken : $accessToken");
       await _methodChannel.invokeMethod(
-          'registerVoice', {"accessToken": accessToken, "fcmToken": "deviceToken"});
+          'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       getService<TokenService>().persistAccessToken(accessToken: accessToken);
-      // TODO
-      // WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
+      // TODO iOS test
+      WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
     } catch (err) {
       print("registration failed");
       isRegistrationValid = false;
@@ -130,9 +131,6 @@ class TwilioProgrammableVoice {
     CallEvent currentCallEvent;
 
     return _callStatusEventChannel.receiveBroadcastStream().where((data) => _containsCall(data['type'])).map((data) {
-      print("inside _callStatusEventChannel");
-      print(data.toString());
-
       switch (data['type']) {
         case 'CallInvite':
           currentCallEvent = CallInvite.from(data);

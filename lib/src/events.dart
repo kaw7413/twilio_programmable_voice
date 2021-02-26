@@ -10,9 +10,10 @@ class CallInvite extends CallEvent {
   String sid;
 
   CallInvite.from(Map<dynamic, dynamic> data)
-    : from = data['from'] as String,
-      to = data['to'] as String,
-      sid = data['callSid'] as String;
+      : from = data['from'] as String,
+        to = data['to'] as String,
+        sid = data['callSid'] as String;
+
 }
 
 class CancelledCallInvite extends CallEvent {
@@ -38,7 +39,7 @@ class CallConnectFailure extends CallEvent {
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
-        state = data['state'] as String,
+        state = data['state'].toString(),
         isMuted = data['isMuted'] as bool,
         isOnHold = data['isOnHold'] as bool;
 }
@@ -55,7 +56,7 @@ class CallRinging extends CallEvent {
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
-        state = data['state'] as String,
+        state = data['state'].toString(),
         isMuted = data['isMuted'] as bool,
         isOnHold = data['isOnHold'] as bool;
 }
@@ -72,7 +73,7 @@ class CallConnected extends CallEvent {
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
-        state = data['state'] as String,
+        state = data['state'].toString(),
         isMuted = data['isMuted'] as bool,
         isOnHold = data['isOnHold'] as bool;
 }
@@ -89,7 +90,7 @@ class CallReconnecting extends CallEvent {
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
-        state = data['state'] as String,
+        state = data['state'].toString(),
         isMuted = data['isMuted'] as bool,
         isOnHold = data['isOnHold'] as bool;
 }
@@ -106,7 +107,7 @@ class CallReconnected extends CallEvent {
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
-        state = data['state'] as String,
+        state = data['state'].toString(),
         isMuted = data['isMuted'] as bool,
         isOnHold = data['isOnHold'] as bool;
 }
@@ -123,7 +124,7 @@ class CallDisconnected extends CallEvent {
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
-        state = data['state'] as String,
+        state = data['state'].toString(),
         isMuted = data['isMuted'] as bool,
         isOnHold = data['isOnHold'] as bool;
 }
@@ -140,7 +141,7 @@ class CallQualityWarningChanged extends CallEvent {
       : from = data['from'] as String,
         to = data['to'] as String,
         sid = data['sid'] as String,
-        state = data['state'] as String,
+        state = data['state'].toString(),
         isMuted = data['isMuted'] as bool,
         isOnHold = data['isOnHold'] as bool;
 }

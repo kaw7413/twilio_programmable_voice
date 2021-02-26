@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:callkeep/callkeep.dart';
+// import 'package:callkeep/callkeep.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -8,8 +8,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
-import 'background_message_handler.dart';
-import 'callkeep_functions.dart';
+// not for iOS
+// import 'background_message_handler.dart';
+// import 'callkeep_functions.dart';
 
 final logger = Logger();
 
@@ -28,12 +29,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  final FlutterCallkeep _callKeep = FlutterCallkeep();
+  // final FlutterCallkeep _callKeep = FlutterCallkeep();
   final TwilioProgrammableVoice _twilioProgrammableVoice = TwilioProgrammableVoice();
 
   Future<void> setUpTwilioProgrammableVoice() async {
     await _twilioProgrammableVoice.requestMicrophonePermissions().then(logger.d);
-    await checkDefaultPhoneAccount();
+    // await checkDefaultPhoneAccount();
     // TODO uncomment this when callkeep merge our pull request
     // await checkDefaultPhoneAccount().then((userAccept) {
     //   // we can use this callback to handle the case where the end user refuse to give the telecom manager permission
@@ -75,7 +76,7 @@ class _HomePageState extends State<HomePage> {
         SoundPoolManager.getInstance().playDisconnect();
 
         // TODO: only end the current active call
-        _callKeep.endAllCalls();
+        // _callKeep.endAllCalls();
       } else if (event is CallQualityWarningChanged) {
         logger.d("CALL_QUALITY_WARNING_CHANGED", event);
       }
@@ -89,37 +90,37 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<bool> checkDefaultPhoneAccount() async {
-    logger.d('[checkDefaultPhoneAccount]');
-    final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
-
-    if (!hasPhoneAccount) {
-      logger.d("Doesn't have phone account, asking for permission");
-      // TODO return this when callkeep merge our pull request
-      await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
-        'alertTitle': 'Permissions required',
-        'alertDescription':
-        'This application needs to access your phone accounts',
-        'cancelButton': 'Cancel',
-        'okButton': 'ok',
-      });
-    }
-
-    return hasPhoneAccount;
-  }
+  // Future<bool> checkDefaultPhoneAccount() async {
+  //   logger.d('[checkDefaultPhoneAccount]');
+  //   final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+  //
+  //   if (!hasPhoneAccount) {
+  //     logger.d("Doesn't have phone account, asking for permission");
+  //     // TODO return this when callkeep merge our pull request
+  //     await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
+  //       'alertTitle': 'Permissions required',
+  //       'alertDescription':
+  //       'This application needs to access your phone accounts',
+  //       'cancelButton': 'Cancel',
+  //       'okButton': 'ok',
+  //     });
+  //   }
+  //
+  //   return hasPhoneAccount;
+  // }
 
   Future<void> displayMakeCallScreen(
       String targetNumber, String callerDisplayName) async {
     logger.d('[displayMakeCallScreen] called');
 
     final String callUUID = _twilioProgrammableVoice.getCall.sid;
-    await checkDefaultPhoneAccount();
+    // await checkDefaultPhoneAccount();
 
     logger.d(
         '[displayMakeCallScreen] uuid: $callUUID, targetNumber: $targetNumber, displayName: $callerDisplayName');
 
     // Display a start call screen
-    _callKeep.startCall(callUUID, targetNumber, callerDisplayName);
+    // _callKeep.startCall(callUUID, targetNumber, callerDisplayName);
   }
 
   Future<void> displayIncomingCallInvite(
@@ -128,21 +129,21 @@ class _HomePageState extends State<HomePage> {
 
     // TODO: review how getCall works to separate calls and call invites
     final String callUUID = _twilioProgrammableVoice.getCall.sid;
-    await checkDefaultPhoneAccount();
+    // await checkDefaultPhoneAccount();
 
     logger.d(
         '[displayIncomingCallInvite] uuid: $callUUID, callerNumber: $callerNumber, displayName: $callerDisplayName');
 
-    _callKeep.displayIncomingCall(callUUID, callerNumber,
-        handleType: 'number',
-        hasVideo: false,
-        localizedCallerName: callerDisplayName);
+    // _callKeep.displayIncomingCall(callUUID, callerNumber,
+    //     handleType: 'number',
+    //     hasVideo: false,
+    //     localizedCallerName: callerDisplayName);
   }
 
   @override
   void initState() {
     super.initState();
-    initCallKeep(_callKeep);
+    // initCallKeep(_callKeep);
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -165,7 +166,8 @@ class _HomePageState extends State<HomePage> {
           }
         }
       },
-      onBackgroundMessage: myBackgroundMessageHandler,
+      // onBackgroundMessage: myBackgroundMessageHandler,
+      onBackgroundMessage: null,
       onLaunch: (Map<String, dynamic> message) async {
         logger.d("onLaunch: $message");
       },
@@ -188,7 +190,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               FlatButton(
                   onPressed: () async {
-                    final makeCall = await _twilioProgrammableVoice.makeCall(from: "testId", to: "+33787934070");
+                    final makeCall = await _twilioProgrammableVoice.makeCall(from: "testId2", to: "+33787934070");
                     print("makeCall c'est bien passé : " + makeCall.toString());
                   },
                   child: Text('Make call')),

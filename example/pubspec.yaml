@@ -16,7 +16,8 @@ dependencies:
   flutter_ios_voip_kit: ^0.0.5
 #  We might want to remove firebase_messagin cause of flutter_apns
   firebase_messaging: 7.0.3
-  callkeep: ^0.2.3
+#  remove callkeep on iOS because we already use it in specific code
+#  callkeep: ^0.2.3
 
   flutter_dotenv: ^2.1.0
   # logger: ^1.0.0-nullsafety.0

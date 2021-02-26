@@ -10,7 +10,7 @@ public class BaseEventChannel: NSObject, FlutterStreamHandler {
 	public var eventSink: FlutterEventSink?;
 	public var queue: [Any] = [];
 	
-	init(eventChannel: FlutterEventChannel ) {
+	init(eventChannel: FlutterEventChannel) {
 		print("[BaseEventHandler]", "constructor called");
 		self.eventChannel = eventChannel;
 		
@@ -43,6 +43,7 @@ public class BaseEventChannel: NSObject, FlutterStreamHandler {
 		} catch {
 			print("Unknow error")
 		}
+		
 		return nil;
 	}
 	
