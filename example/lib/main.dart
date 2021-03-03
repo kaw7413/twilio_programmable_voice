@@ -30,10 +30,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   // final FlutterCallkeep _callKeep = FlutterCallkeep();
-  final TwilioProgrammableVoice _twilioProgrammableVoice = TwilioProgrammableVoice();
+  final TwilioProgrammableVoice _twilioProgrammableVoice =
+      TwilioProgrammableVoice();
 
   Future<void> setUpTwilioProgrammableVoice() async {
-    await _twilioProgrammableVoice.requestMicrophonePermissions().then(logger.d);
+    await _twilioProgrammableVoice
+        .requestMicrophonePermissions()
+        .then(logger.d);
     // await checkDefaultPhoneAccount();
     // TODO uncomment this when callkeep merge our pull request
     // await checkDefaultPhoneAccount().then((userAccept) {
@@ -85,7 +88,11 @@ class _HomePageState extends State<HomePage> {
     await DotEnv().load('.env');
     final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
-    _twilioProgrammableVoice.setUp(accessTokenUrl: accessTokenUrl + "/ios", headers : {"TestHeader": "I'm a test header"}).then((isRegistrationValid) {
+    _twilioProgrammableVoice.setUp(
+        accessTokenUrl: accessTokenUrl + "/ios",
+        headers: {
+          "TestHeader": "I'm a test header"
+        }).then((isRegistrationValid) {
       logger.d("registration is valid: " + isRegistrationValid.toString());
     });
   }
@@ -161,8 +168,8 @@ class _HomePageState extends State<HomePage> {
             final dataMap = Map<String, String>.from(message["data"]);
 
             TwilioProgrammableVoice().handleMessage(data: dataMap);
-            logger
-                .d("TwilioProgrammableVoice().handleMessage called in main.dart");
+            logger.d(
+                "TwilioProgrammableVoice().handleMessage called in main.dart");
           }
         }
       },
@@ -190,13 +197,15 @@ class _HomePageState extends State<HomePage> {
             children: [
               FlatButton(
                   onPressed: () async {
-                    final makeCall = await _twilioProgrammableVoice.makeCall(from: "testId2", to: "+33787934070");
+                    final makeCall = await _twilioProgrammableVoice.makeCall(
+                        from: "testId", to: "+33651727985");
                     print("makeCall c'est bien passé : " + makeCall.toString());
                   },
                   child: Text('Make call')),
               FlatButton(
                   onPressed: () {
-                    _twilioProgrammableVoice.testEventChannel(data: {"data": "test"});
+                    _twilioProgrammableVoice
+                        .testEventChannel(data: {"data": "test"});
                   },
                   child: Text('Test EventChannel')),
             ],
