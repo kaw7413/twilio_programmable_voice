@@ -7,10 +7,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
+import 'package:fluro/fluro.dart';
 
 // not for iOS
 // import 'background_message_handler.dart';
 // import 'callkeep_functions.dart';
+
+import 'package:twilio_programmable_voice_example/config/application.dart';
+import 'package:twilio_programmable_voice_example/config/routes.dart';
 
 final logger = Logger();
 
@@ -19,7 +23,7 @@ void main() async {
 
   await DotEnv().load('.env');
 
-  runApp(TwilioProgrammingVoiceExampleApp());
+  runApp(AppComponent());
 }
 
 class HomePage extends StatefulWidget {
@@ -30,11 +34,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   // final FlutterCallkeep _callKeep = FlutterCallkeep();
-  final TwilioProgrammableVoice _twilioProgrammableVoice =
-      TwilioProgrammableVoice();
 
   Future<void> setUpTwilioProgrammableVoice() async {
-    await _twilioProgrammableVoice
+    await TwilioProgrammableVoice()
         .requestMicrophonePermissions()
         .then(logger.d);
     // await checkDefaultPhoneAccount();
@@ -44,7 +46,7 @@ class _HomePageState extends State<HomePage> {
     //   logger.d("User has taped ok the telecom manager permission dialog : " + userAccept.toString());
     // });
 
-    _twilioProgrammableVoice.callStatusStream.listen((event) async {
+    TwilioProgrammableVoice().callStatusStream.listen((event) async {
       logger.d("[TwilioProgrammableVoice() Event]");
 
       // TODO: make this readable
@@ -88,7 +90,7 @@ class _HomePageState extends State<HomePage> {
     await DotEnv().load('.env');
     final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
-    _twilioProgrammableVoice.setUp(
+    TwilioProgrammableVoice().setUp(
         accessTokenUrl: accessTokenUrl + "/ios",
         headers: {
           "TestHeader": "I'm a test header"
@@ -120,7 +122,7 @@ class _HomePageState extends State<HomePage> {
       String targetNumber, String callerDisplayName) async {
     logger.d('[displayMakeCallScreen] called');
 
-    final String callUUID = _twilioProgrammableVoice.getCall.sid;
+    final String callUUID = TwilioProgrammableVoice().getCall.sid;
     // await checkDefaultPhoneAccount();
 
     logger.d(
@@ -135,7 +137,7 @@ class _HomePageState extends State<HomePage> {
     logger.d('[displayIncomingCallInvite] called');
 
     // TODO: review how getCall works to separate calls and call invites
-    final String callUUID = _twilioProgrammableVoice.getCall.sid;
+    final String callUUID = TwilioProgrammableVoice().getCall.sid;
     // await checkDefaultPhoneAccount();
 
     logger.d(
@@ -191,36 +193,56 @@ class _HomePageState extends State<HomePage> {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Plugin example app'),
+            title: const Text('Twilio Programming Voice'),
           ),
           body: Column(
             children: [
               FlatButton(
                   onPressed: () async {
-                    final makeCall = await _twilioProgrammableVoice.makeCall(
-                        from: "testId", to: "+33651727985");
+                    final makeCall = await TwilioProgrammableVoice()
+                        .makeCall(from: "testId", to: "+33651727985");
                     print("makeCall c'est bien passé : " + makeCall.toString());
                   },
                   child: Text('Make call')),
               FlatButton(
                   onPressed: () {
-                    _twilioProgrammableVoice
+                    TwilioProgrammableVoice()
                         .testEventChannel(data: {"data": "test"});
                   },
                   child: Text('Test EventChannel')),
+              FlatButton(
+                  onPressed: () {
+                    Application.router.navigateTo(context, Routes.call);
+                  },
+                  child: Text('Call Screen')),
             ],
           )),
     );
   }
 }
 
-class TwilioProgrammingVoiceExampleApp extends StatelessWidget {
+class AppComponent extends StatefulWidget {
+  @override
+  State createState() {
+    return AppComponentState();
+  }
+}
+
+class AppComponentState extends State<AppComponent> {
+  AppComponentState() {
+    final router = FluroRouter();
+    Routes.configureRoutes(router);
+    Application.router = router;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final app = MaterialApp(
       title: 'Twilio Programming Voice Example',
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      onGenerateRoute: Application.router.generator,
+      initialRoute: Routes.root,
     );
+    return app;
   }
 }
