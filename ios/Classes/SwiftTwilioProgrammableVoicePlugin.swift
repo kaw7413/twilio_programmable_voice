@@ -14,7 +14,7 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 	var methodChannel: FlutterMethodChannel?
 
 	// interract with TwilioVoice API and hold calls states.
-	let twilioProgrammableVoice = TwilioProgrammableVoice.sharedInstance
+	var twilioProgrammableVoice: TwilioProgrammableVoice!
 
 	// Initializer
 	override init() {
@@ -34,6 +34,8 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 
 	// Map dart method/events calls/stream to a defined methods/listeners (self.handle here)
 	public func onRegister(_ registrar: FlutterPluginRegistrar) {
+		self.twilioProgrammableVoice = TwilioProgrammableVoice.sharedInstance;
+		
 		methodChannel = FlutterMethodChannel(name: "twilio_programmable_voice", binaryMessenger: registrar.messenger())
 		methodChannel?.setMethodCallHandler(self.handle)
 

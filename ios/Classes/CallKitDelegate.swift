@@ -4,13 +4,13 @@ import AVFoundation
 
 class CallKitDelegate: NSObject, CXProviderDelegate {
 	var callKitProvider: CXProvider
-	var callKitCallController: CXCallController
+	let callKitCallController = CXCallController()
 
 	override init () {
 		let configuration = CXProviderConfiguration(localizedName: SwiftTwilioProgrammableVoicePlugin.appName)
 		callKitProvider = CXProvider(configuration: configuration)
-		callKitCallController = CXCallController()
-		super.init()
+
+		super.init();
 
 		callKitProvider.setDelegate(self, queue: nil)
 		if let callKitIcon = UIImage(named: "logo_white") {
@@ -22,6 +22,10 @@ class CallKitDelegate: NSObject, CXProviderDelegate {
 // CallKit has an odd API contract where the developer must call invalidate or the CXProvider is leaked.
 		callKitProvider.invalidate()
 	}
+	
+	public func setProviderDelegate(_ delegate: CXProviderDelegate?, queue: DispatchQueue?) {
+		callKitProvider.setDelegate(delegate, queue: queue);
+	}
 
 	public func providerDidReset(_ provider: CXProvider) {
 		TwilioProgrammableVoice.sharedInstance.audioDevice.isEnabled = false
@@ -32,10 +36,12 @@ class CallKitDelegate: NSObject, CXProviderDelegate {
 	}
 
 	public func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
+		print("Activate audio session")
 		TwilioProgrammableVoice.sharedInstance.audioDevice.isEnabled = true
 	}
 
 	public func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) {
+		print("Deactivate audio session")
 		TwilioProgrammableVoice.sharedInstance.audioDevice.isEnabled = false
 	}
 
@@ -61,6 +67,7 @@ class CallKitDelegate: NSObject, CXProviderDelegate {
 	}
 
 	public func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
+		print("answer call")
 		TwilioProgrammableVoice.sharedInstance.performAnswerVoiceCall(uuid: action.callUUID) { (success) in
 			if success {
 				print("success")
@@ -73,6 +80,7 @@ class CallKitDelegate: NSObject, CXProviderDelegate {
 	}
 
 	public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
+		print("end call")
 		if TwilioProgrammableVoice.sharedInstance.twilioVoiceDelegate!.callInvite != nil {
 			TwilioProgrammableVoice.sharedInstance.twilioVoiceDelegate!.callInvite?.reject()
 			TwilioProgrammableVoice.sharedInstance.twilioVoiceDelegate!.callInvite = nil
@@ -102,16 +110,20 @@ class CallKitDelegate: NSObject, CXProviderDelegate {
 	}
 
 	func performStartCallAction(uuid: UUID, handle: String) {
-		print("performStartCallAction called")
-			let callHandle = CXHandle(type: .generic, value: handle)
-			let startCallAction = CXStartCallAction(call: uuid, handle: callHandle)
-			let transaction = CXTransaction(action: startCallAction)
+		print("performStartCallAction called");
+		
+		print(callKitProvider);
+		
+		let callHandle = CXHandle(type: .generic, value: "my syper handle");
+		let startCallAction = CXStartCallAction(call: uuid, handle: callHandle);
+		let transaction = CXTransaction(action: startCallAction);
 
 		callKitCallController.request(transaction) { error in
 			print("In callKitCallController.request cb")
 
 			if error != nil {
-				print("error in cb", error as Any)
+				print(error as Any)
+				print("error in cb", error.debugDescription as Any)
 				return
 			}
 

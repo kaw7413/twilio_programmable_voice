@@ -4,7 +4,7 @@ import TwilioVoice
 /**
 	Responsible of holding calls states and making API calls to TwilioVoice.
 	
-	It should only be instanciated once.
+	It should only be instanciated once, and only when flutter is ready to go !.
 */
 public class TwilioProgrammableVoice: NSObject {
 	// Used to create singleton
@@ -24,17 +24,18 @@ public class TwilioProgrammableVoice: NSObject {
 	var callTo: String = "error"
 	var defaultCaller = "Unknown Caller"
 	var callArgs: [String: AnyObject] = [String: AnyObject]()
-	var audioDevice: DefaultAudioDevice = DefaultAudioDevice()
+	let audioDevice = DefaultAudioDevice()
 
 	func makeCall(to: String) {
-		print("makeCall called")
+		print("makeCall to", to)
 		if self.twilioVoiceDelegate!.call != nil && self.twilioVoiceDelegate!.call?.state == .connected {
-			print("in first if")
 			self.twilioVoiceDelegate!.userInitiatedDisconnect = true
 			self.callKitDelegate.performEndCallAction(uuid: self.twilioVoiceDelegate!.call!.uuid!)
 		} else {
-			print("in else")
+			// Probably not the right place for such an assignment
+			TwilioVoice.audioDevice = audioDevice;
 			let uuid = UUID()
+			print("UUID : ", uuid)
 			self.callKitDelegate.performStartCallAction(uuid: uuid, handle: to)
 		}
 	}
