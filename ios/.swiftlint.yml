@@ -15,3 +15,4 @@ opt_in_rules:
 
 disabled_rules:
   - switch_case_alignment
+  - weak_delegate

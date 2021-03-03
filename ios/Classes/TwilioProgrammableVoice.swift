@@ -13,9 +13,9 @@ public class TwilioProgrammableVoice: NSObject {
 	// @TODO: supress this delegate in favor of a cleaner thing.
 	// It forces us to add a bad (!) in every call to say : hey, it's initialized bro !
 	// AKA unsafelyUnwrap
-	weak var twilioVoiceDelegate: TwilioVoiceDelegate?
+	var twilioVoiceDelegate: TwilioVoiceDelegate?
 
-	weak var callKitDelegate = CallKitDelegate()
+	var callKitDelegate = CallKitDelegate()
 	let tokenManager = TokenManager()
 	var _result: FlutterResult?
 	let kClientList = "TwilioContactList"
