@@ -1,4 +1,6 @@
 PODS:
+  - callkeep (0.0.1):
+    - Flutter
   - Firebase/CoreOnly (6.33.0):
     - FirebaseCore (= 6.10.3)
   - Firebase/Messaging (6.33.0):
@@ -42,8 +44,6 @@ PODS:
   - Flutter (1.0.0)
   - flutter_apns (0.0.1):
     - Flutter
-  - flutter_ios_voip_kit (0.0.1):
-    - Flutter
   - GoogleDataTransport (7.5.1):
     - nanopb (~> 1.30906.0)
   - GoogleUtilities/AppDelegateSwizzler (6.7.2):
@@ -84,11 +84,11 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - callkeep (from `.symlinks/plugins/callkeep/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_apns (from `.symlinks/plugins/flutter_apns/ios`)
-  - flutter_ios_voip_kit (from `.symlinks/plugins/flutter_ios_voip_kit/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - soundpool (from `.symlinks/plugins/soundpool/ios`)
@@ -111,6 +111,8 @@ SPEC REPOS:
     - TwilioVoice
 
 EXTERNAL SOURCES:
+  callkeep:
+    :path: ".symlinks/plugins/callkeep/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_messaging:
@@ -119,8 +121,6 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_apns:
     :path: ".symlinks/plugins/flutter_apns/ios"
-  flutter_ios_voip_kit:
-    :path: ".symlinks/plugins/flutter_ios_voip_kit/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   permission_handler:
@@ -133,6 +133,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/workmanager/ios"
 
 SPEC CHECKSUMS:
+  callkeep: 6b21abbd46786a36e482190816db99b391ada1e3
   Firebase: 8db6f2d1b2c5e2984efba4949a145875a8f65fe5
   firebase_core: 5d6a02f3d85acd5f8321c2d6d62877626a670659
   firebase_messaging: 0aea2cd5885b65e19ede58ee3507f485c992cc75
@@ -143,7 +144,6 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 5eca4ef173de76253352511aafef774caa1cba2a
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_apns: ddc629f26016140bf52165040b0a8e8869f9ce32
-  flutter_ios_voip_kit: a3b4c5bd0cfda5069b5605a6d1dc60ecf99c6299
   GoogleDataTransport: f56af7caa4ed338dc8e138a5d7c5973e66440833
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc

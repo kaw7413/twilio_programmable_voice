@@ -21,7 +21,7 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 		var from: String = self.callInvite?.from ?? "Unknow Caller"
 		from = from.replacingOccurrences(of: "client:", with: "")
 
-		TwilioProgrammableVoice.sharedInstance.callKitDelegate.reportIncomingCall(from: from, uuid: callInvite.uuid)
+		TwilioProgrammableVoice.sharedInstance.reportIncomingCall(from: from, uuid: callInvite.uuid)
 		self.callInvite = callInvite
 
 		self.callStatusEventChannelWrapper.sendCallInvite(callInvite: getCallInvitePayload(callInvite: callInvite))
@@ -34,7 +34,7 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 			}
 
 			if let ci = self.callInvite {
-				TwilioProgrammableVoice.sharedInstance.callKitDelegate.performEndCallAction(uuid: ci.uuid)
+				TwilioProgrammableVoice.sharedInstance.performEndCallAction(uuid: ci.uuid)
 			}
 
 		self.callStatusEventChannelWrapper.sendCancelledCallInvite(cancelledCallInvite: getCancelledCallInvitePayload(cancelledCallInvite: cancelledCallInvite))
@@ -42,7 +42,7 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 
 	public func callDidStartRinging(call: Call) {
 		print("callDidStartRinging called")
-		callStatusEventChannelWrapper.sendCallRinging(call: getCallPayload(call: call, type: "CALL_RINGING"))
+		callStatusEventChannelWrapper.sendCallRinging(call: getCallPayload(call: call, type: "CallRinging"))
 	}
 
 	public func callDidConnect(call: Call) {
@@ -53,19 +53,19 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 			}
 
 		TwilioProgrammableVoice.sharedInstance.toggleAudioRoute(toSpeaker: false)
-		callStatusEventChannelWrapper.sendCallConnect(call: getCallPayload(call: call, type: "CALL_CONNECTED"))
+		callStatusEventChannelWrapper.sendCallConnect(call: getCallPayload(call: call, type: "CallConnected"))
 	}
 
 	public func call(call: Call, isReconnectingWithError error: Error) {
 		print("isReconnectingWithError called")
 
-		callStatusEventChannelWrapper.sendCallReconnecting(call: getCallPayload(call: call, type: "CALL_RECONNECTING"))
+		callStatusEventChannelWrapper.sendCallReconnecting(call: getCallPayload(call: call, type: "CallReconnecting"))
 	}
 
 	public func callDidReconnect(call: Call) {
 		print("isReconnectingWithError callDidReconnect")
 
-		callStatusEventChannelWrapper.sendCallReconnect(call: getCallPayload(call: call, type: "CALL_RECONNECTED"))
+		callStatusEventChannelWrapper.sendCallReconnect(call: getCallPayload(call: call, type: "CallReconnected"))
 	}
 
 	public func callDidFailToConnect(call: Call, error: Error) {
@@ -78,30 +78,34 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 					completion(false)
 			}
 
-		TwilioProgrammableVoice.sharedInstance.callKitDelegate.callKitProvider.reportCall(with: call.uuid!, endedAt: Date(), reason: CXCallEndedReason.failed)
+		TwilioProgrammableVoice.sharedInstance.callKitProvider.reportCall(with: call.uuid!, endedAt: Date(), reason: CXCallEndedReason.failed)
 		self.callDisconnected()
 		// No callStatusEventWrapper method bind to this cb
 	}
 
 	public func callDidDisconnect(call: Call, error: Error?) {
-		print("isReconnectingWithError callDidDisconnect")
+		print("callDidDisconnect")
+
+		var reason: CXCallEndedReason?
 
 		if self.userInitiatedDisconnect {
-					var reason = CXCallEndedReason.remoteEnded
-					if error != nil {
-							reason = .failed
-					}
-
-			TwilioProgrammableVoice.sharedInstance.callKitDelegate.callKitProvider.reportCall(with: call.uuid!, endedAt: Date(), reason: reason)
+			reason = CXCallEndedReason.remoteEnded
+			if error != nil {
+					reason = .failed
 			}
+		} else {
+			reason = CXCallEndedReason.remoteEnded
+		}
+
+		TwilioProgrammableVoice.sharedInstance.callKitProvider.reportCall(with: call.uuid!, endedAt: Date(), reason: reason!)
 
 		self.callDisconnected()
 
-		callStatusEventChannelWrapper.sendCallDisconnect(call: getCallPayload(call: call, type: "CALL_DISCONNECTED"))
+		callStatusEventChannelWrapper.sendCallDisconnect(call: getCallPayload(call: call, type: "CallDisconnected"))
 	}
 
 	private func callDisconnected() {
-		print("isReconnectingWithError callDisconnected")
+		print("callDisconnected")
 
 			if self.call != nil {
 				self.call = nil
@@ -116,7 +120,7 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 
 	private func getCallInvitePayload(callInvite: CallInvite) -> [String: String] {
 		return [
-			"type": "CALL_INVITE",
+			"type": "CallInvite",
 			"from": callInvite.from ?? "UNKNOW_FROM",
 			"to": callInvite.to,
 			"callSid": callInvite.callSid
@@ -125,7 +129,7 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 
 	private func getCancelledCallInvitePayload(cancelledCallInvite: CancelledCallInvite) -> [String: String] {
 		return [
-			"type": "CANCELLED_CALL_INVITE",
+			"type": "CancelledCallInvite",
 			"from": cancelledCallInvite.from ?? "UNKNOW_FROM",
 			"to": cancelledCallInvite.to,
 			"callSid": cancelledCallInvite.callSid

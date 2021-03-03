@@ -1,5 +1,4 @@
 import Flutter
-import UIKit
 import AVFoundation
 import TwilioVoice
 import CallKit
@@ -34,8 +33,8 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 
 	// Map dart method/events calls/stream to a defined methods/listeners (self.handle here)
 	public func onRegister(_ registrar: FlutterPluginRegistrar) {
-		self.twilioProgrammableVoice = TwilioProgrammableVoice.sharedInstance;
-		
+		self.twilioProgrammableVoice = TwilioProgrammableVoice.sharedInstance
+
 		methodChannel = FlutterMethodChannel(name: "twilio_programmable_voice", binaryMessenger: registrar.messenger())
 		methodChannel?.setMethodCallHandler(self.handle)
 
@@ -110,7 +109,7 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 		} else if flutterCall.method == "hangUp"{
 			if self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil && self.twilioProgrammableVoice.twilioVoiceDelegate!.call?.state == .connected {
 				self.twilioProgrammableVoice.twilioVoiceDelegate!.userInitiatedDisconnect = true
-				self.twilioProgrammableVoice.callKitDelegate.performEndCallAction(uuid: self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.uuid!)
+				self.twilioProgrammableVoice.performEndCallAction(uuid: self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.uuid!)
 			}
 		} else if flutterCall.method == "registerClient"{
 			// TODO bind that

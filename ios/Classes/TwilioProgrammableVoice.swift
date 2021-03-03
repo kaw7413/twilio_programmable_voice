@@ -1,5 +1,6 @@
 import Foundation
 import TwilioVoice
+import CallKit
 
 /**
 	Responsible of holding calls states and making API calls to TwilioVoice.
@@ -15,9 +16,12 @@ public class TwilioProgrammableVoice: NSObject {
 	// AKA unsafelyUnwrap
 	var twilioVoiceDelegate: TwilioVoiceDelegate?
 
-	var callKitDelegate = CallKitDelegate()
+	// CallKit
+	var callKitProvider: CXProvider
+	let callKitCallController = CXCallController()
+	let callKitListener = CallKitListener()
+
 	let tokenManager = TokenManager()
-	var _result: FlutterResult?
 	let kClientList = "TwilioContactList"
 	var clients: [String: String]!
 	var identity = "alice"
@@ -26,17 +30,35 @@ public class TwilioProgrammableVoice: NSObject {
 	var callArgs: [String: AnyObject] = [String: AnyObject]()
 	let audioDevice = DefaultAudioDevice()
 
+	override init () {
+		// Initiate call kit
+		let configuration = CXProviderConfiguration(localizedName: SwiftTwilioProgrammableVoicePlugin.appName)
+		callKitProvider = CXProvider(configuration: configuration)
+
+		if let callKitIcon = UIImage(named: "logo_white") {
+				configuration.iconTemplateImageData = callKitIcon.pngData()
+		}
+
+		super.init()
+
+		callKitProvider.setDelegate(self.callKitListener, queue: nil)
+	}
+
+	deinit {
+		callKitProvider.invalidate()
+	}
+
 	func makeCall(to: String) {
 		print("makeCall to", to)
 		if self.twilioVoiceDelegate!.call != nil && self.twilioVoiceDelegate!.call?.state == .connected {
 			self.twilioVoiceDelegate!.userInitiatedDisconnect = true
-			self.callKitDelegate.performEndCallAction(uuid: self.twilioVoiceDelegate!.call!.uuid!)
+			self.performEndCallAction(uuid: self.twilioVoiceDelegate!.call!.uuid!)
 		} else {
 			// Probably not the right place for such an assignment
-			TwilioVoice.audioDevice = audioDevice;
+			TwilioVoice.audioDevice = audioDevice
 			let uuid = UUID()
 			print("UUID : ", uuid)
-			self.callKitDelegate.performStartCallAction(uuid: uuid, handle: to)
+			self.performStartCallAction(uuid: uuid, handle: to)
 		}
 	}
 
@@ -93,6 +115,76 @@ public class TwilioProgrammableVoice: NSObject {
 			guard #available(iOS 13, *) else {
 				self.tokenManager.incomingPushHandled()
 				return
+			}
+		}
+	}
+
+	func performStartCallAction(uuid: UUID, handle: String) {
+		print("performStartCallAction called")
+
+		let callHandle = CXHandle(type: .generic, value: "my syper handle")
+		let startCallAction = CXStartCallAction(call: uuid, handle: callHandle)
+		let transaction = CXTransaction(action: startCallAction)
+
+		callKitCallController.request(transaction) { error in
+			print("In callKitCallController.request cb")
+
+			if error != nil {
+				print(error as Any)
+				print("error in cb", error.debugDescription as Any)
+				return
+			}
+
+			print("creating callUpdate")
+			let callUpdate = CXCallUpdate()
+			callUpdate.remoteHandle = callHandle
+
+			// @TODO: Allow to rename number to a custom display
+			callUpdate.localizedCallerName = handle
+			callUpdate.supportsDTMF = false
+			callUpdate.supportsHolding = true
+			callUpdate.supportsGrouping = false
+			callUpdate.supportsUngrouping = false
+			callUpdate.hasVideo = false
+
+			print("reporting call", uuid, callUpdate)
+
+			// TODO: wtf.
+			// self.callKitProvider.setDelegate(self, queue: nil)
+
+			self.callKitProvider.reportCall(with: uuid, updated: callUpdate)
+		}
+	}
+
+	func performEndCallAction(uuid: UUID) {
+		let endCallAction = CXEndCallAction(call: uuid)
+		let transaction = CXTransaction(action: endCallAction)
+
+		callKitCallController.request(transaction) { error in
+			if let error = error {
+				print("error", error as Any)
+			}
+		}
+	}
+
+	func reportIncomingCall(from: String, uuid: UUID) {
+		let callHandle = CXHandle(type: .generic, value: from)
+
+		let callUpdate = CXCallUpdate()
+		callUpdate.remoteHandle = callHandle
+
+		// @TODO: override from that would usually display unknown caller
+		// with a custom value
+		callUpdate.localizedCallerName = from
+		callUpdate.supportsDTMF = true
+		callUpdate.supportsHolding = true
+		callUpdate.supportsGrouping = false
+		callUpdate.supportsUngrouping = false
+		callUpdate.hasVideo = false
+
+		self.callKitProvider.reportNewIncomingCall(with: uuid, update: callUpdate) { error in
+			if let error = error {
+				print("error", error as Any)
 			}
 		}
 	}

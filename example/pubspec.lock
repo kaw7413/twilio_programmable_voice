@@ -15,6 +15,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  callkeep:
+    dependency: "direct main"
+    description:
+      name: callkeep
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3+1"
   characters:
     dependency: transitive
     description:
@@ -132,13 +139,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
-  flutter_ios_voip_kit:
-    dependency: "direct main"
-    description:
-      name: flutter_ios_voip_kit
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.5"
   flutter_test:
     dependency: "direct dev"
     description: flutter
