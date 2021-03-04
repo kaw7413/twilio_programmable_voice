@@ -48,47 +48,6 @@ class _HomePageState extends State<HomePage> {
     //   logger.d("User has taped ok the telecom manager permission dialog : " + userAccept.toString());
     // });
 
-    TwilioProgrammableVoice().callStatusStream.listen((event) async {
-      logger.d("[TwilioProgrammableVoice() Event]");
-
-      // TODO: make this readable
-      if (event is CallInvite) {
-        logger.d("CALL_INVITE", event);
-        SoundPoolManager.getInstance().playIncoming();
-        await displayIncomingCallInvite(event.from, "CallerDisplayName");
-      } else if (event is CancelledCallInvite) {
-        logger.d("CANCELLED_CALL_INVITE", event);
-        SoundPoolManager.getInstance().stopRinging();
-        SoundPoolManager.getInstance().playDisconnect();
-      } else if (event is CallConnectFailure) {
-        logger.d("CALL_CONNECT_FAILURE", event);
-        SoundPoolManager.getInstance().stopRinging();
-      } else if (event is CallRinging) {
-        logger.d("CALL_RINGING", event);
-        SoundPoolManager.getInstance().stopRinging();
-        // TwilioProgrammableVoice().getCall.to and TwilioProgrammableVoice().getCall.from are always null when making a call
-        // TODO replace brut phone number with TwilioProgrammableVoice().getCall.to
-        await displayMakeCallScreen("+33787934070", "Display Caller Name");
-      } else if (event is CallConnected) {
-        logger.d("CALL_CONNECTED", event);
-        SoundPoolManager.getInstance().stopRinging();
-      } else if (event is CallReconnecting) {
-        logger.d("CALL_RECONNECTING", event);
-      } else if (event is CallReconnected) {
-        logger.d("CALL_RECONNECTED", event);
-      } else if (event is CallDisconnected) {
-        logger.d("CALL_DISCONNECTED", event);
-
-        // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
-        SoundPoolManager.getInstance().playDisconnect();
-
-        // TODO: only end the current active call
-        // _callKeep.endAllCalls();
-      } else if (event is CallQualityWarningChanged) {
-        logger.d("CALL_QUALITY_WARNING_CHANGED", event);
-      }
-    });
-
     await DotEnv().load('.env');
     final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
@@ -201,9 +160,20 @@ class _HomePageState extends State<HomePage> {
             children: [
               FlatButton(
                   onPressed: () async {
-                    final makeCall = await TwilioProgrammableVoice()
+                    print("MAKE CALL");
+                    final hasSucceed = await TwilioProgrammableVoice()
                         .makeCall(from: "testId", to: "+33651727985");
-                    print("makeCall c'est bien passé : " + makeCall.toString());
+                    print("AFTER MAKE CALL");
+
+                    print("Make call success state $hasSucceed");
+
+                    // Notify BLoC we've emitted a call
+                    // Note: we could have moved .makeCall call to BLoC
+                    context
+                        .read<CallBloc>()
+                        .add(CallEmited(contactPerson: "+33651727985"));
+
+                    Application.router.navigateTo(context, Routes.call);
                   },
                   child: Text('Make call')),
               FlatButton(
@@ -212,11 +182,7 @@ class _HomePageState extends State<HomePage> {
                         .testEventChannel(data: {"data": "test"});
                   },
                   child: Text('Test EventChannel')),
-              FlatButton(
-                  onPressed: () {
-                    Application.router.navigateTo(context, Routes.call);
-                  },
-                  child: Text('Call Screen')),
+              FlatButton(onPressed: () {}, child: Text('Call Screen')),
             ],
           )),
     );
