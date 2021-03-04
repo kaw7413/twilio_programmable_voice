@@ -1,5 +1,6 @@
 import Foundation
 import TwilioVoice
+import Flutter
 import CallKit
 
 /**
@@ -48,7 +49,7 @@ public class TwilioProgrammableVoice: NSObject {
 		callKitProvider.invalidate()
 	}
 
-	func makeCall(to: String) {
+	func makeCall(to: String, result: @escaping FlutterResult) {
 		print("makeCall to", to)
 		if self.twilioVoiceDelegate!.call != nil && self.twilioVoiceDelegate!.call?.state == .connected {
 			self.twilioVoiceDelegate!.userInitiatedDisconnect = true
@@ -58,7 +59,9 @@ public class TwilioProgrammableVoice: NSObject {
 			TwilioVoice.audioDevice = audioDevice
 			let uuid = UUID()
 			print("UUID : ", uuid)
-			self.performStartCallAction(uuid: uuid, handle: to)
+			self.performStartCallAction(uuid: uuid, handle: to) { (success) in
+				result(success);
+			}
 		}
 	}
 
@@ -119,7 +122,7 @@ public class TwilioProgrammableVoice: NSObject {
 		}
 	}
 
-	func performStartCallAction(uuid: UUID, handle: String) {
+	func performStartCallAction(uuid: UUID, handle: String, completion: @escaping (Bool) -> ()) {
 		print("performStartCallAction called")
 
 		let callHandle = CXHandle(type: .generic, value: "my syper handle")
@@ -153,6 +156,8 @@ public class TwilioProgrammableVoice: NSObject {
 			// self.callKitProvider.setDelegate(self, queue: nil)
 
 			self.callKitProvider.reportCall(with: uuid, updated: callUpdate)
+			
+			completion(true);
 		}
 	}
 

@@ -71,7 +71,7 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 			self.twilioProgrammableVoice.identity = callFrom
 
 			print("calling makeCall", "self.callTo", self.twilioProgrammableVoice.callTo, "identity", self.twilioProgrammableVoice.identity)
-			self.twilioProgrammableVoice.makeCall(to: callTo)
+			self.twilioProgrammableVoice.makeCall(to: callTo, result: result)
 		} else if flutterCall.method == "muteCall" {
 			if self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil {
 				let muted = self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.isMuted
