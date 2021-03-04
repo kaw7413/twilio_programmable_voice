@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:twilio_programmable_voice_example/bloc/bloc/call_bloc.dart';
+import 'package:twilio_programmable_voice_example/bloc/call_bloc.dart';
 import 'package:twilio_programmable_voice_example/config/application.dart';
 import 'package:twilio_programmable_voice_example/config/routes.dart';
 import 'package:twilio_programmable_voice_example/widgets/dial_button.dart';
