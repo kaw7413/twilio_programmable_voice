@@ -16,6 +16,12 @@ class CallAnswered extends CallEvent {
   CallAnswered({this.uuid, this.contactPerson});
 }
 
+class CallCancelled extends CallEvent {
+  final String uuid;
+
+  CallCancelled({this.uuid});
+}
+
 class CallEnded extends CallEvent {
   final String uuid;
 

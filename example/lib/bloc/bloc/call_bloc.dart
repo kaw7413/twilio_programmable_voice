@@ -22,7 +22,6 @@ class CallBloc extends Bloc<CallEvent, CallState> {
         .listen((event) async {
       logger.d("[TwilioProgrammableVoice() Event]");
 
-      // TODO: make this readable
       if (event is TwilioVoice.CallInvite) {
         logger.d("CALL_INVITE", event);
         TwilioVoice.SoundPoolManager.getInstance().playIncoming();
@@ -43,6 +42,9 @@ class CallBloc extends Bloc<CallEvent, CallState> {
       } else if (event is TwilioVoice.CallConnected) {
         logger.d("CALL_CONNECTED", event);
         TwilioVoice.SoundPoolManager.getInstance().stopRinging();
+        this.add(CallAnswered(
+            contactPerson: (this.state as CallRinging).contactPerson,
+            uuid: event.sid));
       } else if (event is TwilioVoice.CallReconnecting) {
         logger.d("CALL_RECONNECTING", event);
       } else if (event is TwilioVoice.CallReconnected) {
@@ -52,6 +54,8 @@ class CallBloc extends Bloc<CallEvent, CallState> {
 
         // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
         TwilioVoice.SoundPoolManager.getInstance().playDisconnect();
+
+        this.add(CallEnded(uuid: event.sid));
 
         // TODO: only end the current active call
         // _callKeep.endAllCalls();
@@ -83,6 +87,15 @@ class CallBloc extends Bloc<CallEvent, CallState> {
     if (event is CallEnded) {
       yield mapCallEndedToState(event);
     }
+
+    if (event is CallCancelled) {
+      yield mapCallCancelledToState(event);
+    }
+  }
+
+  CallState mapCallCancelledToState(CallCancelled event) {
+    // TODO: ask TwilioProgrammableVoice to stop call here.
+    return CallInitial();
   }
 
   CallState mapCallEmittedToState(CallEmited event) {

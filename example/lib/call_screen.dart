@@ -9,6 +9,33 @@ import 'package:twilio_programmable_voice_example/widgets/rounded_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CallScreen extends StatelessWidget {
+  Widget displayStateText(CallState state) {
+    String text;
+
+    if (state is CallRinging) {
+      text = "Calling...";
+    } else if (state is CallInProgress) {
+      text = "Call In Progress...";
+    } else {
+      text = "Call Ended";
+    }
+
+    return Text(
+      text,
+      style: TextStyle(color: Colors.white60),
+    );
+  }
+
+  String getContactPerson(CallState state) {
+    if (state is CallRinging) {
+      return state.contactPerson;
+    } else if (state is CallInProgress) {
+      return state.contactPerson;
+    } else {
+      return "Unknown";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CallBloc, CallState>(
@@ -24,16 +51,13 @@ class CallScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    (state as CallRinging).contactPerson,
+                    this.getContactPerson(state),
                     style: Theme.of(context)
                         .textTheme
                         .headline4
                         .copyWith(color: Colors.white),
                   ),
-                  Text(
-                    "Calling…",
-                    style: TextStyle(color: Colors.white60),
-                  ),
+                  this.displayStateText(state),
                   SizedBox(height: 5),
                   DialUserPicture(image: "assets/images/calling_face.png"),
                   Spacer(),
