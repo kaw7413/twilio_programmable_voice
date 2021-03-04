@@ -8,6 +8,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 import 'package:fluro/fluro.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:twilio_programmable_voice_example/bloc/bloc/call_bloc.dart';
 
 // not for iOS
 // import 'background_message_handler.dart';
@@ -237,12 +239,14 @@ class AppComponentState extends State<AppComponent> {
 
   @override
   Widget build(BuildContext context) {
-    final app = MaterialApp(
-      title: 'Twilio Programming Voice Example',
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: Application.router.generator,
-      initialRoute: Routes.root,
-    );
-    return app;
+    return BlocProvider(
+        // BLoC is only here to have a call state.
+        create: (BuildContext context) => CallBloc(),
+        child: MaterialApp(
+          title: 'Twilio Programming Voice',
+          debugShowCheckedModeBanner: false,
+          onGenerateRoute: Application.router.generator,
+          initialRoute: Routes.root,
+        ));
   }
 }
