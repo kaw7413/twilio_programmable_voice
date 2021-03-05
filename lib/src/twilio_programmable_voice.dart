@@ -22,7 +22,8 @@ class TwilioProgrammableVoice {
   final EventChannel _callStatusEventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
 
-  static final TwilioProgrammableVoice _singleton = new TwilioProgrammableVoice._internal();
+  static final TwilioProgrammableVoice _singleton =
+      new TwilioProgrammableVoice._internal();
 
   factory TwilioProgrammableVoice() {
     return _singleton;
@@ -43,12 +44,17 @@ class TwilioProgrammableVoice {
   /// [tokenManagerStrategies] an optional map where you can set defined the strategies you want to use to retrieve tokens
   ///
   /// [headers] optional headers, use by the GET access token strategy
-  Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
+  Future<bool> setUp(
+      {@required String accessTokenUrl,
+      Map<String, Object> tokenManagerStrategies,
+      Map<String, dynamic> headers}) async {
     _setAccessTokenUrl(accessTokenUrl);
     print("SetUp called");
-    getService<TokenService>().init(strategies: tokenManagerStrategies, headers: headers);
+    getService<TokenService>()
+        .init(strategies: tokenManagerStrategies, headers: headers);
     WorkmanagerWrapper.setUpWorkmanager();
-    final bool isRegistrationValid = await registerVoice(accessTokenUrl: accessTokenUrl);
+    final bool isRegistrationValid =
+        await registerVoice(accessTokenUrl: accessTokenUrl);
     return isRegistrationValid;
   }
 
@@ -66,9 +72,11 @@ class TwilioProgrammableVoice {
     print("registerVoice called");
     bool isRegistrationValid = true;
 
-    String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: accessTokenUrl);
-    String fcmToken = Platform.isAndroid ? await getService<TokenService>().getFcmToken() : null;
-
+    String accessToken = await getService<TokenService>()
+        .getAccessToken(accessTokenUrl: accessTokenUrl);
+    String fcmToken = Platform.isAndroid
+        ? await getService<TokenService>().getFcmToken()
+        : null;
 
     try {
       print("trying to register | accessToken : $accessToken");
@@ -76,15 +84,19 @@ class TwilioProgrammableVoice {
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       getService<TokenService>().persistAccessToken(accessToken: accessToken);
       // TODO iOS test
-      WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
+      WorkmanagerWrapper.launchJobInBg(
+          accessTokenUrl: accessTokenUrl, accessToken: accessToken);
     } catch (err) {
       print("registration failed");
       isRegistrationValid = false;
-      await getService<BoxService>().getBox().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
+      await getService<BoxService>()
+          .getBox()
+          .then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
       registerVoice(accessTokenUrl: accessTokenUrl);
     }
 
-    print("La registration c'est bien passé : " + isRegistrationValid.toString());
+    print(
+        "La registration c'est bien passé : " + isRegistrationValid.toString());
     return isRegistrationValid;
   }
 
@@ -93,8 +105,30 @@ class TwilioProgrammableVoice {
   /// [from] this device identity (or number)
   /// [to] the target identity (or number)
   Future<bool> makeCall({@required String from, @required String to}) async {
-    String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: _accessTokenUrl);
-    return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to, "accessToken": accessToken});
+    String accessToken = await getService<TokenService>()
+        .getAccessToken(accessTokenUrl: _accessTokenUrl);
+    return _methodChannel.invokeMethod(
+        'makeCall', {"from": from, "to": to, "accessToken": accessToken});
+  }
+
+  /// Stop the current call
+  Future<void> hangout() {
+    return _methodChannel.invokeMethod('stopCall');
+  }
+
+  /// Mute the current active call
+  Future<void> mute({@required bool setOn}) {
+    return _methodChannel.invokeMethod('muteCall', {"setOn": setOn});
+  }
+
+  /// Hold the current active call
+  Future<void> hold({@required bool setOn}) {
+    return _methodChannel.invokeMethod('holdCall', {"setOn": setOn});
+  }
+
+  /// Hold the current active call
+  Future<void> toggleSpeaker({@required bool setOn}) {
+    return _methodChannel.invokeMethod('toggleSpeaker', {"setOn": setOn});
   }
 
   /// Answer the current call invite
@@ -130,7 +164,10 @@ class TwilioProgrammableVoice {
     print("callStatusStream called");
     CallEvent currentCallEvent;
 
-    return _callStatusEventChannel.receiveBroadcastStream().where((data) => _containsCall(data['type'])).map((data) {
+    return _callStatusEventChannel
+        .receiveBroadcastStream()
+        .where((data) => _containsCall(data['type']))
+        .map((data) {
       switch (data['type']) {
         case 'CallInvite':
           currentCallEvent = CallInvite.from(data);
@@ -196,14 +233,14 @@ class TwilioProgrammableVoice {
   }
 
   get getCall => _currentCallEvent;
-  
+
   dynamic testIos() async {
     return await _methodChannel.invokeMethod('getBatteryLevel');
   }
 
   // TODO remove this when eventChannel works on iOS
   Future<bool> testEventChannel({@required Map<String, String> data}) {
-    return _methodChannel.invokeMethod('testEventChannel', {"data": data, "type": "CallTest"});
+    return _methodChannel
+        .invokeMethod('testEventChannel', {"data": data, "type": "CallTest"});
   }
 }
-

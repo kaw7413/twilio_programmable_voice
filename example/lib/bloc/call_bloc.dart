@@ -91,6 +91,45 @@ class CallBloc extends Bloc<CallEvent, CallState> {
     if (event is CallCancelled) {
       yield mapCallCancelledToState(event);
     }
+
+    if (event is CallToggleHold) {
+      yield mapCallToggleHoldToState(event);
+    }
+
+    if (event is CallToggleMute) {
+      yield mapCallToggleMuteToState(event);
+    }
+
+    if (event is CallToggleSpeaker) {
+      yield mapCallToggleSpeakerToState(event);
+    }
+  }
+
+  CallState mapCallToggleHoldToState(CallToggleHold event) {
+    final _state = state;
+
+    if (_state is CallInProgress) {
+      TwilioVoice.TwilioProgrammableVoice().hold(setOn: event.setOn);
+      return _state.copyWith(isHold: event.setOn);
+    }
+  }
+
+  CallState mapCallToggleMuteToState(CallToggleMute event) {
+    final _state = state;
+
+    if (_state is CallInProgress) {
+      TwilioVoice.TwilioProgrammableVoice().mute(setOn: event.setOn);
+      return _state.copyWith(isMuted: event.setOn);
+    }
+  }
+
+  CallState mapCallToggleSpeakerToState(CallToggleSpeaker event) {
+    final _state = state;
+
+    if (_state is CallInProgress) {
+      TwilioVoice.TwilioProgrammableVoice().toggleSpeaker(setOn: event.setOn);
+      return _state.copyWith(isAutioRoutedToSpeaker: event.setOn);
+    }
   }
 
   CallState mapCallCancelledToState(CallCancelled event) {
@@ -108,10 +147,14 @@ class CallBloc extends Bloc<CallEvent, CallState> {
 
   CallState mapCallAnsweredToState(CallAnswered event) {
     return CallInProgress(
-        contactPerson: event.contactPerson,
-        uuid: event.uuid,
-        direction: "OUT",
-        startedAt: new DateTime.now().toIso8601String());
+      contactPerson: event.contactPerson,
+      uuid: event.uuid,
+      direction: "OUT",
+      startedAt: new DateTime.now().toIso8601String(),
+      isAudioRoutedToSpeaker: false,
+      isHold: false,
+      isMuted: false,
+    );
   }
 
   CallState mapCallEndedToState(CallEnded event) {

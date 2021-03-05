@@ -29,7 +29,7 @@ class CallKitListener: NSObject, CXProviderDelegate {
 		print("provider called CXStartCallAction")
 		provider.reportOutgoingCall(with: action.callUUID, startedConnectingAt: Date())
 
-		TwilioProgrammableVoice.sharedInstance.performVoiceCall(uuid: action.callUUID, client: "") { (success) in
+		TwilioProgrammableVoice.sharedInstance.performVoiceCall(uuid: action.callUUID, to: action.handle.value) { (success) in
 			print("in performVoiceCall cb")
 				if success {
 					print("success case")

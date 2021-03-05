@@ -67,12 +67,20 @@ class CallScreen extends StatelessWidget {
                       DialButton(
                         iconSrc: "assets/icons/Icon Mic.svg",
                         text: "Audio",
-                        press: () {},
+                        press: () {
+                          context
+                              .read<CallBloc>()
+                              .add(CallToggleMute(setOn: true));
+                        },
                       ),
                       DialButton(
                         iconSrc: "assets/icons/Icon Volume.svg",
                         text: "Microphone",
-                        press: () {},
+                        press: () {
+                          context
+                              .read<CallBloc>()
+                              .add(CallToggleSpeaker(setOn: true));
+                        },
                       ),
                       DialButton(
                         iconSrc: "assets/icons/Icon Video.svg",

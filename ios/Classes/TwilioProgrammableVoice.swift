@@ -23,12 +23,7 @@ public class TwilioProgrammableVoice: NSObject {
 	let callKitListener = CallKitListener()
 
 	let tokenManager = TokenManager()
-	let kClientList = "TwilioContactList"
-	var clients: [String: String]!
 	var identity = "alice"
-	var callTo: String = "error"
-	var defaultCaller = "Unknown Caller"
-	var callArgs: [String: AnyObject] = [String: AnyObject]()
 	let audioDevice = DefaultAudioDevice()
 
 	override init () {
@@ -42,6 +37,9 @@ public class TwilioProgrammableVoice: NSObject {
 
 		super.init()
 
+		// Probably not the right place for such an assignment
+		TwilioVoice.audioDevice = self.audioDevice
+
 		callKitProvider.setDelegate(self.callKitListener, queue: nil)
 	}
 
@@ -49,20 +47,46 @@ public class TwilioProgrammableVoice: NSObject {
 		callKitProvider.invalidate()
 	}
 
-	func makeCall(to: String, result: @escaping FlutterResult) {
-		print("makeCall to", to)
+	func makeCall(to: String, from: String, result: @escaping FlutterResult) {
 		if self.twilioVoiceDelegate!.call != nil && self.twilioVoiceDelegate!.call?.state == .connected {
 			self.twilioVoiceDelegate!.userInitiatedDisconnect = true
 			self.performEndCallAction(uuid: self.twilioVoiceDelegate!.call!.uuid!)
 		} else {
-			// Probably not the right place for such an assignment
-			TwilioVoice.audioDevice = audioDevice
 			let uuid = UUID()
-			print("UUID : ", uuid)
 			self.performStartCallAction(uuid: uuid, handle: to) { (success) in
-				result(success);
+				result(success)
 			}
 		}
+	}
+
+	func stopActiveCall(result: @escaping FlutterResult) {
+		guard let activeCall = self.twilioVoiceDelegate?.call else { return; }
+
+		activeCall.disconnect()
+
+		result(nil)
+	}
+
+	func muteActiveCall(setOn: Bool, result: @escaping FlutterResult) {
+		guard let activeCall = self.twilioVoiceDelegate?.call else { return; }
+
+		activeCall.isMuted = setOn
+
+		result(nil)
+	}
+
+	func holdActiveCall(setOn: Bool, result: @escaping FlutterResult) {
+		guard let activeCall = self.twilioVoiceDelegate?.call else { return; }
+
+		activeCall.isOnHold = setOn
+
+		result(nil)
+	}
+
+	func toggleAudioRoute(toSpeaker: Bool, result: @escaping FlutterResult) {
+		toggleAudioRoute(toSpeaker: toSpeaker)
+
+		result(nil)
 	}
 
 	func toggleAudioRoute(toSpeaker: Bool) {
@@ -82,25 +106,23 @@ public class TwilioProgrammableVoice: NSObject {
 		audioDevice.block()
 	}
 
-	func performVoiceCall(uuid: UUID, client: String?, completionHandler: @escaping (Bool) -> Swift.Void) {
+	// Called after the CXProvider is notify of the CXUpdateCallAction
+	func performVoiceCall(uuid: UUID, to: String, completionHandler: @escaping (Bool) -> Swift.Void) {
+		// Fetch access token
 		guard let token = self.tokenManager.accessToken else {
 			completionHandler(false)
 			return
 		}
 
 		let connectOptions: ConnectOptions = ConnectOptions(accessToken: token) { (builder) in
-			builder.params = ["To": self.callTo]
-			for (key, value) in self.callArgs {
-				// Only add from and to parameters, ignore the rest.
-				if key != "to" && key != "from" {
-					builder.params[key] = "\(value)"
-				}
-			}
+			builder.params = ["To": to]
 			builder.uuid = uuid
 		}
-		print("CALLING")
-		let theCall = TwilioVoice.connect(options: connectOptions, delegate: self.twilioVoiceDelegate!)
-		self.twilioVoiceDelegate!.call = theCall
+
+		// Connect to Twilio
+		let call = TwilioVoice.connect(options: connectOptions, delegate: self.twilioVoiceDelegate!)
+
+		self.twilioVoiceDelegate!.call = call
 		self.twilioVoiceDelegate!.callCompletionCallback = completionHandler
 	}
 
@@ -122,10 +144,10 @@ public class TwilioProgrammableVoice: NSObject {
 		}
 	}
 
-	func performStartCallAction(uuid: UUID, handle: String, completion: @escaping (Bool) -> ()) {
+	func performStartCallAction(uuid: UUID, handle: String, completion: @escaping (Bool) -> Void) {
 		print("performStartCallAction called")
 
-		let callHandle = CXHandle(type: .generic, value: "my syper handle")
+		let callHandle = CXHandle(type: .generic, value: handle)
 		let startCallAction = CXStartCallAction(call: uuid, handle: callHandle)
 		let transaction = CXTransaction(action: startCallAction)
 
@@ -156,8 +178,8 @@ public class TwilioProgrammableVoice: NSObject {
 			// self.callKitProvider.setDelegate(self, queue: nil)
 
 			self.callKitProvider.reportCall(with: uuid, updated: callUpdate)
-			
-			completion(true);
+
+			completion(true)
 		}
 	}
 

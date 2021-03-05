@@ -1,8 +1,8 @@
 import Foundation
 import PushKit
-// TODO lint
-// TODO we might want only one class to interact with the TwilioVoice
 import TwilioVoice
+// For access to UIDevice version
+import UIKit
 
 class TokenManager: NSObject, PKPushRegistryDelegate {
 	var voipRegistry: PKPushRegistry

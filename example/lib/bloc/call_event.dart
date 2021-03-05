@@ -27,3 +27,23 @@ class CallEnded extends CallEvent {
 
   CallEnded({this.uuid});
 }
+
+// Call Actions
+
+class CallToggleMute extends CallEvent {
+  final bool setOn;
+
+  CallToggleMute({this.setOn});
+}
+
+class CallToggleSpeaker extends CallEvent {
+  final bool setOn;
+
+  CallToggleSpeaker({this.setOn});
+}
+
+class CallToggleHold extends CallEvent {
+  final bool setOn;
+
+  CallToggleHold({this.setOn});
+}

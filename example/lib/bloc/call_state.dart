@@ -20,6 +20,30 @@ class CallInProgress extends CallState {
   final String contactPerson;
   final String direction;
 
+  final bool isMuted;
+  final bool isHold;
+  final bool isAudioRoutedToSpeaker;
+
   CallInProgress(
-      {this.uuid, this.startedAt, this.contactPerson, this.direction});
+      {this.uuid,
+      this.startedAt,
+      this.contactPerson,
+      this.direction,
+      this.isAudioRoutedToSpeaker,
+      this.isHold,
+      this.isMuted});
+
+  CallInProgress copyWith(
+      {bool isHold, bool isMuted, bool isAutioRoutedToSpeaker}) {
+    return CallInProgress(
+      uuid: this.uuid,
+      startedAt: this.startedAt,
+      contactPerson: this.contactPerson,
+      direction: this.direction,
+      isMuted: isMuted ?? this.isMuted,
+      isHold: isHold ?? this.isHold,
+      isAudioRoutedToSpeaker:
+          isAudioRoutedToSpeaker ?? this.isAudioRoutedToSpeaker,
+    );
+  }
 }

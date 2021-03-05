@@ -61,28 +61,22 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 			print("handle -> makeCall")
 			guard let callTo = args["to"] as? String else {return}
 			guard let callFrom = args["from"] as? String else {return}
-			self.twilioProgrammableVoice.callArgs = args
-			self.twilioProgrammableVoice.twilioVoiceDelegate!.callOutgoing = true
+
 			if let accessToken = args["accessToken"] as? String {
 				self.twilioProgrammableVoice.tokenManager.accessToken = accessToken
 			}
 
-			self.twilioProgrammableVoice.callTo = callTo
-			self.twilioProgrammableVoice.identity = callFrom
-
-			print("calling makeCall", "self.callTo", self.twilioProgrammableVoice.callTo, "identity", self.twilioProgrammableVoice.identity)
-			self.twilioProgrammableVoice.makeCall(to: callTo, result: result)
+			self.twilioProgrammableVoice.makeCall(to: callTo, from: callFrom, result: result)
+		} else if flutterCall.method == "stopCall" {
+			self.twilioProgrammableVoice.stopActiveCall(result: result)
 		} else if flutterCall.method == "muteCall" {
-			if self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil {
-				let muted = self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.isMuted
-				self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.isMuted = !muted
-			} else {
-				let ferror: FlutterError = FlutterError(code: "MUTE_ERROR", message: "No call to be muted", details: nil)
-				result(ferror)
-			}
+			guard let setOn = args["setOn"] as? Bool else {return}
+
+			self.twilioProgrammableVoice.muteActiveCall(setOn: setOn, result: result)
 		} else if flutterCall.method == "toggleSpeaker" {
-			guard let speakerIsOn = args["speakerIsOn"] as? Bool else {return}
-			self.twilioProgrammableVoice.toggleAudioRoute(toSpeaker: speakerIsOn)
+			guard let setOn = args["setOn"] as? Bool else {return}
+
+			self.twilioProgrammableVoice.toggleAudioRoute(toSpeaker: setOn, result: result)
 		} else if flutterCall.method == "isOnCall" {
 			result(self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil)
 			return
@@ -92,12 +86,11 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 				self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.sendDigits(digits)
 			}
 		} else if flutterCall.method == "holdCall" {
-			if self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil {
-				let hold = self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.isOnHold
-				self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.isOnHold = !hold
-			}
+			guard let setOn = args["setOn"] as? Bool else {return}
+
+			self.twilioProgrammableVoice.muteActiveCall(setOn: setOn, result: result)
 		} else if flutterCall.method == "answer" {
-			result(true) /// do nuthin
+			result(true) /// do nothing
 			return
 		} else if flutterCall.method == "unregister" {
 			guard let token = args["accessToken"] as? String else {return}
@@ -111,29 +104,11 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 				self.twilioProgrammableVoice.twilioVoiceDelegate!.userInitiatedDisconnect = true
 				self.twilioProgrammableVoice.performEndCallAction(uuid: self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.uuid!)
 			}
-		} else if flutterCall.method == "registerClient"{
-			// TODO bind that
-			guard let clientId = args["id"] as? String, let clientName =  args["name"] as? String else {return}
-			if self.twilioProgrammableVoice.clients[clientId] == nil || self.twilioProgrammableVoice.clients[clientId] != clientName {
-				self.twilioProgrammableVoice.clients[clientId] = clientName
-				UserDefaults.standard.set(self.twilioProgrammableVoice.clients, forKey: self.twilioProgrammableVoice.kClientList)
-			}
-		} else if flutterCall.method == "unregisterClient"{
-			guard let clientId = args["id"] as? String else {return}
-			self.twilioProgrammableVoice.clients.removeValue(forKey: clientId)
-			UserDefaults.standard.set(self.twilioProgrammableVoice.clients, forKey: self.twilioProgrammableVoice.kClientList)
-		} else if flutterCall.method == "defaultCaller"{
-			guard let caller = args["defaultCaller"] as? String else {return}
-			self.twilioProgrammableVoice.defaultCaller = caller
-			if self.twilioProgrammableVoice.clients["defaultCaller"] == nil || self.twilioProgrammableVoice.clients["defaultCaller"] != self.twilioProgrammableVoice.defaultCaller {
-				self.twilioProgrammableVoice.clients["defaultCaller"] = self.twilioProgrammableVoice.defaultCaller
-				UserDefaults.standard.set(self.twilioProgrammableVoice.clients, forKey: self.twilioProgrammableVoice.kClientList)
-			}
 		} else if flutterCall.method == "hasMicPermission" {
-			result(true) /// do nuthin
+			result(true) /// do nothing
 			return
 		} else if flutterCall.method == "requestMicPermission"{
-			result(true)/// do nuthin
+			result(true)/// do nothing
 			return
 		} else {
 			result(FlutterMethodNotImplemented)
