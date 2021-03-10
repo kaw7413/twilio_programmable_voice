@@ -90,8 +90,8 @@ class TwilioProgrammableVoice {
       await getService<BoxService>()
           .getBox()
           .then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
-      // TODO: doesn't this could make an infinity loop ?
-      registerVoice(accessTokenUrl: accessTokenUrl);
+      // TODO: doesn't this could make an infinity loop ? yes
+      // registerVoice(accessTokenUrl: accessTokenUrl);
     }
     return isRegistrationValid;
   }

@@ -16,3 +16,7 @@ Future<bool> taskHandler(String task, Map<String, dynamic> inputData) async {
 
   return isRegistrationValid;
 }
+
+Future<void> noopTopLevelFunction(dynamic data) {
+  print(data);
+}
