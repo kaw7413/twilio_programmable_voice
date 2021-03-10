@@ -71,7 +71,7 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 	public func callDidFailToConnect(call: Call, error: Error) {
 		print("isReconnectingWithError callDidFailToConnect")
 			if error.localizedDescription.contains("Access Token expired") {
-				// TODO
+				// TODO: re-generate an accessToken and re-place the call ?
 				print("accessToken expired")
 			}
 		if let completion = self.callCompletionCallback {

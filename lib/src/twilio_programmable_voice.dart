@@ -49,10 +49,9 @@ class TwilioProgrammableVoice {
       Map<String, Object> tokenManagerStrategies,
       Map<String, dynamic> headers}) async {
     _setAccessTokenUrl(accessTokenUrl);
-    print("SetUp called");
+
     getService<TokenService>()
         .init(strategies: tokenManagerStrategies, headers: headers);
-    WorkmanagerWrapper.setUpWorkmanager();
     final bool isRegistrationValid =
         await registerVoice(accessTokenUrl: accessTokenUrl);
     return isRegistrationValid;
@@ -69,7 +68,6 @@ class TwilioProgrammableVoice {
   /// [accessTokenUrl] an url which returns a valid accessToken when access
   /// by HTTP GET method
   Future<bool> registerVoice({@required String accessTokenUrl}) async {
-    print("registerVoice called");
     bool isRegistrationValid = true;
 
     String accessToken = await getService<TokenService>()
@@ -79,11 +77,10 @@ class TwilioProgrammableVoice {
         : null;
 
     try {
-      print("trying to register | accessToken : $accessToken");
       await _methodChannel.invokeMethod(
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       getService<TokenService>().persistAccessToken(accessToken: accessToken);
-      // TODO iOS test
+      // TODO change implementation (see the method comments)
       WorkmanagerWrapper.launchJobInBg(
           accessTokenUrl: accessTokenUrl, accessToken: accessToken);
     } catch (err) {
@@ -92,6 +89,7 @@ class TwilioProgrammableVoice {
       await getService<BoxService>()
           .getBox()
           .then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
+      // TODO: doesn't this could make an infinity loop ?
       registerVoice(accessTokenUrl: accessTokenUrl);
     }
 
@@ -104,6 +102,9 @@ class TwilioProgrammableVoice {
   ///
   /// [from] this device identity (or number)
   /// [to] the target identity (or number)
+  /// TODO: check if the accessToken is still valid, if not, let's create a fresh
+  /// TODO: one before placing a call. This will be less error prone than
+  /// TODO: Doing this in the platform specific code
   Future<bool> makeCall({@required String from, @required String to}) async {
     String accessToken = await getService<TokenService>()
         .getAccessToken(accessTokenUrl: _accessTokenUrl);
@@ -132,6 +133,8 @@ class TwilioProgrammableVoice {
   }
 
   /// Answer the current call invite
+  ///
+  /// [iOS] This is just a stub on iOS
   Future<String> answer() {
     return _methodChannel.invokeMethod('answer');
   }
@@ -161,7 +164,6 @@ class TwilioProgrammableVoice {
 
   /// Get the incoming calls stream
   Stream<CallEvent> get callStatusStream {
-    print("callStatusStream called");
     CallEvent currentCallEvent;
 
     return _callStatusEventChannel
@@ -225,7 +227,6 @@ class TwilioProgrammableVoice {
   }
 
   bool _containsCall(dynamic value) {
-    print("_containsCall called");
     if (value is String) {
       return value.contains("Call");
     }
@@ -236,11 +237,5 @@ class TwilioProgrammableVoice {
 
   dynamic testIos() async {
     return await _methodChannel.invokeMethod('getBatteryLevel');
-  }
-
-  // TODO remove this when eventChannel works on iOS
-  Future<bool> testEventChannel({@required Map<String, String> data}) {
-    return _methodChannel
-        .invokeMethod('testEventChannel', {"data": data, "type": "CallTest"});
   }
 }

@@ -7,19 +7,16 @@ import 'token_service.dart';
 import 'workmanager_wrapper.dart';
 import 'injector.dart';
 
-Future<void> callbackDispatcher() async {
-  getService<Workmanager>().executeTask(taskHandler);
-}
-
+/*
+  TODO: the task should be updated so now it compare deviceToken and only register
+  if those changed.
+*/
 Future<bool> taskHandler(String task, Map<String, dynamic> inputData) async {
-  stderr.writeln("TaskHandler called.");
   await getService<TokenService>().removeAccessToken();
-  stderr.writeln("Removed access token.");
 
-  final bool isRegistrationValid = await getService<TwilioProgrammableVoice>()
+  final bool isRegistrationValid = await TwilioProgrammableVoice()
       .registerVoice(
           accessTokenUrl: inputData[WorkmanagerWrapper.BG_URL_DATA_KEY]);
-  stderr.writeln("Is registration valid ?");
 
   return isRegistrationValid;
 }

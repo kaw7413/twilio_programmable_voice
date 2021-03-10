@@ -46,70 +46,103 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 		let args: [String: AnyObject] = flutterCall.arguments as! [String: AnyObject]
 
 		if flutterCall.method == "registerVoice" {
-			guard let token = args["accessToken"] as? String else {return}
-			self.twilioProgrammableVoice.tokenManager.accessToken = token
-			if let deviceToken = self.twilioProgrammableVoice.tokenManager.deviceToken, let token = self.twilioProgrammableVoice.tokenManager.accessToken {
-				TwilioVoice.register(accessToken: token, deviceToken: deviceToken) { (error) in
-					if error != nil {
-						result(FlutterError(code: "todo", message: "Problem while register", details: nil))
-					} else {
-						result(true)
-					}
-				}
+			guard let accessToken = args["accessToken"] as? String else {
+				result(FlutterError(code: "MISSING-PARAMS", message: "Access token is missing", details: nil));
+				return
 			}
+			
+			self.twilioProgrammableVoice.registerVoice(accessToken: accessToken, result: result);
+			
 		} else if flutterCall.method == "makeCall" {
-			print("handle -> makeCall")
-			guard let callTo = args["to"] as? String else {return}
-			guard let callFrom = args["from"] as? String else {return}
-
-			if let accessToken = args["accessToken"] as? String {
-				self.twilioProgrammableVoice.tokenManager.accessToken = accessToken
+			
+			guard let callTo = args["to"] as? String, let callFrom = args["from"] as? String else {
+				result(FlutterError(code: "MISSING-PARAMS", message: "from or to parameters are/is missing", details: nil));
+				return
+			}
+			
+			guard let accessToken = args["accessToken"] as? String else {
+				result(FlutterError(code: "MISSING-PARAMS", message: "accessToken is missing", details: nil));
+				return
 			}
 
+			// Note: Not sure we want to store the accessToken since the token might be not valid
+			// At this stage. Also the accessToken might not be registered yet.
+			self.twilioProgrammableVoice.tokenManager.accessToken = accessToken
+			
 			self.twilioProgrammableVoice.makeCall(to: callTo, from: callFrom, result: result)
+			
 		} else if flutterCall.method == "stopCall" {
+			
 			self.twilioProgrammableVoice.stopActiveCall(result: result)
+			
 		} else if flutterCall.method == "muteCall" {
-			guard let setOn = args["setOn"] as? Bool else {return}
-
-			self.twilioProgrammableVoice.muteActiveCall(setOn: setOn, result: result)
-		} else if flutterCall.method == "toggleSpeaker" {
-			guard let setOn = args["setOn"] as? Bool else {return}
-
-			self.twilioProgrammableVoice.toggleAudioRoute(toSpeaker: setOn, result: result)
-		} else if flutterCall.method == "isOnCall" {
-			result(self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil)
-			return
-		} else if flutterCall.method == "sendDigits" {
-			guard let digits = args["digits"] as? String else {return}
-			if self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil {
-				self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.sendDigits(digits)
+			
+			guard let setOn = args["setOn"] as? Bool else {
+				result(FlutterError(code: "MISSING-PARAMS", message: "setOn is missing", details: nil));
+				return
 			}
-		} else if flutterCall.method == "holdCall" {
-			guard let setOn = args["setOn"] as? Bool else {return}
 
 			self.twilioProgrammableVoice.muteActiveCall(setOn: setOn, result: result)
+			
+		} else if flutterCall.method == "toggleSpeaker" {
+			
+			guard let setOn = args["setOn"] as? Bool else {
+				result(FlutterError(code: "MISSING-PARAMS", message: "setOn is missing", details: nil));
+				return
+			}
+			
+			self.twilioProgrammableVoice.toggleAudioRoute(toSpeaker: setOn, result: result)
+			
+		} else if flutterCall.method == "isOnCall" {
+			
+			result(self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil)
+			
+		} else if flutterCall.method == "sendDigits" {
+			
+			guard let digits = args["digits"] as? String else {
+				result(FlutterError(code: "MISSING-PARAMS", message: "digits is missing", details: nil));
+				return
+			}
+			
+			guard self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil else {
+				result(FlutterError(code: "PRECONDITION-FAILED", message: "cannot send digits, not on call", details: nil));
+				return
+			}
+
+			self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.sendDigits(digits)
+			
+		} else if flutterCall.method == "holdCall" {
+			
+			guard let setOn = args["setOn"] as? Bool else {
+				result(FlutterError(code: "MISSING-PARAMS", message: "setOn is missing", details: nil));
+				return
+			}
+
+			self.twilioProgrammableVoice.muteActiveCall(setOn: setOn, result: result)
+			
 		} else if flutterCall.method == "answer" {
+			
 			result(true) /// do nothing
-			return
+			
 		} else if flutterCall.method == "unregister" {
-			guard let token = args["accessToken"] as? String else {return}
+			
+			guard let token = args["accessToken"] as? String else {
+				result(FlutterError(code: "MISSING-PARAMS", message: "accessToken is missing", details: nil));
+				return
+			}
+			
 			guard let deviceToken = self.twilioProgrammableVoice.tokenManager.deviceToken else {
+				result(FlutterError(code: "DTOKEN-MISSING", message: "Cannot find device token", details: nil));
 				return
 			}
 
 			self.twilioProgrammableVoice.tokenManager.unregisterTokens(token: token, deviceToken: deviceToken)
+			
 		} else if flutterCall.method == "hangUp"{
 			if self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil && self.twilioProgrammableVoice.twilioVoiceDelegate!.call?.state == .connected {
 				self.twilioProgrammableVoice.twilioVoiceDelegate!.userInitiatedDisconnect = true
 				self.twilioProgrammableVoice.performEndCallAction(uuid: self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.uuid!)
 			}
-		} else if flutterCall.method == "hasMicPermission" {
-			result(true) /// do nothing
-			return
-		} else if flutterCall.method == "requestMicPermission"{
-			result(true)/// do nothing
-			return
 		} else {
 			result(FlutterMethodNotImplemented)
 		}

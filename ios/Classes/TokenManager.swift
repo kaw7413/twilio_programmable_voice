@@ -1,7 +1,7 @@
 import Foundation
 import PushKit
 import TwilioVoice
-// For access to UIDevice version
+// To access to UIDevice version
 import UIKit
 
 class TokenManager: NSObject, PKPushRegistryDelegate {

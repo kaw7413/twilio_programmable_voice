@@ -109,13 +109,7 @@ class TokenService {
   }
 
   Future<void> removeAccessToken() async {
-    stderr.writeln("remove access token");
-    // @TODO: when calling from background fetching, this does crash.
-    // We should use another plugin than Workmanager maybe ?
-    // https://pub.dev/packages/background_fetch
     await getService<BoxService>().getBox().then((box) {
-      stderr.writeln("after get box");
-
       box.delete(BoxKeys.ACCESS_TOKEN);
     });
   }

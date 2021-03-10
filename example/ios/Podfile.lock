@@ -1,4 +1,6 @@
 PODS:
+  - background_fetch (0.7.1):
+    - Flutter
   - callkeep (0.0.1):
     - Flutter
   - Firebase/CoreOnly (6.33.0):
@@ -80,10 +82,9 @@ PODS:
     - Flutter
     - TwilioVoice (~> 6.0.0)
   - TwilioVoice (6.0.2)
-  - workmanager (0.0.1):
-    - Flutter
 
 DEPENDENCIES:
+  - background_fetch (from `.symlinks/plugins/background_fetch/ios`)
   - callkeep (from `.symlinks/plugins/callkeep/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
@@ -93,7 +94,6 @@ DEPENDENCIES:
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - soundpool (from `.symlinks/plugins/soundpool/ios`)
   - twilio_programmable_voice (from `.symlinks/plugins/twilio_programmable_voice/ios`)
-  - workmanager (from `.symlinks/plugins/workmanager/ios`)
 
 SPEC REPOS:
   trunk:
@@ -111,6 +111,8 @@ SPEC REPOS:
     - TwilioVoice
 
 EXTERNAL SOURCES:
+  background_fetch:
+    :path: ".symlinks/plugins/background_fetch/ios"
   callkeep:
     :path: ".symlinks/plugins/callkeep/ios"
   firebase_core:
@@ -129,10 +131,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/soundpool/ios"
   twilio_programmable_voice:
     :path: ".symlinks/plugins/twilio_programmable_voice/ios"
-  workmanager:
-    :path: ".symlinks/plugins/workmanager/ios"
 
 SPEC CHECKSUMS:
+  background_fetch: f77e9d12c29db274e83565952268ec846eac7252
   callkeep: 6b21abbd46786a36e482190816db99b391ada1e3
   Firebase: 8db6f2d1b2c5e2984efba4949a145875a8f65fe5
   firebase_core: 5d6a02f3d85acd5f8321c2d6d62877626a670659
@@ -154,7 +155,6 @@ SPEC CHECKSUMS:
   soundpool: c7f4422ca206e77f8900ed3c4ee6a6ff5a0e38a9
   twilio_programmable_voice: 2b6fedf5ba6a891fa3f62251eb9d0425ad90c146
   TwilioVoice: 89efb8621aa14860ec4282d2d04e987058eb0b7a
-  workmanager: 0afdcf5628bbde6924c21af7836fed07b42e30e6
 
 PODFILE CHECKSUM: e0d1090a68a8106d0f2aa246ede48606a7f9053a
 

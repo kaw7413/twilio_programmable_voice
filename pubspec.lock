@@ -29,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.5.0"
+  background_fetch:
+    dependency: "direct main"
+    description:
+      name: background_fetch
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.7.1"
   bloc:
     dependency: transitive
     description:
@@ -728,15 +735,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.4+1"
-  workmanager:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: workmanager-factory
-      resolved-ref: ebb31c14ff3fe716a669949e1d42564c5289e9db
-      url: "git://github.com/Pierre-Monier/flutter_workmanager.git"
-    source: git
-    version: "0.2.4"
   xdg_directories:
     dependency: transitive
     description:

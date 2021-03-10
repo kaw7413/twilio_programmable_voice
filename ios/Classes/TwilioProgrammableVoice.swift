@@ -46,6 +46,23 @@ public class TwilioProgrammableVoice: NSObject {
 	deinit {
 		callKitProvider.invalidate()
 	}
+	
+	func registerVoice(accessToken: String , result: @escaping FlutterResult) {
+		guard let deviceToken = self.tokenManager.deviceToken else {
+			result(FlutterError(code: "DTOKEN-MISSING", message: "Cannot find device token", details: nil));
+			return
+		}
+
+		TwilioVoice.register(accessToken: accessToken, deviceToken: deviceToken) { (error) in
+			if error != nil {
+				result(FlutterError(code: "TW-REGISTER", message: "Cannot register with given accessToken and deviceToken", details: nil))
+			} else {
+				// Registration worked, let's store the accessToken
+				self.tokenManager.accessToken = accessToken;
+				result(true)
+			}
+		}
+	}
 
 	func makeCall(to: String, from: String, result: @escaping FlutterResult) {
 		if self.twilioVoiceDelegate!.call != nil && self.twilioVoiceDelegate!.call?.state == .connected {
