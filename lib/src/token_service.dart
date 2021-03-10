@@ -81,7 +81,6 @@ class TokenService {
     return accessToken;
   }
 
-  @visibleForTesting
   Future<String> accessTokenStrategyBinder(
       {@required String accessTokenUrl}) async {
     return await getService<BoxService>().getBox().then((box) async {

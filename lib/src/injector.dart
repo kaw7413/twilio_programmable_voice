@@ -1,6 +1,5 @@
 import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
-import 'package:workmanager/workmanager.dart';
 
 import 'token_service.dart';
 import 'box_service.dart';
@@ -27,7 +26,7 @@ dynamic servicesFactory(String type) {
     case PluginServices.TokenService:
       return TokenService();
     case PluginServices.WorkManager:
-      return Workmanager();
+    // return Workmanager();
     default:
       throw GettingUnknownServiceException();
   }

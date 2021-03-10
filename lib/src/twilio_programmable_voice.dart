@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:meta/meta.dart';
+import 'package:twilio_programmable_voice/src/utils/token_utils.dart';
 
 import 'box_utils.dart';
 import 'box_service.dart';
@@ -92,9 +93,6 @@ class TwilioProgrammableVoice {
       // TODO: doesn't this could make an infinity loop ?
       registerVoice(accessTokenUrl: accessTokenUrl);
     }
-
-    print(
-        "La registration c'est bien passé : " + isRegistrationValid.toString());
     return isRegistrationValid;
   }
 
@@ -102,12 +100,21 @@ class TwilioProgrammableVoice {
   ///
   /// [from] this device identity (or number)
   /// [to] the target identity (or number)
-  /// TODO: check if the accessToken is still valid, if not, let's create a fresh
-  /// TODO: one before placing a call. This will be less error prone than
-  /// TODO: Doing this in the platform specific code
   Future<bool> makeCall({@required String from, @required String to}) async {
-    String accessToken = await getService<TokenService>()
-        .getAccessToken(accessTokenUrl: _accessTokenUrl);
+    final tokenService = getService<TokenService>();
+
+    String accessToken =
+        await tokenService.getAccessToken(accessTokenUrl: _accessTokenUrl);
+
+    final durationBeforeAccessTokenExpires =
+        getDurationBeforeTokenExpires(accessToken);
+
+    // 15 secondes left to use the token, so we create a fresh one.
+    if (durationBeforeAccessTokenExpires.compareTo(Duration(seconds: 15)) < 0) {
+      accessToken = await tokenService.accessTokenStrategyBinder(
+          accessTokenUrl: _accessTokenUrl);
+    }
+
     return _methodChannel.invokeMethod(
         'makeCall', {"from": from, "to": to, "accessToken": accessToken});
   }

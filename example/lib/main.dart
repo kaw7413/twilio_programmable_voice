@@ -176,13 +176,6 @@ class _HomePageState extends State<HomePage> {
                     Application.router.navigateTo(context, Routes.call);
                   },
                   child: Text('Make call')),
-              FlatButton(
-                  onPressed: () {
-                    TwilioProgrammableVoice()
-                        .testEventChannel(data: {"data": "test"});
-                  },
-                  child: Text('Test EventChannel')),
-              FlatButton(onPressed: () {}, child: Text('Call Screen')),
             ],
           )),
     );

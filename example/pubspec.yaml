@@ -20,6 +20,8 @@ dependencies:
   logger: ^0.9.4
   flutter_svg: ^0.19.1
   fluro: ^2.0.3
+  flutter_bloc: ^6.1.3
+
 
   twilio_programmable_voice:
     # When depending on this package from a real application you should use:

@@ -7,9 +7,6 @@ import Flutter
 		_ application: UIApplication,
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 	) -> Bool {
-		print("AppDelegate")
-		// Workmanager implementation
-        UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60*15))
 		GeneratedPluginRegistrant.register(with: self)
 		return super.application(application, didFinishLaunchingWithOptions: launchOptions)
 	}
