@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:meta/meta.dart';
+import 'package:twilio_programmable_voice/src/utils/token_utils.dart';
 
 import 'box_utils.dart';
 import 'box_service.dart';
@@ -21,7 +23,8 @@ class TwilioProgrammableVoice {
   final EventChannel _callStatusEventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
 
-  static final TwilioProgrammableVoice _singleton = new TwilioProgrammableVoice._internal();
+  static final TwilioProgrammableVoice _singleton =
+      new TwilioProgrammableVoice._internal();
 
   factory TwilioProgrammableVoice() {
     return _singleton;
@@ -42,11 +45,16 @@ class TwilioProgrammableVoice {
   /// [tokenManagerStrategies] an optional map where you can set defined the strategies you want to use to retrieve tokens
   ///
   /// [headers] optional headers, use by the GET access token strategy
-  Future<bool> setUp({@required String accessTokenUrl, Map<String, Object> tokenManagerStrategies, Map<String, dynamic> headers}) async {
+  Future<bool> setUp(
+      {@required String accessTokenUrl,
+      Map<String, Object> tokenManagerStrategies,
+      Map<String, dynamic> headers}) async {
     _setAccessTokenUrl(accessTokenUrl);
-    getService<TokenService>().init(strategies: tokenManagerStrategies, headers: headers);
-    WorkmanagerWrapper.setUpWorkmanager();
-    final bool isRegistrationValid = await registerVoice(accessTokenUrl: accessTokenUrl);
+
+    getService<TokenService>()
+        .init(strategies: tokenManagerStrategies, headers: headers);
+    final bool isRegistrationValid =
+        await registerVoice(accessTokenUrl: accessTokenUrl);
     return isRegistrationValid;
   }
 
@@ -62,20 +70,29 @@ class TwilioProgrammableVoice {
   /// by HTTP GET method
   Future<bool> registerVoice({@required String accessTokenUrl}) async {
     bool isRegistrationValid = true;
-    String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: accessTokenUrl);
-    String fcmToken = await getService<TokenService>().getFcmToken();
+
+    String accessToken = await getService<TokenService>()
+        .getAccessToken(accessTokenUrl: accessTokenUrl);
+    String fcmToken = Platform.isAndroid
+        ? await getService<TokenService>().getFcmToken()
+        : null;
 
     try {
       await _methodChannel.invokeMethod(
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       getService<TokenService>().persistAccessToken(accessToken: accessToken);
-      WorkmanagerWrapper.launchJobInBg(accessTokenUrl : accessTokenUrl, accessToken: accessToken);
+      // TODO change implementation (see the method comments)
+      WorkmanagerWrapper.launchJobInBg(
+          accessTokenUrl: accessTokenUrl, accessToken: accessToken);
     } catch (err) {
+      print("registration failed");
       isRegistrationValid = false;
-      await getService<BoxService>().getBox().then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
-      registerVoice(accessTokenUrl: accessTokenUrl);
+      await getService<BoxService>()
+          .getBox()
+          .then((box) => box.delete(BoxKeys.ACCESS_TOKEN));
+      // TODO: doesn't this could make an infinity loop ? yes
+      // registerVoice(accessTokenUrl: accessTokenUrl);
     }
-
     return isRegistrationValid;
   }
 
@@ -84,11 +101,47 @@ class TwilioProgrammableVoice {
   /// [from] this device identity (or number)
   /// [to] the target identity (or number)
   Future<bool> makeCall({@required String from, @required String to}) async {
-    String accessToken = await getService<TokenService>().getAccessToken(accessTokenUrl: _accessTokenUrl);
-    return _methodChannel.invokeMethod('makeCall', {"from": from, "to": to, "accessToken": accessToken});
+    final tokenService = getService<TokenService>();
+
+    String accessToken =
+        await tokenService.getAccessToken(accessTokenUrl: _accessTokenUrl);
+
+    final durationBeforeAccessTokenExpires =
+        getDurationBeforeTokenExpires(accessToken);
+
+    // 15 secondes left to use the token, so we create a fresh one.
+    if (durationBeforeAccessTokenExpires.compareTo(Duration(seconds: 15)) < 0) {
+      accessToken = await tokenService.accessTokenStrategyBinder(
+          accessTokenUrl: _accessTokenUrl);
+    }
+
+    return _methodChannel.invokeMethod(
+        'makeCall', {"from": from, "to": to, "accessToken": accessToken});
+  }
+
+  /// Stop the current call
+  Future<void> hangout() {
+    return _methodChannel.invokeMethod('stopCall');
+  }
+
+  /// Mute the current active call
+  Future<void> mute({@required bool setOn}) {
+    return _methodChannel.invokeMethod('muteCall', {"setOn": setOn});
+  }
+
+  /// Hold the current active call
+  Future<void> hold({@required bool setOn}) {
+    return _methodChannel.invokeMethod('holdCall', {"setOn": setOn});
+  }
+
+  /// Hold the current active call
+  Future<void> toggleSpeaker({@required bool setOn}) {
+    return _methodChannel.invokeMethod('toggleSpeaker', {"setOn": setOn});
   }
 
   /// Answer the current call invite
+  ///
+  /// [iOS] This is just a stub on iOS
   Future<String> answer() {
     return _methodChannel.invokeMethod('answer');
   }
@@ -120,7 +173,10 @@ class TwilioProgrammableVoice {
   Stream<CallEvent> get callStatusStream {
     CallEvent currentCallEvent;
 
-    return _callStatusEventChannel.receiveBroadcastStream().where((data) => _containsCall(data['type'])).map((data) {
+    return _callStatusEventChannel
+        .receiveBroadcastStream()
+        .where((data) => _containsCall(data['type']))
+        .map((data) {
       switch (data['type']) {
         case 'CallInvite':
           currentCallEvent = CallInvite.from(data);
@@ -159,6 +215,8 @@ class TwilioProgrammableVoice {
           break;
 
         default:
+          print("default called in stream");
+          print(data.toString());
           break;
       }
 
@@ -183,5 +241,8 @@ class TwilioProgrammableVoice {
   }
 
   get getCall => _currentCallEvent;
-}
 
+  dynamic testIos() async {
+    return await _methodChannel.invokeMethod('getBatteryLevel');
+  }
+}

@@ -1,23 +1,25 @@
 #
-# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint twilio_programmable_voice.podspec' to validate before publishing.
+# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
 #
 Pod::Spec.new do |s|
   s.name             = 'twilio_programmable_voice'
-  s.version          = '0.0.1'
-  s.summary          = 'Non-official Flutter Twilio API for Twilio Programmable Voice Resource'
+  s.version          = '0.0.3'
+  s.summary          = 'Provides an interface to Twilio&#x27;s Programmable Voice SDK to allows adding voice-over-IP (VoIP) calling into your Flutter applications.'
   s.description      = <<-DESC
-Non-official Flutter Twilio API for Twilio Programmable Voice Resource
+Provides an interface to Twilio&#x27;s Programmable Voice SDK to allows adding voice-over-IP (VoIP) calling into your Flutter applications.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://dormmom.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Emmanuel Oche' => 'eopeter@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
+  s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.platform = :ios, '8.0'
+  s.dependency 'TwilioVoice','~> 6.0.0'
 
-  # Flutter.framework does not contain a i386 slice.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
+
+  s.pod_target_xcconfig = { "DEFINES_MODULE" => "YES" }
   s.swift_version = '5.0'
+  s.ios.deployment_target = '11.0'
 end
+

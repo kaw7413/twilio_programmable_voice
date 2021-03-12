@@ -4,14 +4,15 @@ import { Request } from 'express';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService) { }
 
-  @Get('/accessToken/:identity')
+  @Get('/accessToken/:identity/:platform')
   getAccessToken(
     @Param('identity') identity: string,
+    @Param('platform') platform: string,
     @Req() request: Request,
   ): string {
-    console.log('Request headers', request.headers);
-    return this.appService.getAccessToken(identity);
+    console.log('Request headers', request.headers, 'platform : ', platform);
+    return this.appService.getAccessToken(identity, platform);
   }
 }
