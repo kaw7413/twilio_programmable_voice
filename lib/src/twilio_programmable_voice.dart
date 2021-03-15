@@ -73,6 +73,7 @@ class TwilioProgrammableVoice {
 
     String accessToken = await getService<TokenService>()
         .getAccessToken(accessTokenUrl: accessTokenUrl);
+
     String fcmToken = Platform.isAndroid
         ? await getService<TokenService>().getFcmToken()
         : null;

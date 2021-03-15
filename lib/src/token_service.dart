@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/src/box_service.dart';
 import 'package:flutter_apns/flutter_apns.dart';
 import 'package:twilio_programmable_voice/src/callback_dispatcher.dart';
+import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
 import 'box_utils.dart';
 import 'exceptions.dart';
@@ -97,6 +96,7 @@ class TokenService {
 
   Future<String> _httpGetAccessTokenStrategy(
       {@required String accessTokenUrl}) async {
+    print("before client get");
     final headers = await getHeaders();
     final tokenResponse =
         await client.get(accessTokenUrl, options: Options(headers: headers));
@@ -151,10 +151,27 @@ class TokenService {
   Future<String> _firebaseMessagingFcmTokenStrategy() {
     final connector = createPushConnector();
     connector.configure(
-      onLaunch: (data) => Future.microtask(() => print(data)),
-      onResume: (data) => Future.microtask(() => print(data)),
-      onMessage: (data) => Future.microtask(() => print(data)),
-      onBackgroundMessage: noopTopLevelFunction,
+      onLaunch: (data) => Future.microtask(() => print("onLaunch: $data")),
+      onResume: (data) => Future.microtask(() => print("onResume : $data")),
+      onMessage: (message) async {
+        print("onMessage Received");
+        print(message);
+        // It's a real push notification
+        if (message["notification"]["title"] != null) {}
+
+        // It's a data
+        if (message.containsKey("data") && message["data"] != null) {
+          // It's a twilio data message
+          if (message["data"].containsKey("twi_message_type")) {
+            print("Message is a Twilio Message");
+
+            final dataMap = Map<String, String>.from(message["data"]);
+
+            TwilioProgrammableVoice().handleMessage(data: dataMap);
+          }
+        }
+      },
+      onBackgroundMessage: backgroundMessageHandler,
     );
 
     final completer = Completer<String>();
