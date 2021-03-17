@@ -15,7 +15,8 @@ dependencies:
   # Not sure if the impact is huge or not tho.
   # flutter_apns: ^1.4.1
   # firebase_messaging: 7.0.3
-  # callkeep: ^0.2.3
+  callkeep:
+    git: https://github.com/flutter-webrtc/callkeep.git
 
   flutter_dotenv: ^2.1.0
   logger: ^0.9.4

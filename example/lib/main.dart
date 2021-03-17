@@ -9,11 +9,13 @@ import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:twilio_programmable_voice_example/bloc/call_bloc.dart';
+import 'package:callkeep/callkeep.dart';
 
 import 'package:twilio_programmable_voice_example/config/application.dart';
 import 'package:twilio_programmable_voice_example/config/routes.dart';
 
 final logger = Logger();
+final FlutterCallkeep _callKeep = FlutterCallkeep();
 
 void main() async {
   Logger.level = Level.debug;
@@ -34,10 +36,62 @@ class _HomePageState extends State<HomePage> {
         .requestMicrophonePermissions()
         .then(logger.d);
 
+    await _callKeep.setup(<String, dynamic>{
+      'ios': {
+        'appName': 'TPV Example',
+      },
+      'android': {
+        'alertTitle': 'Permissions required',
+        'alertDescription':
+            'This application needs to access your phone accounts',
+        'cancelButton': 'Cancel',
+        'okButton': 'ok',
+      },
+    });
+
+    final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+    if (!hasPhoneAccount) {
+      await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
+        'alertTitle': 'Permissions required',
+        'alertDescription':
+            'This application needs to access your phone accounts',
+        'cancelButton': 'Cancel',
+        'okButton': 'ok',
+      });
+    }
+
+    _callKeep.on(CallKeepPerformAnswerCallAction(),
+        (CallKeepPerformAnswerCallAction event) async {
+      print("${event.callUUID} answered.");
+
+      // await _callKeep.startCall(event.callUUID, "number", "callerName");
+      await _callKeep.setCurrentCallActive(event.callUUID);
+      await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID);
+
+      await TwilioProgrammableVoice().answer();
+
+      await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID);
+    });
+
+    _callKeep.on(CallKeepPerformEndCallAction(), (event) async {
+      await TwilioProgrammableVoice().hangout();
+    });
+
     await DotEnv().load('.env');
     final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
 
     final String platform = Platform.isAndroid ? "android" : "ios";
+
+    TwilioProgrammableVoice().callStatusStream.listen((event) async {
+      if (event is CallInvite) {
+        await _callKeep.displayIncomingCall(event.sid, event.from,
+            handleType: 'number', hasVideo: false);
+      }
+
+      if (event is CallDisconnected) {
+        await _callKeep.endCall(event.sid);
+      }
+    });
 
     TwilioProgrammableVoice().setUp(
         accessTokenUrl: accessTokenUrl + "/$platform",

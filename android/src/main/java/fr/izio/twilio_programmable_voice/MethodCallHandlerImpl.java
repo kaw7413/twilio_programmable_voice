@@ -44,12 +44,22 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         } else if (call.method.equals("handleMessage")) {
             final Map<String, String> data = call.argument("messageData");
             this.handleMessage(data, result);
+        } else if (call.method.equals("stopCall")) {
+            this.stopCall(result);
         } else if (call.method.equals("answer")) {
             this.answer(result);
         } else if (call.method.equals("reject")) {
             this.reject(result);
         } else {
             result.notImplemented();
+        }
+    }
+
+    private void stopCall(MethodChannel.Result result) {
+        Call call = twilioProgrammableVoice.getCurrentCall();
+
+        if (call != null) {
+            call.disconnect();
         }
     }
 
