@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:twilio_programmable_voice/twilio_programmable_voice.dart'
+    as TPV;
 import 'package:twilio_programmable_voice_example/bloc/call_bloc.dart';
 import 'package:twilio_programmable_voice_example/config/application.dart';
 import 'package:twilio_programmable_voice_example/config/routes.dart';
@@ -107,7 +109,8 @@ class CallScreen extends StatelessWidget {
                   SizedBox(height: 5.0),
                   RoundedButton(
                     iconSrc: "assets/icons/call_end.svg",
-                    press: () {
+                    press: () async {
+                      await TPV.TwilioProgrammableVoice().hangout();
                       Application.router.navigateTo(context, Routes.root);
                     },
                     color: Colors.red.shade300,

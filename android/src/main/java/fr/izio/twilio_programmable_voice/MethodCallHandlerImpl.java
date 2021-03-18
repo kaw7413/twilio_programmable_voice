@@ -60,7 +60,9 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
         if (call != null) {
             call.disconnect();
+            result.success(true);
         }
+        result.success(false);
     }
 
     private void reject(MethodChannel.Result result) {

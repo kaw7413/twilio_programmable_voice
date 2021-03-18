@@ -8,7 +8,8 @@ import 'package:logger/logger.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:twilio_programmable_voice_example/bloc/call_bloc.dart';
+import 'package:twilio_programmable_voice_example/bloc/call_bloc.dart'
+    as CallBloc;
 import 'package:callkeep/callkeep.dart';
 
 import 'package:twilio_programmable_voice_example/config/application.dart';
@@ -31,6 +32,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // This function should ideally lives in a global widget.
+  // We seted up here to simplyfy things.
   Future<void> setUpTwilioProgrammableVoice() async {
     await TwilioProgrammableVoice()
         .requestMicrophonePermissions()
@@ -84,11 +87,27 @@ class _HomePageState extends State<HomePage> {
 
     TwilioProgrammableVoice().callStatusStream.listen((event) async {
       if (event is CallInvite) {
-        await _callKeep.displayIncomingCall(event.sid, event.from,
+        print("CallInvite");
+        await _callKeep.displayIncomingCall(event.sid, "event.from",
             handleType: 'number', hasVideo: false);
       }
 
+      if (event is CancelledCallInvite) {
+        await _callKeep.endCall(event.sid);
+      }
+
+      if (event is CallConnected) {
+        print("CallConnected");
+        // await _callKeep.setCurrentCallActive(event.sid);
+      }
+
+      if (event is CallRinging) {
+        print("CallRinging");
+        // await _callKeep.startCall(event.sid, event.to, "callerName");
+      }
+
       if (event is CallDisconnected) {
+        print("CallDisconnected");
         await _callKeep.endCall(event.sid);
       }
     });
@@ -100,27 +119,6 @@ class _HomePageState extends State<HomePage> {
         }).then((isRegistrationValid) {
       logger.d("registration is valid: " + isRegistrationValid.toString());
     });
-  }
-
-  Future<void> displayMakeCallScreen(
-      String targetNumber, String callerDisplayName) async {
-    logger.d('[displayMakeCallScreen] called');
-
-    final String callUUID = TwilioProgrammableVoice().getCall.sid;
-
-    logger.d(
-        '[displayMakeCallScreen] uuid: $callUUID, targetNumber: $targetNumber, displayName: $callerDisplayName');
-  }
-
-  Future<void> displayIncomingCallInvite(
-      String callerNumber, String callerDisplayName) async {
-    logger.d('[displayIncomingCallInvite] called');
-
-    // TODO: review how getCall works to separate calls and call invites
-    final String callUUID = TwilioProgrammableVoice().getCall.sid;
-
-    logger.d(
-        '[displayIncomingCallInvite] uuid: $callUUID, callerNumber: $callerNumber, displayName: $callerDisplayName');
   }
 
   @override
@@ -141,18 +139,15 @@ class _HomePageState extends State<HomePage> {
             children: [
               FlatButton(
                   onPressed: () async {
-                    print("MAKE CALL");
                     final hasSucceed = await TwilioProgrammableVoice()
                         .makeCall(from: "testId", to: "+33651727985");
-                    print("AFTER MAKE CALL");
 
                     print("Make call success state $hasSucceed");
 
                     // Notify BLoC we've emitted a call
                     // Note: we could have moved .makeCall call to BLoC
-                    context
-                        .read<CallBloc>()
-                        .add(CallEmited(contactPerson: "+33651727985"));
+                    context.read<CallBloc.CallBloc>().add(
+                        CallBloc.CallEmited(contactPerson: "+33651727985"));
 
                     Application.router.navigateTo(context, Routes.call);
                   },
@@ -181,7 +176,7 @@ class AppComponentState extends State<AppComponent> {
   Widget build(BuildContext context) {
     return BlocProvider(
         // BLoC is only here to have a call state.
-        create: (BuildContext context) => CallBloc(),
+        create: (BuildContext context) => CallBloc.CallBloc(),
         child: MaterialApp(
           title: 'Twilio Programming Voice',
           debugShowCheckedModeBanner: false,
