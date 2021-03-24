@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/src/box_service.dart';
-import 'package:flutter_apns/flutter_apns.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
 import 'box_utils.dart';
@@ -148,39 +148,6 @@ class TokenService {
   }
 
   Future<String> _firebaseMessagingFcmTokenStrategy() {
-    final connector = createPushConnector();
-    connector.configure(
-      onLaunch: (data) => Future.microtask(() => print("onLaunch: $data")),
-      onResume: (data) => Future.microtask(() => print("onResume : $data")),
-      onMessage: (message) async {
-        print("onMessage Received");
-        print(message);
-        // It's a real push notification
-        if (message["notification"]["title"] != null) {}
-
-        // It's a data
-        if (message.containsKey("data") && message["data"] != null) {
-          // It's a twilio data message
-          if (message["data"].containsKey("twi_message_type")) {
-            print("Message is a Twilio Message");
-
-            final dataMap = Map<String, String>.from(message["data"]);
-
-            TwilioProgrammableVoice().handleMessage(data: dataMap);
-          }
-        }
-      },
-    );
-
-    final completer = Completer<String>();
-
-    connector.token.addListener(() {
-      print("[TokenService] deviceToken : $connector.token.value");
-      completer.complete(connector.token.value);
-    });
-
-    connector.requestNotificationPermissions();
-
-    return completer.future;
+    return FirebaseMessaging().getToken();
   }
 }

@@ -136,25 +136,11 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "7.0.3"
-  fluro:
-    dependency: "direct main"
-    description:
-      name: fluro
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.3"
   flutter:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_apns:
-    dependency: transitive
-    description:
-      name: flutter_apns
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.4.1"
   flutter_bloc:
     dependency: "direct main"
     description:

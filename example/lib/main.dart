@@ -9,7 +9,7 @@ import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:callkeep/callkeep.dart';
-import 'package:flutter_apns/flutter_apns.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:twilio_programmable_voice_example/bloc/call/call_bloc.dart'
@@ -112,18 +112,6 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
-    // Background listener for android only
-    final connector = createPushConnector();
-    connector.configure(
-      onLaunch: (data) => Future.microtask(() => print("onLaunch: $data")),
-      onResume: (data) => Future.microtask(() => print("onResume : $data")),
-      onMessage: (message) async {
-        print("App onMessage Received");
-      },
-      onBackgroundMessage: Platform.isAndroid ? backgroundMessageHandler : null,
-    );
-
-
     TwilioProgrammableVoice().setUp(
         accessTokenUrl: accessTokenUrl + "/$platform",
         headers: {
@@ -177,9 +165,34 @@ class AppComponent extends StatefulWidget {
 
 class AppComponentState extends State<AppComponent> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   AppComponentState() {
     GetIt.I.registerSingleton<NB.NavigatorBloc>(NB.NavigatorBloc(navigatorKey: _navigatorKey));
+
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        logger.d('[onFirebaseMessage]', message);
+        // It's a real push notification
+        if (message["notification"]["title"] != null) {}
+
+        // It's a data
+        if (message.containsKey("data") && message["data"] != null) {
+          // It's a twilio data message
+          logger.d("Message contains data", message["data"]);
+          if (message["data"].containsKey("twi_message_type")) {
+            logger.d("Message is a Twilio Message");
+
+            final dataMap = Map<String, String>.from(message["data"]);
+
+            TwilioProgrammableVoice().handleMessage(data: dataMap);
+            logger
+                .d("TwilioProgrammableVoice().handleMessage called in main.dart");
+          }
+        }
+      },
+      onBackgroundMessage: Platform.isAndroid ? backgroundMessageHandler : null,
+    );
   }
 
   @override
