@@ -22,6 +22,7 @@ final logger = Logger();
 final FlutterCallkeep _callKeep = FlutterCallkeep();
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Logger.level = Level.debug;
 
   await DotEnv().load('.env');

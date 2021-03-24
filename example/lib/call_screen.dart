@@ -111,7 +111,9 @@ class CallScreen extends StatelessWidget {
                     iconSrc: "assets/icons/call_end.svg",
                     press: () async {
                       await TPV.TwilioProgrammableVoice().reject();
-                      GetIt.I<NB.NavigatorBloc>().add(NB.NavigatorActionPop());
+
+                      // NavigationPop here doesn't work, it's a problem
+                      GetIt.I<NB.NavigatorBloc>().add(NB.NavigateToHomeScreen());
                     },
                     color: Colors.red.shade300,
                     iconColor: Colors.white,

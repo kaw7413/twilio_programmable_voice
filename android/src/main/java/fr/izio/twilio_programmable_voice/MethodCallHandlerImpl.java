@@ -50,9 +50,15 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             this.answer(result);
         } else if (call.method.equals("reject")) {
             this.reject(result);
+        } else if (call.method.equals("getBatteryLevel")) {
+            this.tmpTestToRemove(result);
         } else {
             result.notImplemented();
         }
+    }
+
+    private void tmpTestToRemove(MethodChannel.Result result) {
+        result.success("TOTO");
     }
 
     private void stopCall(MethodChannel.Result result) {

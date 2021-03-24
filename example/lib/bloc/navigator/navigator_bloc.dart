@@ -15,8 +15,10 @@ class NavigatorBloc extends Bloc<NavigatorEvent, dynamic>{
   Stream<dynamic> mapEventToState(NavigatorEvent event) async* {
     if(event is NavigatorActionPop){
       navigatorKey.currentState.pop();
-    }else if(event is NavigateToCallScreen){
+    }else if(event is NavigateToCallScreen) {
       navigatorKey.currentState.pushNamed('/call');
+    } else if (event is NavigateToHomeScreen) {
+      navigatorKey.currentState.pushNamed('/');
     }
   }
 }
