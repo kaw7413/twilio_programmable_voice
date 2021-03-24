@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/src/box_service.dart';
 import 'package:flutter_apns/flutter_apns.dart';
-import 'package:twilio_programmable_voice/src/callback_dispatcher.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
 import 'box_utils.dart';
@@ -171,7 +170,6 @@ class TokenService {
           }
         }
       },
-      onBackgroundMessage: backgroundMessageHandler,
     );
 
     final completer = Completer<String>();

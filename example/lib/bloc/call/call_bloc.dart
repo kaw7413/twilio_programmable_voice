@@ -5,6 +5,8 @@ import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart'
     as TwilioVoice;
+import 'package:get_it/get_it.dart';
+import 'package:twilio_programmable_voice_example/bloc/navigator/navigator_bloc.dart' as NB;
 
 part 'call_event.dart';
 part 'call_state.dart';
@@ -54,8 +56,8 @@ class CallBloc extends Bloc<CallEvent, CallState> {
 
         // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
         TwilioVoice.SoundPoolManager.getInstance().playDisconnect();
-
         this.add(CallEnded(uuid: event.sid));
+        GetIt.I<NB.NavigatorBloc>().add(NB.NavigatorActionPop());
 
         // TODO: only end the current active call
         // _callKeep.endAllCalls();

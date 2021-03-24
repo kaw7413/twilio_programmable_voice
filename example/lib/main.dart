@@ -6,14 +6,17 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
-import 'package:fluro/fluro.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:twilio_programmable_voice_example/bloc/call_bloc.dart'
-    as CallBloc;
-import 'package:callkeep/callkeep.dart';
 
-import 'package:twilio_programmable_voice_example/config/application.dart';
-import 'package:twilio_programmable_voice_example/config/routes.dart';
+import 'package:callkeep/callkeep.dart';
+import 'package:flutter_apns/flutter_apns.dart';
+import 'package:get_it/get_it.dart';
+
+import 'package:twilio_programmable_voice_example/bloc/call/call_bloc.dart'
+as CallBloc;
+import 'package:twilio_programmable_voice_example/background_message_handler.dart';
+import 'package:twilio_programmable_voice_example/call_screen.dart';
+import 'bloc/navigator/navigator_bloc.dart' as NB;
 
 final logger = Logger();
 final FlutterCallkeep _callKeep = FlutterCallkeep();
@@ -46,7 +49,7 @@ class _HomePageState extends State<HomePage> {
       'android': {
         'alertTitle': 'Permissions required',
         'alertDescription':
-            'This application needs to access your phone accounts',
+        'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
       },
@@ -57,27 +60,26 @@ class _HomePageState extends State<HomePage> {
       await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
         'alertTitle': 'Permissions required',
         'alertDescription':
-            'This application needs to access your phone accounts',
+        'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
       });
     }
 
     _callKeep.on(CallKeepPerformAnswerCallAction(),
-        (CallKeepPerformAnswerCallAction event) async {
-      print("${event.callUUID} answered.");
+            (CallKeepPerformAnswerCallAction event) async {
+          print("${event.callUUID} answered.");
 
-      // await _callKeep.startCall(event.callUUID, "number", "callerName");
-      await _callKeep.setCurrentCallActive(event.callUUID);
-      await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID);
+          await _callKeep.setCurrentCallActive(event.callUUID);
+          await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID);
 
-      await TwilioProgrammableVoice().answer();
+          await TwilioProgrammableVoice().answer();
 
-      await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID);
-    });
+          await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID);
+        });
 
     _callKeep.on(CallKeepPerformEndCallAction(), (event) async {
-      await TwilioProgrammableVoice().hangout();
+      await TwilioProgrammableVoice().reject();
     });
 
     await DotEnv().load('.env');
@@ -98,12 +100,10 @@ class _HomePageState extends State<HomePage> {
 
       if (event is CallConnected) {
         print("CallConnected");
-        // await _callKeep.setCurrentCallActive(event.sid);
       }
 
       if (event is CallRinging) {
         print("CallRinging");
-        // await _callKeep.startCall(event.sid, event.to, "callerName");
       }
 
       if (event is CallDisconnected) {
@@ -111,6 +111,18 @@ class _HomePageState extends State<HomePage> {
         await _callKeep.endCall(event.sid);
       }
     });
+
+    // Background listener for android only
+    final connector = createPushConnector();
+    connector.configure(
+      onLaunch: (data) => Future.microtask(() => print("onLaunch: $data")),
+      onResume: (data) => Future.microtask(() => print("onResume : $data")),
+      onMessage: (message) async {
+        print("App onMessage Received");
+      },
+      onBackgroundMessage: Platform.isAndroid ? backgroundMessageHandler : null,
+    );
+
 
     TwilioProgrammableVoice().setUp(
         accessTokenUrl: accessTokenUrl + "/$platform",
@@ -124,7 +136,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
     setUpTwilioProgrammableVoice();
   }
 
@@ -140,16 +151,15 @@ class _HomePageState extends State<HomePage> {
               FlatButton(
                   onPressed: () async {
                     final hasSucceed = await TwilioProgrammableVoice()
-                        .makeCall(from: "testId", to: "+33651727985");
+                        .makeCall(from: "testId", to: "+33787934070");
 
-                    print("Make call success state $hasSucceed");
-
+                    print("Make call success state toto $hasSucceed");
+                    GetIt.I<NB.NavigatorBloc>().add(NB.NavigateToCallScreen());
                     // Notify BLoC we've emitted a call
                     // Note: we could have moved .makeCall call to BLoC
                     context.read<CallBloc.CallBloc>().add(
-                        CallBloc.CallEmited(contactPerson: "+33651727985"));
 
-                    Application.router.navigateTo(context, Routes.call);
+                    CallBloc.CallEmited(contactPerson: "+3787934070"));
                   },
                   child: Text('Make call')),
             ],
@@ -166,10 +176,10 @@ class AppComponent extends StatefulWidget {
 }
 
 class AppComponentState extends State<AppComponent> {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey();
+
   AppComponentState() {
-    final router = FluroRouter();
-    Routes.configureRoutes(router);
-    Application.router = router;
+    GetIt.I.registerSingleton<NB.NavigatorBloc>(NB.NavigatorBloc(navigatorKey: _navigatorKey));
   }
 
   @override
@@ -178,10 +188,14 @@ class AppComponentState extends State<AppComponent> {
         // BLoC is only here to have a call state.
         create: (BuildContext context) => CallBloc.CallBloc(),
         child: MaterialApp(
+          navigatorKey: _navigatorKey,
+          initialRoute: '/',
+          routes: {
+            '/': (context) => HomePage(),
+            '/call': (context) => CallScreen(),
+          },
           title: 'Twilio Programming Voice',
           debugShowCheckedModeBanner: false,
-          onGenerateRoute: Application.router.generator,
-          initialRoute: Routes.root,
         ));
   }
 }

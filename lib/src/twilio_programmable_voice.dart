@@ -11,7 +11,6 @@ import 'box_service.dart';
 import 'events.dart';
 import 'token_service.dart';
 import 'exceptions.dart';
-import 'workmanager_wrapper.dart';
 import 'injector.dart';
 
 class TwilioProgrammableVoice {
@@ -82,9 +81,6 @@ class TwilioProgrammableVoice {
       await _methodChannel.invokeMethod(
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       getService<TokenService>().persistAccessToken(accessToken: accessToken);
-      // TODO change implementation (see the method comments)
-      WorkmanagerWrapper.launchJobInBg(
-          accessTokenUrl: accessTokenUrl, accessToken: accessToken);
     } catch (err) {
       print("registration failed");
       isRegistrationValid = false;
@@ -118,11 +114,6 @@ class TwilioProgrammableVoice {
 
     return _methodChannel.invokeMethod(
         'makeCall', {"from": from, "to": to, "accessToken": accessToken});
-  }
-
-  /// Stop the current call
-  Future<void> hangout() {
-    return _methodChannel.invokeMethod('stopCall');
   }
 
   /// Mute the current active call
