@@ -43,7 +43,12 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 	}
 
 	public func handle(_ flutterCall: FlutterMethodCall, result: @escaping FlutterResult) {
-		let args: [String: AnyObject] = flutterCall.arguments as! [String: AnyObject]
+		var args: [String: AnyObject] = [:];
+		
+		// we need this because sometimes arguments is nil and we unwrap a nil value, that throw an error and terminate the process :(
+		if let flutterArgs = flutterCall.arguments {
+			args = flutterArgs as! [String: AnyObject]
+		}
 
 		if flutterCall.method == "registerVoice" {
 			guard let accessToken = args["accessToken"] as? String else {
@@ -138,7 +143,7 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 
 			self.twilioProgrammableVoice.tokenManager.unregisterTokens(token: token, deviceToken: deviceToken)
 			
-		} else if flutterCall.method == "hangUp"{
+		} else if flutterCall.method == "reject"{
 			if self.twilioProgrammableVoice.twilioVoiceDelegate!.call != nil && self.twilioProgrammableVoice.twilioVoiceDelegate!.call?.state == .connected {
 				self.twilioProgrammableVoice.twilioVoiceDelegate!.userInitiatedDisconnect = true
 				self.twilioProgrammableVoice.performEndCallAction(uuid: self.twilioProgrammableVoice.twilioVoiceDelegate!.call!.uuid!)

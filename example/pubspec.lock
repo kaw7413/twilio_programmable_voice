@@ -33,9 +33,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: "7f23ec40b7dfb904c7f5597a3ed15c611eddf009"
-      url: "https://github.com/flutter-webrtc/callkeep.git"
+      ref: empty-ios
+      resolved-ref: d84b3e09267cc4642cd54c9da71a605cdcf4ca7b
+      url: "git://github.com/Pierre-Monier/callkeep.git"
     source: git
     version: "0.2.3+1"
   characters:
