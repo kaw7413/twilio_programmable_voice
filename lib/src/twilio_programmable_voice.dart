@@ -148,6 +148,11 @@ class TwilioProgrammableVoice {
     return _methodChannel.invokeMethod('reject');
   }
 
+  /// Returns the current call, null if there is no call at the moment
+  Future<dynamic> getCurrentCall() {
+    return _methodChannel.invokeMethod('getCurrentCall');
+  }
+
   /// Request microphone permission on the platform
   ///
   /// Return the microphone [PermissionStatus] after trying to request permissions.

@@ -13,7 +13,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:twilio_programmable_voice_example/bloc/call/call_bloc.dart'
-as CallBloc;
+    as CallBloc;
 import 'package:twilio_programmable_voice_example/background_message_handler.dart';
 import 'package:twilio_programmable_voice_example/call_screen.dart';
 import 'bloc/navigator/navigator_bloc.dart' as NB;
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
       'android': {
         'alertTitle': 'Permissions required',
         'alertDescription':
-        'This application needs to access your phone accounts',
+            'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
       },
@@ -61,23 +61,23 @@ class _HomePageState extends State<HomePage> {
       await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
         'alertTitle': 'Permissions required',
         'alertDescription':
-        'This application needs to access your phone accounts',
+            'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
       });
     }
 
     _callKeep.on(CallKeepPerformAnswerCallAction(),
-            (CallKeepPerformAnswerCallAction event) async {
-          print("${event.callUUID} answered.");
+        (CallKeepPerformAnswerCallAction event) async {
+      print("${event.callUUID} answered.");
 
-          await _callKeep.setCurrentCallActive(event.callUUID);
-          await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID);
+      await _callKeep.setCurrentCallActive(event.callUUID);
+      await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID);
 
-          await TwilioProgrammableVoice().answer();
+      await TwilioProgrammableVoice().answer();
 
-          await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID);
-        });
+      await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID);
+    });
 
     _callKeep.on(CallKeepPerformEndCallAction(), (event) async {
       await TwilioProgrammableVoice().reject();
@@ -101,6 +101,12 @@ class _HomePageState extends State<HomePage> {
 
       if (event is CallConnected) {
         print("CallConnected");
+        GetIt.I<NB.NavigatorBloc>().add(NB.NavigateToCallScreen());
+        // Notify BLoC we've emitted a call
+        // Note: we could have moved .makeCall call to BLoC
+        context
+            .read<CallBloc.CallBloc>()
+            .add(CallBloc.CallEmited(contactPerson: event.from));
       }
 
       if (event is CallRinging) {
@@ -114,7 +120,9 @@ class _HomePageState extends State<HomePage> {
     });
 
     TwilioProgrammableVoice().setUp(
-        accessTokenUrl: accessTokenUrl + "/$platform",
+        accessTokenUrl: accessTokenUrl +
+            "/${DotEnv().env['TWILIO_IDENTITY']}" +
+            "/$platform",
         headers: {
           "TestHeader": "I'm a test header"
         }).then((isRegistrationValid) {
@@ -139,16 +147,16 @@ class _HomePageState extends State<HomePage> {
             children: [
               FlatButton(
                   onPressed: () async {
-                    final hasSucceed = await TwilioProgrammableVoice()
-                        .makeCall(from: "testId", to: "+33787934070");
+                    final hasSucceed = await TwilioProgrammableVoice().makeCall(
+                        from: DotEnv().env['TWILIO_IDENTITY'],
+                        to: DotEnv().env['MAKE_CALL_NUMBER']);
 
                     print("Make call success state toto $hasSucceed");
                     GetIt.I<NB.NavigatorBloc>().add(NB.NavigateToCallScreen());
                     // Notify BLoC we've emitted a call
                     // Note: we could have moved .makeCall call to BLoC
-                    context.read<CallBloc.CallBloc>().add(
-
-                    CallBloc.CallEmited(contactPerson: "+3787934070"));
+                    context.read<CallBloc.CallBloc>().add(CallBloc.CallEmited(
+                        contactPerson: DotEnv().env['MAKE_CALL_NUMBER']));
                   },
                   child: Text('Make call')),
             ],
@@ -164,12 +172,14 @@ class AppComponent extends StatefulWidget {
   }
 }
 
-class AppComponentState extends State<AppComponent> {
+class AppComponentState extends State<AppComponent>
+    with WidgetsBindingObserver {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   AppComponentState() {
-    GetIt.I.registerSingleton<NB.NavigatorBloc>(NB.NavigatorBloc(navigatorKey: _navigatorKey));
+    GetIt.I.registerSingleton<NB.NavigatorBloc>(
+        NB.NavigatorBloc(navigatorKey: _navigatorKey));
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -187,13 +197,37 @@ class AppComponentState extends State<AppComponent> {
             final dataMap = Map<String, String>.from(message["data"]);
 
             TwilioProgrammableVoice().handleMessage(data: dataMap);
-            logger
-                .d("TwilioProgrammableVoice().handleMessage called in main.dart");
+            logger.d(
+                "TwilioProgrammableVoice().handleMessage called in main.dart");
           }
         }
       },
       onBackgroundMessage: Platform.isAndroid ? backgroundMessageHandler : null,
     );
+  }
+
+  // @TODO: try to play with this and see if we can have a neat way
+  // to detect if a call is in progress (native side) so we can display
+  // a neat in-app call screen ;)
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("app in resumed");
+        var test = TwilioProgrammableVoice().getCurrentCall();
+        print("TEST:");
+        print(test);
+        break;
+      case AppLifecycleState.inactive:
+        print("app in inactive");
+        break;
+      case AppLifecycleState.paused:
+        print("app in paused");
+        break;
+      case AppLifecycleState.detached:
+        print("app in detached");
+        break;
+    }
   }
 
   @override

@@ -125,6 +125,8 @@ public class SwiftTwilioProgrammableVoicePlugin: NSObject, FlutterPlugin {
 
 			self.twilioProgrammableVoice.muteActiveCall(setOn: setOn, result: result)
 			
+		} else if flutterCall.method == "getCurrentCall" {
+			self.twilioProgrammableVoice.getCurrentCall(result: result);
 		} else if flutterCall.method == "answer" {
 			
 			result(true) /// do nothing

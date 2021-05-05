@@ -123,6 +123,10 @@ public class TwilioProgrammableVoice: NSObject {
 		audioDevice.block()
 	}
 
+	func getCurrentCall(result: @escaping FlutterResult) {
+		result(self.twilioVoiceDelegate!.call)
+	}
+
 	// Called after the CXProvider is notify of the CXUpdateCallAction
 	func performVoiceCall(uuid: UUID, to: String, completionHandler: @escaping (Bool) -> Swift.Void) {
 		// Fetch access token
@@ -225,6 +229,8 @@ public class TwilioProgrammableVoice: NSObject {
 		callUpdate.supportsGrouping = false
 		callUpdate.supportsUngrouping = false
 		callUpdate.hasVideo = false
+
+		print("reporting a new incoming call", uuid, callUpdate);
 
 		// this display the callInvite UI
 		self.callKitProvider.reportNewIncomingCall(with: uuid, update: callUpdate) { error in

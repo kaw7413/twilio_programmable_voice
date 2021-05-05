@@ -52,6 +52,8 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             this.reject(result);
         } else if (call.method.equals("getBatteryLevel")) {
             this.tmpTestToRemove(result);
+        } else if (call.method.equals("getCurrentCall")) {
+            result.success(twilioProgrammableVoice.getCurrentCall());
         } else {
             result.notImplemented();
         }
