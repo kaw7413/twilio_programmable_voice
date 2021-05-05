@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/src/box_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
 import 'box_utils.dart';
 import 'exceptions.dart';

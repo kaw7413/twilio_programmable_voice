@@ -17,7 +17,7 @@ dependencies:
   hive_flutter: ^0.3.1
   background_fetch: ^0.7.1
   jwt_decoder: ^1.0.3
-  firebase_messaging: 7.0.3
+  firebase_messaging: ^7.0.3
 
   dio: ^3.0.10
   meta: ^1.2.4
