@@ -233,7 +233,7 @@ packages:
     source: hosted
     version: "0.2.1+1"
   firebase_messaging:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: firebase_messaging
       url: "https://pub.dartlang.org"
@@ -251,13 +251,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_apns:
-    dependency: "direct main"
-    description:
-      name: flutter_apns
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.4.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter

@@ -11,7 +11,6 @@ import 'box_service.dart';
 import 'events.dart';
 import 'token_service.dart';
 import 'exceptions.dart';
-import 'workmanager_wrapper.dart';
 import 'injector.dart';
 
 class TwilioProgrammableVoice {
@@ -73,6 +72,7 @@ class TwilioProgrammableVoice {
 
     String accessToken = await getService<TokenService>()
         .getAccessToken(accessTokenUrl: accessTokenUrl);
+
     String fcmToken = Platform.isAndroid
         ? await getService<TokenService>().getFcmToken()
         : null;
@@ -81,9 +81,6 @@ class TwilioProgrammableVoice {
       await _methodChannel.invokeMethod(
           'registerVoice', {"accessToken": accessToken, "fcmToken": fcmToken});
       getService<TokenService>().persistAccessToken(accessToken: accessToken);
-      // TODO change implementation (see the method comments)
-      WorkmanagerWrapper.launchJobInBg(
-          accessTokenUrl: accessTokenUrl, accessToken: accessToken);
     } catch (err) {
       print("registration failed");
       isRegistrationValid = false;
@@ -119,11 +116,6 @@ class TwilioProgrammableVoice {
         'makeCall', {"from": from, "to": to, "accessToken": accessToken});
   }
 
-  /// Stop the current call
-  Future<void> hangout() {
-    return _methodChannel.invokeMethod('stopCall');
-  }
-
   /// Mute the current active call
   Future<void> mute({@required bool setOn}) {
     return _methodChannel.invokeMethod('muteCall', {"setOn": setOn});
@@ -154,6 +146,11 @@ class TwilioProgrammableVoice {
   /// Reject the current call invite
   Future<void> reject() {
     return _methodChannel.invokeMethod('reject');
+  }
+
+  /// Returns the current call, null if there is no call at the moment
+  Future<dynamic> getCurrentCall() {
+    return _methodChannel.invokeMethod('getCurrentCall');
   }
 
   /// Request microphone permission on the platform

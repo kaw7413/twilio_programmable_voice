@@ -16,13 +16,9 @@ dependencies:
   hive: ^1.4.4+1
   hive_flutter: ^0.3.1
   background_fetch: '^0.7.1'
-  # workmanager:
-  #   git:
-  #     url: git://github.com/Pierre-Monier/flutter_workmanager.git
-  #     ref: workmanager-factory
   jwt_decoder: ^1.0.3
-  # firebase_messaging: 7.0.3
-  flutter_apns: ^1.4.1
+  firebase_messaging: 7.0.3
+
   dio: ^3.0.10
   meta: ^1.2.4
   uuid: ^2.2.2

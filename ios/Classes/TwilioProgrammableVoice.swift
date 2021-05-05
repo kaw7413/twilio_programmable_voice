@@ -123,6 +123,10 @@ public class TwilioProgrammableVoice: NSObject {
 		audioDevice.block()
 	}
 
+	func getCurrentCall(result: @escaping FlutterResult) {
+		result(self.twilioVoiceDelegate!.call)
+	}
+
 	// Called after the CXProvider is notify of the CXUpdateCallAction
 	func performVoiceCall(uuid: UUID, to: String, completionHandler: @escaping (Bool) -> Swift.Void) {
 		// Fetch access token
@@ -148,13 +152,13 @@ public class TwilioProgrammableVoice: NSObject {
 			let acceptOptions: AcceptOptions = AcceptOptions(callInvite: ci) { (builder) in
 				builder.uuid = ci.uuid
 			}
+			
+				let theCall = ci.accept(options: acceptOptions, delegate: self.twilioVoiceDelegate!)
+				self.twilioVoiceDelegate!.call = theCall
+				self.twilioVoiceDelegate!.callCompletionCallback = completionHandler
+				self.twilioVoiceDelegate!.callInvite = nil
 
-			let theCall = ci.accept(options: acceptOptions, delegate: self.twilioVoiceDelegate!)
-			self.twilioVoiceDelegate!.call = theCall
-			self.twilioVoiceDelegate!.callCompletionCallback = completionHandler
-			self.twilioVoiceDelegate!.callInvite = nil
-
-			guard #available(iOS 13, *) else {
+				guard #available(iOS 13, *) else {
 				self.tokenManager.incomingPushHandled()
 				return
 			}
@@ -226,6 +230,9 @@ public class TwilioProgrammableVoice: NSObject {
 		callUpdate.supportsUngrouping = false
 		callUpdate.hasVideo = false
 
+		print("reporting a new incoming call", uuid, callUpdate);
+
+		// this display the callInvite UI
 		self.callKitProvider.reportNewIncomingCall(with: uuid, update: callUpdate) { error in
 			if let error = error {
 				print("error", error as Any)

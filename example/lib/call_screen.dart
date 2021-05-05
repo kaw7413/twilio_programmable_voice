@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:twilio_programmable_voice_example/bloc/call_bloc.dart';
-import 'package:twilio_programmable_voice_example/config/application.dart';
-import 'package:twilio_programmable_voice_example/config/routes.dart';
+import 'package:twilio_programmable_voice/twilio_programmable_voice.dart'
+    as TPV;
+import 'bloc/navigator/navigator_bloc.dart' as NB;
+import 'package:twilio_programmable_voice_example/bloc/call/call_bloc.dart';
 import 'package:twilio_programmable_voice_example/widgets/dial_button.dart';
 import 'package:twilio_programmable_voice_example/widgets/dial_user_picture.dart';
 import 'package:twilio_programmable_voice_example/widgets/rounded_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 class CallScreen extends StatelessWidget {
   Widget displayStateText(CallState state) {
@@ -107,8 +109,11 @@ class CallScreen extends StatelessWidget {
                   SizedBox(height: 5.0),
                   RoundedButton(
                     iconSrc: "assets/icons/call_end.svg",
-                    press: () {
-                      Application.router.navigateTo(context, Routes.root);
+                    press: () async {
+                      await TPV.TwilioProgrammableVoice().reject();
+
+                      // NavigationPop here doesn't work, it's a problem
+                      GetIt.I<NB.NavigatorBloc>().add(NB.NavigateToHomeScreen());
                     },
                     color: Colors.red.shade300,
                     iconColor: Colors.white,
