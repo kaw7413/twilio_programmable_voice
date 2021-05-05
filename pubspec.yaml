@@ -1,12 +1,12 @@
 name: twilio_programmable_voice
 description: Non-official Flutter Twilio API for Twilio Programmable Voice Resource
-version: 0.0.1
-author: 'izio38'
-homepage: 'https://github.com/izio38/'
+version: 0.0.0-dev.1
+homepage:
+repository: https://github.com/Bilik-fr/twilio_programmable_voice/
 
 environment:
-  sdk: '>=2.7.0 <3.0.0'
-  flutter: '>=1.20.0'
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.20.0"
 
 dependencies:
   flutter:
@@ -15,7 +15,7 @@ dependencies:
   soundpool: ^1.1.3
   hive: ^1.4.4+1
   hive_flutter: ^0.3.1
-  background_fetch: '^0.7.1'
+  background_fetch: ^0.7.1
   jwt_decoder: ^1.0.3
   firebase_messaging: 7.0.3
 
@@ -44,4 +44,3 @@ flutter:
     - packages/twilio_programmable_voice/assets/sounds/disconnect.wav
     - packages/twilio_programmable_voice/assets/sounds/incoming.wav
     - packages/twilio_programmable_voice/assets/sounds/outgoing.wav
-
