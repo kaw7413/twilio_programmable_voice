@@ -4,8 +4,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'box_utils.dart';
 
 class BoxService {
-  Box _box;
-  Future _boxCreated;
+  late Box _box;
+  late Future _boxCreated;
 
   BoxService() {
     _boxCreated = _createBox();

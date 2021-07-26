@@ -6,26 +6,26 @@ abstract class CallEvent {}
 class CallEmited extends CallEvent {
   final String contactPerson;
 
-  CallEmited({this.contactPerson});
+  CallEmited({required this.contactPerson});
 }
 
 class CallAnswered extends CallEvent {
   final String uuid;
   final String contactPerson;
 
-  CallAnswered({this.uuid, this.contactPerson});
+  CallAnswered({required this.uuid, required this.contactPerson});
 }
 
 class CallCancelled extends CallEvent {
   final String uuid;
 
-  CallCancelled({this.uuid});
+  CallCancelled({required this.uuid});
 }
 
 class CallEnded extends CallEvent {
   final String uuid;
 
-  CallEnded({this.uuid});
+  CallEnded({required this.uuid});
 }
 
 // Call Actions
@@ -33,17 +33,17 @@ class CallEnded extends CallEvent {
 class CallToggleMute extends CallEvent {
   final bool setOn;
 
-  CallToggleMute({this.setOn});
+  CallToggleMute({required this.setOn});
 }
 
 class CallToggleSpeaker extends CallEvent {
   final bool setOn;
 
-  CallToggleSpeaker({this.setOn});
+  CallToggleSpeaker({required this.setOn});
 }
 
 class CallToggleHold extends CallEvent {
   final bool setOn;
 
-  CallToggleHold({this.setOn});
+  CallToggleHold({required this.setOn});
 }

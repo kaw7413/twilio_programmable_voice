@@ -3,10 +3,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class DialButton extends StatelessWidget {
   const DialButton({
-    Key key,
-    @required this.iconSrc,
-    @required this.text,
-    @required this.press,
+    Key? key,
+    required this.iconSrc,
+    required this.text,
+    required this.press,
   }) : super(key: key);
 
   final String iconSrc, text;

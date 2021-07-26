@@ -17,7 +17,8 @@ class UndefinedAccessTokenStrategyException implements Exception {
 }
 
 class NoValuePassToAccessTokenStrategyException implements Exception {
-  final String message = "You need to pass a value to the key BoxKeys.ACCESS_TOKEN_STRATEGY if you want to add a custom config";
+  final String message =
+      "You need to pass a value to the key BoxKeys.ACCESS_TOKEN_STRATEGY if you want to add a custom config";
 
   NoValuePassToAccessTokenStrategyException();
 
@@ -26,7 +27,8 @@ class NoValuePassToAccessTokenStrategyException implements Exception {
 }
 
 class NoValuePassFcmTokenStrategyException implements Exception {
-  final String message = "You need to pass a value to the key BoxKeys.FCM_TOKEN_STRATEGY if you want to add a custom config";
+  final String message =
+      "You need to pass a value to the key BoxKeys.FCM_TOKEN_STRATEGY if you want to add a custom config";
 
   NoValuePassFcmTokenStrategyException();
 
@@ -35,7 +37,8 @@ class NoValuePassFcmTokenStrategyException implements Exception {
 }
 
 class SettingNonExistingStrategiesException {
-  final String message = "The only strategies you can set are the BoxKeys.FCM_TOKEN_STRATEGY and the BoxKeys.ACCESS_TOKEN_STRATEGY";
+  final String message =
+      "The only strategies you can set are the BoxKeys.FCM_TOKEN_STRATEGY and the BoxKeys.ACCESS_TOKEN_STRATEGY";
 
   SettingNonExistingStrategiesException();
 
@@ -44,7 +47,8 @@ class SettingNonExistingStrategiesException {
 }
 
 class GettingUnknownServiceException {
-  final String message = "You try to instantiate an unknown service, you can only instantiate services of type: BoxService, TokenService or WorkManager";
+  final String message =
+      "You try to instantiate an unknown service, you can only instantiate services of type: BoxService, TokenService or WorkManager";
 
   GettingUnknownServiceException();
 
@@ -52,11 +56,12 @@ class GettingUnknownServiceException {
   String toString() => 'GettingUnknownServiceException($message)';
 }
 
-class AccessTokenUrlIsNullException {
-  final String message = "You must provide a valid accessTokenUrl, null was provided";
+class UndefinedAccessTokenUrlException implements Exception {
+  final String message =
+      "No access token url defined. Did you forget to use setUp() to initialize Twilio programmable voice ?";
 
-  AccessTokenUrlIsNullException();
+  UndefinedAccessTokenUrlException();
 
   @override
-  String toString() => 'AccessTokenUrlIsNullException($message)';
+  String toString() => 'UndefinedAccessTokenUrlException($message)';
 }

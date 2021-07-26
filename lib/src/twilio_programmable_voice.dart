@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/src/utils/token_utils.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'box_utils.dart';
 import 'box_service.dart';
@@ -14,8 +15,8 @@ import 'exceptions.dart';
 import 'injector.dart';
 
 class TwilioProgrammableVoice {
-  CallEvent _currentCallEvent;
-  String _accessTokenUrl;
+  CallEvent? _currentCallEvent;
+  String? _accessTokenUrl;
 
   final MethodChannel _methodChannel =
       const MethodChannel('twilio_programmable_voice');
@@ -31,6 +32,7 @@ class TwilioProgrammableVoice {
 
   TwilioProgrammableVoice._internal() {
     // Initialization logic goes here.
+    Firebase.initializeApp();
   }
 
   /// Must be the first function you call in the TwilioProgrammableVoice package
@@ -45,11 +47,10 @@ class TwilioProgrammableVoice {
   ///
   /// [headers] optional headers, use by the GET access token strategy
   Future<bool> setUp(
-      {@required String accessTokenUrl,
-      Map<String, Object> tokenManagerStrategies,
-      Map<String, dynamic> headers}) async {
-    _setAccessTokenUrl(accessTokenUrl);
-
+      {required String accessTokenUrl,
+      Map<String, String>? tokenManagerStrategies,
+      Map<String, dynamic>? headers}) async {
+    _accessTokenUrl = accessTokenUrl;
     getService<TokenService>()
         .init(strategies: tokenManagerStrategies, headers: headers);
     final bool isRegistrationValid =
@@ -67,13 +68,13 @@ class TwilioProgrammableVoice {
   ///
   /// [accessTokenUrl] an url which returns a valid accessToken when access
   /// by HTTP GET method
-  Future<bool> registerVoice({@required String accessTokenUrl}) async {
+  Future<bool> registerVoice({required String accessTokenUrl}) async {
     bool isRegistrationValid = true;
 
     String accessToken = await getService<TokenService>()
         .getAccessToken(accessTokenUrl: accessTokenUrl);
 
-    String fcmToken = Platform.isAndroid
+    String? fcmToken = Platform.isAndroid
         ? await getService<TokenService>().getFcmToken()
         : null;
 
@@ -97,11 +98,15 @@ class TwilioProgrammableVoice {
   ///
   /// [from] this device identity (or number)
   /// [to] the target identity (or number)
-  Future<bool> makeCall({@required String from, @required String to}) async {
+  Future<bool> makeCall({required String from, required String to}) async {
+    if (_accessTokenUrl == null) {
+      throw UndefinedAccessTokenUrlException();
+    }
+
     final tokenService = getService<TokenService>();
 
     String accessToken =
-        await tokenService.getAccessToken(accessTokenUrl: _accessTokenUrl);
+        await tokenService.getAccessToken(accessTokenUrl: _accessTokenUrl!);
 
     final durationBeforeAccessTokenExpires =
         getDurationBeforeTokenExpires(accessToken);
@@ -109,38 +114,42 @@ class TwilioProgrammableVoice {
     // 15 secondes left to use the token, so we create a fresh one.
     if (durationBeforeAccessTokenExpires.compareTo(Duration(seconds: 15)) < 0) {
       accessToken = await tokenService.accessTokenStrategyBinder(
-          accessTokenUrl: _accessTokenUrl);
+          accessTokenUrl: _accessTokenUrl!);
     }
 
-    return _methodChannel.invokeMethod(
-        'makeCall', {"from": from, "to": to, "accessToken": accessToken});
+    return _methodChannel.invokeMethod<bool>('makeCall', {
+      "from": from,
+      "to": to,
+      "accessToken": accessToken
+    }).then((bool? value) => value ?? false);
   }
 
   /// Mute the current active call
-  Future<void> mute({@required bool setOn}) {
+  Future<void> mute({required bool setOn}) {
     return _methodChannel.invokeMethod('muteCall', {"setOn": setOn});
   }
 
   /// Hold the current active call
-  Future<void> hold({@required bool setOn}) {
+  Future<void> hold({required bool setOn}) {
     return _methodChannel.invokeMethod('holdCall', {"setOn": setOn});
   }
 
   /// Hold the current active call
-  Future<void> toggleSpeaker({@required bool setOn}) {
+  Future<void> toggleSpeaker({required bool setOn}) {
     return _methodChannel.invokeMethod('toggleSpeaker', {"setOn": setOn});
   }
 
   /// Answer the current call invite
   ///
   /// [iOS] This is just a stub on iOS
-  Future<String> answer() {
-    return _methodChannel.invokeMethod('answer');
+  Future<String?> answer() {
+    return _methodChannel.invokeMethod<String>('answer');
   }
 
   /// Handle Fcm Message and delegate to Twilio
-  Future<bool> handleMessage({@required Map<String, String> data}) {
-    return _methodChannel.invokeMethod('handleMessage', {"messageData": data});
+  Future<bool> handleMessage({required Map<String, String> data}) {
+    return _methodChannel.invokeMethod<bool>('handleMessage',
+        {"messageData": data}).then<bool>((bool? value) => value ?? false);
   }
 
   /// Reject the current call invite
@@ -172,8 +181,10 @@ class TwilioProgrammableVoice {
 
     return _callStatusEventChannel
         .receiveBroadcastStream()
-        .where((data) => _containsCall(data['type']))
-        .map((data) {
+        .where((jsonString) => _containsCall(json.decode(jsonString)['type']))
+        .map((jsonString) {
+      Map<String, dynamic> data = json.decode(jsonString);
+
       switch (data['type']) {
         case 'CallInvite':
           currentCallEvent = CallInvite.from(data);
@@ -212,22 +223,12 @@ class TwilioProgrammableVoice {
           break;
 
         default:
-          print("default called in stream");
           print(data.toString());
-          break;
+          throw Exception('default called in stream');
       }
 
-      _currentCallEvent = currentCallEvent;
-      return currentCallEvent;
+      return _currentCallEvent = currentCallEvent;
     });
-  }
-
-  void _setAccessTokenUrl([String accessTokenUrl]) {
-    if (accessTokenUrl == null) {
-      throw AccessTokenUrlIsNullException();
-    }
-
-    _accessTokenUrl = accessTokenUrl;
   }
 
   bool _containsCall(dynamic value) {

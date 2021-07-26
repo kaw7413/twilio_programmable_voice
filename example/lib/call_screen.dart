@@ -54,10 +54,7 @@ class CallScreen extends StatelessWidget {
                 children: [
                   Text(
                     this.getContactPerson(state),
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline4
-                        .copyWith(color: Colors.white),
+                    style: TextStyle(color: Colors.white),
                   ),
                   this.displayStateText(state),
                   SizedBox(height: 5),
@@ -113,7 +110,8 @@ class CallScreen extends StatelessWidget {
                       await TPV.TwilioProgrammableVoice().reject();
 
                       // NavigationPop here doesn't work, it's a problem
-                      GetIt.I<NB.NavigatorBloc>().add(NB.NavigateToHomeScreen());
+                      GetIt.I<NB.NavigatorBloc>()
+                          .add(NB.NavigateToHomeScreen());
                     },
                     color: Colors.red.shade300,
                     iconColor: Colors.white,

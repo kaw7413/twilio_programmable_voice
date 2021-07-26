@@ -25,7 +25,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Logger.level = Level.debug;
 
-  await DotEnv().load('.env');
+  await dotenv.load();
 
   runApp(AppComponent());
 }
@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
 
     await _callKeep.setup(<String, dynamic>{
       'ios': {
-        'appName': 'TPV Example',
+        'appName': 'CallKeepDemo',
       },
       'android': {
         'alertTitle': 'Permissions required',
@@ -53,6 +53,7 @@ class _HomePageState extends State<HomePage> {
             'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
+        'additionalPermissions': <String>[]
       },
     });
 
@@ -69,22 +70,24 @@ class _HomePageState extends State<HomePage> {
 
     _callKeep.on(CallKeepPerformAnswerCallAction(),
         (CallKeepPerformAnswerCallAction event) async {
-      print("${event.callUUID} answered.");
+      if (event.callUUID != null) {
+        print("${event.callUUID} answered.");
 
-      await _callKeep.setCurrentCallActive(event.callUUID);
-      await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID);
+        await _callKeep.setCurrentCallActive(event.callUUID!);
+        await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID!);
 
-      await TwilioProgrammableVoice().answer();
+        await TwilioProgrammableVoice().answer();
 
-      await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID);
+        await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID!);
+      }
     });
 
     _callKeep.on(CallKeepPerformEndCallAction(), (event) async {
       await TwilioProgrammableVoice().reject();
     });
 
-    await DotEnv().load('.env');
-    final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
+    await dotenv.load();
+    final accessTokenUrl = dotenv.env['ACCESS_TOKEN_URL'];
 
     final String platform = Platform.isAndroid ? "android" : "ios";
 
@@ -120,9 +123,8 @@ class _HomePageState extends State<HomePage> {
     });
 
     TwilioProgrammableVoice().setUp(
-        accessTokenUrl: accessTokenUrl +
-            "/${DotEnv().env['TWILIO_IDENTITY']}" +
-            "/$platform",
+        accessTokenUrl:
+            "$accessTokenUrl/${dotenv.env['TWILIO_IDENTITY']}/$platform",
         headers: {
           "TestHeader": "I'm a test header"
         }).then((isRegistrationValid) {
@@ -147,16 +149,24 @@ class _HomePageState extends State<HomePage> {
             children: [
               FlatButton(
                   onPressed: () async {
+                    if (dotenv.env['TWILIO_IDENTITY'] == null) {
+                      throw Exception('env not found : TWILIO_IDENTITY');
+                    }
+
+                    if (dotenv.env['MAKE_CALL_NUMBER'] == null) {
+                      throw Exception('env not found : MAKE_CALL_NUMBER');
+                    }
+
                     final hasSucceed = await TwilioProgrammableVoice().makeCall(
-                        from: DotEnv().env['TWILIO_IDENTITY'],
-                        to: DotEnv().env['MAKE_CALL_NUMBER']);
+                        from: dotenv.env['TWILIO_IDENTITY']!,
+                        to: dotenv.env['MAKE_CALL_NUMBER']!);
 
                     print("Make call success state toto $hasSucceed");
                     GetIt.I<NB.NavigatorBloc>().add(NB.NavigateToCallScreen());
                     // Notify BLoC we've emitted a call
                     // Note: we could have moved .makeCall call to BLoC
                     context.read<CallBloc.CallBloc>().add(CallBloc.CallEmited(
-                        contactPerson: DotEnv().env['MAKE_CALL_NUMBER']));
+                        contactPerson: dotenv.env['MAKE_CALL_NUMBER']!));
                   },
                   child: Text('Make call')),
             ],
@@ -175,35 +185,33 @@ class AppComponent extends StatefulWidget {
 class AppComponentState extends State<AppComponent>
     with WidgetsBindingObserver {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey();
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   AppComponentState() {
-    GetIt.I.registerSingleton<NB.NavigatorBloc>(
+    GetIt.instance.registerSingleton<NB.NavigatorBloc>(
         NB.NavigatorBloc(navigatorKey: _navigatorKey));
 
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        logger.d('[onFirebaseMessage]', message);
-        // It's a real push notification
-        if (message["notification"]["title"] != null) {}
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      logger.d('[onFirebaseMessage]', message);
+      // It's a real push notification
+      if (message.notification != null) {}
 
-        // It's a data
-        if (message.containsKey("data") && message["data"] != null) {
-          // It's a twilio data message
-          logger.d("Message contains data", message["data"]);
-          if (message["data"].containsKey("twi_message_type")) {
-            logger.d("Message is a Twilio Message");
+      // It's a data
+      if (message.data.length > 0) {
+        // It's a twilio data message
+        logger.d("Message contains data", message.data);
+        if (message.data.containsKey("twi_message_type")) {
+          logger.d("Message is a Twilio Message");
 
-            final dataMap = Map<String, String>.from(message["data"]);
+          final dataMap = Map<String, String>.from(message.data);
 
-            TwilioProgrammableVoice().handleMessage(data: dataMap);
-            logger.d(
-                "TwilioProgrammableVoice().handleMessage called in main.dart");
-          }
+          TwilioProgrammableVoice().handleMessage(data: dataMap);
+          logger
+              .d("TwilioProgrammableVoice().handleMessage called in main.dart");
         }
-      },
-      onBackgroundMessage: Platform.isAndroid ? backgroundMessageHandler : null,
-    );
+      }
+    });
+
+    FirebaseMessaging.onBackgroundMessage(backgroundMessageHandler);
   }
 
   // @TODO: try to play with this and see if we can have a neat way

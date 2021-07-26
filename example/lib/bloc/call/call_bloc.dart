@@ -1,18 +1,19 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
-import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart'
     as TwilioVoice;
 import 'package:get_it/get_it.dart';
-import 'package:twilio_programmable_voice_example/bloc/navigator/navigator_bloc.dart' as NB;
+import 'package:twilio_programmable_voice_example/bloc/navigator/navigator_bloc.dart'
+    as NB;
 
 part 'call_event.dart';
 part 'call_state.dart';
 
 class CallBloc extends Bloc<CallEvent, CallState> {
-  StreamSubscription<TwilioVoice.CallEvent> callListener;
+  late StreamSubscription<TwilioVoice.CallEvent> callListener;
 
   // Should we use a new logger instance or share the same across app ?
   final logger = Logger();
@@ -116,6 +117,8 @@ class CallBloc extends Bloc<CallEvent, CallState> {
       TwilioVoice.TwilioProgrammableVoice().hold(setOn: event.setOn);
       return _state.copyWith(isHold: event.setOn);
     }
+
+    return _state;
   }
 
   CallState mapCallToggleMuteToState(CallToggleMute event) {
@@ -125,6 +128,7 @@ class CallBloc extends Bloc<CallEvent, CallState> {
       TwilioVoice.TwilioProgrammableVoice().mute(setOn: event.setOn);
       return _state.copyWith(isMuted: event.setOn);
     }
+    return _state;
   }
 
   CallState mapCallToggleSpeakerToState(CallToggleSpeaker event) {
@@ -134,6 +138,7 @@ class CallBloc extends Bloc<CallEvent, CallState> {
       TwilioVoice.TwilioProgrammableVoice().toggleSpeaker(setOn: event.setOn);
       return _state.copyWith(isAutioRoutedToSpeaker: event.setOn);
     }
+    return _state;
   }
 
   CallState mapCallCancelledToState(CallCancelled event) {

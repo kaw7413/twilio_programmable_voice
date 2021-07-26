@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class DialUserPicture extends StatelessWidget {
   const DialUserPicture({
-    Key key,
+    Key? key,
     this.size = 192,
-    @required this.image,
+    required this.image,
   }) : super(key: key);
 
   final double size;

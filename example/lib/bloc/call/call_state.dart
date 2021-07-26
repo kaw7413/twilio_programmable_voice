@@ -11,7 +11,11 @@ class CallRinging extends CallState {
   final String contactPerson;
   final String direction;
 
-  CallRinging({this.uuid, this.startedAt, this.contactPerson, this.direction});
+  CallRinging(
+      {required this.uuid,
+      required this.startedAt,
+      required this.contactPerson,
+      required this.direction});
 }
 
 class CallInProgress extends CallState {
@@ -20,21 +24,21 @@ class CallInProgress extends CallState {
   final String contactPerson;
   final String direction;
 
-  final bool isMuted;
-  final bool isHold;
-  final bool isAudioRoutedToSpeaker;
+  final bool? isMuted;
+  final bool? isHold;
+  final bool? isAudioRoutedToSpeaker;
 
   CallInProgress(
-      {this.uuid,
-      this.startedAt,
-      this.contactPerson,
-      this.direction,
+      {required this.uuid,
+      required this.startedAt,
+      required this.contactPerson,
+      required this.direction,
       this.isAudioRoutedToSpeaker,
       this.isHold,
       this.isMuted});
 
   CallInProgress copyWith(
-      {bool isHold, bool isMuted, bool isAutioRoutedToSpeaker}) {
+      {bool? isHold, bool? isMuted, bool? isAutioRoutedToSpeaker}) {
     return CallInProgress(
       uuid: this.uuid,
       startedAt: this.startedAt,

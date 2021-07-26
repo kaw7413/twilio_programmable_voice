@@ -1,5 +1,3 @@
-import 'package:flutter/widgets.dart';
-
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart';
 
 Future<void> backgroundMessageHandler(dynamic message) async {
@@ -38,8 +36,8 @@ Future<void> backgroundMessageHandler(dynamic message) async {
 //
 // Future<dynamic> backgroundMessageHandler(Map<String, dynamic> message) async {
 //   WidgetsFlutterBinding.ensureInitialized();
-//   await DotEnv().load('.env');
-//   final accessTokenUrl = DotEnv().env['ACCESS_TOKEN_URL'];
+//   await dotenv.load('.env');
+//   final accessTokenUrl = dotenv.env['ACCESS_TOKEN_URL'];
 //   // It's a data
 //   if (message.containsKey("data") && message["data"] != null) {
 //     // It's a twilio data message
