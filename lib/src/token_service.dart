@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/widgets.dart';
 import 'package:twilio_programmable_voice/src/box_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -17,17 +17,15 @@ class TokenService {
 
   Dio client;
 
-  TokenService({Dio mock}) {
-    this.client = mock ?? Dio();
-  }
+  TokenService({Dio? mock}) : this.client = mock ?? Dio();
 
   Future<void> init(
-      {Map<String, String> strategies, Map<String, dynamic> headers}) async {
+      {Map<String, String>? strategies, Map<String, dynamic>? headers}) async {
     bool strategiesDefined = await areStrategiesDefined();
     if (strategies != null) {
       return setUpStrategies(strategies: strategies);
     } else if (!strategiesDefined) {
-      return setUpStrategies(strategies: _DEFAULT_CONFIG);
+      return setUpStrategies(strategies: TokenService._DEFAULT_CONFIG);
     }
 
     if (headers != null) {
@@ -37,7 +35,7 @@ class TokenService {
 
   @visibleForTesting
   Future<void> setUpStrategies(
-      {@required Map<String, Object> strategies}) async {
+      {required Map<String, Object> strategies}) async {
     if (!strategies.containsKey(BoxKeys.ACCESS_TOKEN_STRATEGY) &&
         !strategies.containsKey(BoxKeys.FCM_TOKEN_STRATEGY)) {
       throw SettingNonExistingStrategiesException();
@@ -68,8 +66,8 @@ class TokenService {
     });
   }
 
-  Future<String> getAccessToken({@required String accessTokenUrl}) async {
-    String accessToken = await getService<BoxService>()
+  Future<String> getAccessToken({required String accessTokenUrl}) async {
+    String? accessToken = await getService<BoxService>()
         .getBox()
         .then((box) => box.get(BoxKeys.ACCESS_TOKEN));
     if (accessToken == null) {
@@ -81,7 +79,7 @@ class TokenService {
   }
 
   Future<String> accessTokenStrategyBinder(
-      {@required String accessTokenUrl}) async {
+      {required String accessTokenUrl}) async {
     return await getService<BoxService>().getBox().then((box) async {
       if (box.get(BoxKeys.ACCESS_TOKEN_STRATEGY) == AccessTokenStrategy.GET) {
         return await _httpGetAccessTokenStrategy(
@@ -93,7 +91,7 @@ class TokenService {
   }
 
   Future<String> _httpGetAccessTokenStrategy(
-      {@required String accessTokenUrl}) async {
+      {required String accessTokenUrl}) async {
     print("before client get");
     final headers = await getHeaders();
     final tokenResponse =
@@ -101,7 +99,7 @@ class TokenService {
     return tokenResponse.data;
   }
 
-  Future<void> persistAccessToken({@required String accessToken}) async {
+  Future<void> persistAccessToken({required String accessToken}) async {
     await getService<BoxService>()
         .getBox()
         .then((box) => box.put(BoxKeys.ACCESS_TOKEN, accessToken));
@@ -114,14 +112,14 @@ class TokenService {
   }
 
   @visibleForTesting
-  Future<void> setHeaders({@required Map<String, dynamic> headers}) async {
+  Future<void> setHeaders({required Map<String, dynamic> headers}) async {
     await getService<BoxService>()
         .getBox()
         .then((box) => box.put(BoxKeys.HEADERS, headers));
   }
 
   @visibleForTesting
-  Future<Map<String, dynamic>> getHeaders() async {
+  Future<Map<String, dynamic>?> getHeaders() async {
     final headers = await getService<BoxService>()
         .getBox()
         .then((box) => box.get(BoxKeys.HEADERS));
@@ -129,12 +127,12 @@ class TokenService {
     return (headers != null) ? Map<String, dynamic>.from(headers) : null;
   }
 
-  Future<String> getFcmToken() async {
+  Future<String?> getFcmToken() async {
     print("[TokenService] getFcmToken called");
     return await _fcmTokenStrategyBinder();
   }
 
-  Future<String> _fcmTokenStrategyBinder() async {
+  Future<String?> _fcmTokenStrategyBinder() async {
     print("[TokenService] _fcmTokenStrategyBinder called");
     return await getService<BoxService>().getBox().then((box) {
       if (box.get(BoxKeys.FCM_TOKEN_STRATEGY) ==
@@ -146,7 +144,7 @@ class TokenService {
     });
   }
 
-  Future<String> _firebaseMessagingFcmTokenStrategy() {
-    return FirebaseMessaging().getToken();
+  Future<String?> _firebaseMessagingFcmTokenStrategy() {
+    return FirebaseMessaging.instance.getToken();
   }
 }

@@ -63,20 +63,20 @@
 //   });
 
 //   test('singleton should be implemented', () {
-//     expect(TwilioProgrammableVoice(), isA<TwilioProgrammableVoice>());
+//     expect(TwilioProgrammableVoice.instance, isA<TwilioProgrammableVoice>());
 //   });
 
 //   group('setup', () {
 //     test('should return true if registration is valid', () async {
 
 //       when(mockTokenService.getAccessToken(accessTokenUrl: anyNamed("accessTokenUrl"))).thenAnswer((realInvocation) async => token);
-//       expect(await TwilioProgrammableVoice().setUp(accessTokenUrl: "fakeAccessToken"), true);
+//       expect(await TwilioProgrammableVoice.instance.setUp(accessTokenUrl: "fakeAccessToken"), true);
 //     });
 
 //     test('should return false and delete the accesstoken in the box if anything fails during registration', () async {
 //       when(mockTokenService.getAccessToken(accessTokenUrl: anyNamed("accessTokenUrl"))).thenAnswer((realInvocation) async => "throw");
 
-//       expect(await TwilioProgrammableVoice().setUp(accessTokenUrl: "fakeAccessToken"), false);
+//       expect(await TwilioProgrammableVoice.instance.setUp(accessTokenUrl: "fakeAccessToken"), false);
 //       verify(mockBox.delete(BoxKeys.ACCESS_TOKEN));
 //     });
 //   });
@@ -85,7 +85,7 @@
 //     test('should get the token from token service and call makeCall', () async {
 //       when(mockTokenService.getAccessToken(accessTokenUrl: anyNamed("accessTokenUrl"))).thenAnswer((realInvocation) async => token);
 
-//       await TwilioProgrammableVoice().makeCall(from: "from", to: "to");
+//       await TwilioProgrammableVoice.instance.makeCall(from: "from", to: "to");
 
 //       verify(mockTokenService.getAccessToken(accessTokenUrl: anyNamed("accessTokenUrl")));
 //     });
@@ -93,19 +93,19 @@
 
 //   group('answer', () {
 //     test('it should return the method channel <String> response', () async {
-//       expect(await TwilioProgrammableVoice().answer(), "ok");
+//       expect(await TwilioProgrammableVoice.instance.answer(), "ok");
 //     });
 //   });
 
 //   group('reject', () {
 //     test('it should execute without exception', () async {
-//       await TwilioProgrammableVoice().reject();
+//       await TwilioProgrammableVoice.instance.reject();
 //     });
 //   });
 
 //   group('handleMessage', () {
 //     test('it should return the method channel <Boolean> response', () async {
-//       expect(await TwilioProgrammableVoice().handleMessage(data: {}), true);
+//       expect(await TwilioProgrammableVoice.instance.handleMessage(data: {}), true);
 //     });
 //   });
 // }

@@ -3,12 +3,12 @@ import 'package:flutter_svg/svg.dart';
 
 class RoundedButton extends StatelessWidget {
   const RoundedButton({
-    Key key,
+    Key? key,
     this.size = 64,
-    @required this.iconSrc,
+    required this.iconSrc,
     this.color = Colors.white,
     this.iconColor = Colors.black,
-    @required this.press,
+    required this.press,
   }) : super(key: key);
 
   final double size;

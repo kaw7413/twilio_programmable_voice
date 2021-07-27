@@ -1,49 +1,49 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
-import 'package:meta/meta.dart';
 import 'package:twilio_programmable_voice/twilio_programmable_voice.dart'
     as TwilioVoice;
 import 'package:get_it/get_it.dart';
-import 'package:twilio_programmable_voice_example/bloc/navigator/navigator_bloc.dart' as NB;
+import 'package:twilio_programmable_voice_example/bloc/navigator/navigator_bloc.dart'
+    as NB;
 
 part 'call_event.dart';
 part 'call_state.dart';
 
 class CallBloc extends Bloc<CallEvent, CallState> {
-  StreamSubscription<TwilioVoice.CallEvent> callListener;
+  late StreamSubscription<TwilioVoice.CallEvent> callListener;
 
   // Should we use a new logger instance or share the same across app ?
   final logger = Logger();
 
   CallBloc() : super(CallInitial()) {
     // TODO: clean this
-    callListener = TwilioVoice.TwilioProgrammableVoice()
-        .callStatusStream
+    callListener = TwilioVoice.TwilioProgrammableVoice.instance.callStatusStream
         .listen((event) async {
-      logger.d("[TwilioProgrammableVoice() Event]");
+      logger.d("[TwilioProgrammableVoice Event]");
 
       if (event is TwilioVoice.CallInvite) {
         logger.d("CALL_INVITE", event);
-        TwilioVoice.SoundPoolManager.getInstance().playIncoming();
+        TwilioVoice.SoundPoolManager.instance.playIncoming();
         // await displayIncomingCallInvite(event.from, "CallerDisplayName");
       } else if (event is TwilioVoice.CancelledCallInvite) {
         logger.d("CANCELLED_CALL_INVITE", event);
-        TwilioVoice.SoundPoolManager.getInstance().stopRinging();
-        TwilioVoice.SoundPoolManager.getInstance().playDisconnect();
+        TwilioVoice.SoundPoolManager.instance.stopRinging();
+        TwilioVoice.SoundPoolManager.instance.playDisconnect();
       } else if (event is TwilioVoice.CallConnectFailure) {
         logger.d("CALL_CONNECT_FAILURE", event);
-        TwilioVoice.SoundPoolManager.getInstance().stopRinging();
+        TwilioVoice.SoundPoolManager.instance.stopRinging();
       } else if (event is CallRinging) {
         logger.d("CALL_RINGING", event);
-        TwilioVoice.SoundPoolManager.getInstance().stopRinging();
-        // TwilioProgrammableVoice().getCall.to and TwilioProgrammableVoice().getCall.from are always null when making a call
-        // TODO replace brut phone number with TwilioProgrammableVoice().getCall.to
+        TwilioVoice.SoundPoolManager.instance.stopRinging();
+        // TwilioProgrammableVoice.instance.getCall.to and TwilioProgrammableVoice.instance.getCall.from are always null when making a call
+        // TODO replace brut phone number with TwilioProgrammableVoice.instance.getCall.to
         // await displayMakeCallScreen("+33787934070", "Display Caller Name");
       } else if (event is TwilioVoice.CallConnected) {
         logger.d("CALL_CONNECTED", event);
-        TwilioVoice.SoundPoolManager.getInstance().stopRinging();
+        TwilioVoice.SoundPoolManager.instance.stopRinging();
 
         // The type cast to CallRinging can throw exception in case this.state is a CallInitial
         this.add(CallAnswered(
@@ -56,8 +56,8 @@ class CallBloc extends Bloc<CallEvent, CallState> {
       } else if (event is TwilioVoice.CallDisconnected) {
         logger.d("CALL_DISCONNECTED", event);
 
-        // Maybe we need to ensure their is no ringing with SoundPoolManager.getInstance().stopRinging();
-        TwilioVoice.SoundPoolManager.getInstance().playDisconnect();
+        // Maybe we need to ensure their is no ringing with SoundPoolManager.instance.stopRinging();
+        TwilioVoice.SoundPoolManager.instance.playDisconnect();
         this.add(CallEnded(uuid: event.sid));
         GetIt.I<NB.NavigatorBloc>().add(NB.NavigatorActionPop());
 
@@ -113,27 +113,32 @@ class CallBloc extends Bloc<CallEvent, CallState> {
     final _state = state;
 
     if (_state is CallInProgress) {
-      TwilioVoice.TwilioProgrammableVoice().hold(setOn: event.setOn);
+      TwilioVoice.TwilioProgrammableVoice.instance.hold(setOn: event.setOn);
       return _state.copyWith(isHold: event.setOn);
     }
+
+    return _state;
   }
 
   CallState mapCallToggleMuteToState(CallToggleMute event) {
     final _state = state;
 
     if (_state is CallInProgress) {
-      TwilioVoice.TwilioProgrammableVoice().mute(setOn: event.setOn);
+      TwilioVoice.TwilioProgrammableVoice.instance.mute(setOn: event.setOn);
       return _state.copyWith(isMuted: event.setOn);
     }
+    return _state;
   }
 
   CallState mapCallToggleSpeakerToState(CallToggleSpeaker event) {
     final _state = state;
 
     if (_state is CallInProgress) {
-      TwilioVoice.TwilioProgrammableVoice().toggleSpeaker(setOn: event.setOn);
+      TwilioVoice.TwilioProgrammableVoice.instance
+          .toggleSpeaker(setOn: event.setOn);
       return _state.copyWith(isAutioRoutedToSpeaker: event.setOn);
     }
+    return _state;
   }
 
   CallState mapCallCancelledToState(CallCancelled event) {

@@ -1,5 +1,5 @@
+import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:meta/meta.dart';
 
 import 'token_service.dart';
 import 'box_service.dart';
@@ -11,7 +11,7 @@ abstract class PluginServices {
   static const WorkManager = "Workmanager";
 }
 
-T getService<T>() {
+T getService<T extends Object>() {
   if (!GetIt.I.isRegistered<T>()) {
     GetIt.I.registerSingleton<T>(servicesFactory(T.toString()));
   }
@@ -33,7 +33,7 @@ dynamic servicesFactory(String type) {
 }
 
 @visibleForTesting
-T mockService<T>({@required T mock}) {
+T mockService<T extends Object>({required T mock}) {
   if (GetIt.I.isRegistered<T>()) {
     GetIt.I.unregister<T>();
   }

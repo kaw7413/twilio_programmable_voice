@@ -12,12 +12,15 @@ import com.twilio.voice.CallInvite;
 import com.twilio.voice.CancelledCallInvite;
 import com.twilio.voice.MessageListener;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Set;
 
 import fr.izio.twilio_programmable_voice.event_handler_wrapper.CallStatusEventChannelWrapper;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
+import io.flutter.Log;
 
 public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
     private Activity activity;
@@ -146,6 +149,7 @@ public class TwilioProgrammableVoice implements MessageListener, Call.Listener {
     }
 
     private HashMap<String, Object> getCallPayload(Call call, String type) {
+
         HashMap<String, Object> payload = new HashMap<>();
         payload.put("type", type);
         payload.put("from", call.getFrom());

@@ -5,32 +5,29 @@ homepage:
 repository: https://github.com/Bilik-fr/twilio_programmable_voice/
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.20.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  permission_handler: ^5.0.1+1 # https://pub.dev/packages/permission_handler
-  soundpool: ^1.1.3
-  hive: ^1.4.4+1
-  hive_flutter: ^0.3.1
-  background_fetch: ^0.7.1
-  jwt_decoder: ^1.0.3
-  firebase_messaging: ^7.0.3
-
-  dio: ^3.0.10
-  meta: ^1.2.4
-  uuid: ^2.2.2
-  get_it: ^5.0.6
+  permission_handler: ^8.1.4+1 # https://pub.dev/packages/permission_handler
+  soundpool: ^2.1.0
+  hive_flutter: ^1.1.0
+  background_fetch: ^1.0.1
+  jwt_decoder: ^2.0.1
+  firebase_messaging: ^10.0.4
+  firebase_core : ^1.4.0
+  dio: ^4.0.0
+  uuid: ^3.0.4
+  get_it: ^7.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator: ^0.8.2
-  build_runner: ^1.10.12
-  mockito: ^4.1.4
-  http_mock_adapter: ^0.1.5
-  start_jwt: ^0.2.0
+  hive_generator: ^1.1.0
+  build_runner: ^2.0.6
+  mockito: ^5.0.12
+  http_mock_adapter: ^0.3.1
 
 flutter:
   plugin:
