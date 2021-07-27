@@ -23,17 +23,19 @@ class TwilioProgrammableVoice {
   final EventChannel _callStatusEventChannel =
       const EventChannel("twilio_programmable_voice/call_status");
 
-  static final TwilioProgrammableVoice _singleton =
-      new TwilioProgrammableVoice._internal();
+  static final TwilioProgrammableVoice _instance =
+      TwilioProgrammableVoice._internal();
 
   factory TwilioProgrammableVoice() {
-    return _singleton;
+    return _instance;
   }
 
+  // Initialization logic goes here.
   TwilioProgrammableVoice._internal() {
-    // Initialization logic goes here.
     Firebase.initializeApp();
   }
+
+  static TwilioProgrammableVoice get instance => _instance;
 
   /// Must be the first function you call in the TwilioProgrammableVoice package
   ///
@@ -181,9 +183,10 @@ class TwilioProgrammableVoice {
 
     return _callStatusEventChannel
         .receiveBroadcastStream()
-        .where((jsonString) => _containsCall(json.decode(jsonString)['type']))
-        .map((jsonString) {
-      Map<String, dynamic> data = json.decode(jsonString);
+        .map((jsonString) => json.decode(jsonString))
+        .where((data) => _containsCall(data['type']))
+        .map((data) {
+      print('------------------------ ${data.toString()}');
 
       switch (data['type']) {
         case 'CallInvite':

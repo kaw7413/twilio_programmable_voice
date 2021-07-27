@@ -1,101 +1,58 @@
-abstract class CallEvent {
-  String from;
-  String to;
-  String sid;
-
-  CallEvent(this.from, this.to, this.sid);
-}
+abstract class CallEvent {}
 
 class CallInvite extends CallEvent {
+  String sid;
+  String type;
+  String from;
+  String to;
+
   CallInvite.from(Map<String, dynamic> data)
-      : super(data['from'], data['to'], data['sid']);
+      : this.sid = data['callSid'],
+        this.from = data['from'],
+        this.to = data['to'],
+        this.type = data['type'];
 }
 
 class CancelledCallInvite extends CallEvent {
+  String sid;
+
   CancelledCallInvite.from(Map<String, dynamic> data)
-      : super(data['from'], data['to'], data['sid']);
+      : this.sid = data['callSid'];
 }
 
 class CallConnectFailure extends CallEvent {
-  String state;
-  bool isMuted;
-  bool isOnHold;
-
-  CallConnectFailure.from(Map<String, dynamic> data)
-      : state = data['state'].toString(),
-        isMuted = data['isMuted'] as bool,
-        isOnHold = data['isOnHold'] as bool,
-        super(data['from'], data['to'], data['sid']);
+  CallConnectFailure.from(Map<String, dynamic> data);
 }
 
 class CallRinging extends CallEvent {
-  String state;
-  bool isMuted;
-  bool isOnHold;
-
-  CallRinging.from(Map<String, dynamic> data)
-      : state = data['state'].toString(),
-        isMuted = data['isMuted'] as bool,
-        isOnHold = data['isOnHold'] as bool,
-        super(data['from'], data['to'], data['sid']);
+  CallRinging.from(Map<String, dynamic> data);
 }
 
 class CallConnected extends CallEvent {
-  String state;
-  bool isMuted;
-  bool isOnHold;
+  String sid;
+  String? from;
+  String? to;
 
   CallConnected.from(Map<String, dynamic> data)
-      : state = data['state'].toString(),
-        isMuted = data['isMuted'] as bool,
-        isOnHold = data['isOnHold'] as bool,
-        super(data['from'], data['to'], data['sid']);
+      : this.sid = data['sid'],
+        this.from = data['from'],
+        this.to = data['to'];
 }
 
 class CallReconnecting extends CallEvent {
-  String state;
-  bool isMuted;
-  bool isOnHold;
-
-  CallReconnecting.from(Map<String, dynamic> data)
-      : state = data['state'].toString(),
-        isMuted = data['isMuted'] as bool,
-        isOnHold = data['isOnHold'] as bool,
-        super(data['from'], data['to'], data['sid']);
+  CallReconnecting.from(Map<String, dynamic> data);
 }
 
 class CallReconnected extends CallEvent {
-  String state;
-  bool isMuted;
-  bool isOnHold;
-
-  CallReconnected.from(Map<String, dynamic> data)
-      : state = data['state'].toString(),
-        isMuted = data['isMuted'] as bool,
-        isOnHold = data['isOnHold'] as bool,
-        super(data['from'], data['to'], data['sid']);
+  CallReconnected.from(Map<String, dynamic> data);
 }
 
 class CallDisconnected extends CallEvent {
-  String state;
-  bool isMuted;
-  bool isOnHold;
+  String sid;
 
-  CallDisconnected.from(Map<String, dynamic> data)
-      : state = data['state'].toString(),
-        isMuted = data['isMuted'] as bool,
-        isOnHold = data['isOnHold'] as bool,
-        super(data['from'], data['to'], data['sid']);
+  CallDisconnected.from(Map<String, dynamic> data) : this.sid = data['sid'];
 }
 
 class CallQualityWarningChanged extends CallEvent {
-  String state;
-  bool isMuted;
-  bool isOnHold;
-
-  CallQualityWarningChanged.from(Map<String, dynamic> data)
-      : state = data['state'].toString(),
-        isMuted = data['isMuted'] as bool,
-        isOnHold = data['isOnHold'] as bool,
-        super(data['from'], data['to'], data['sid']);
+  CallQualityWarningChanged.from(Map<String, dynamic> data);
 }

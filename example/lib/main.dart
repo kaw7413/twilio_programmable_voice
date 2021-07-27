@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   // This function should ideally lives in a global widget.
   // We seted up here to simplyfy things.
   Future<void> setUpTwilioProgrammableVoice() async {
-    await TwilioProgrammableVoice()
+    await TwilioProgrammableVoice.instance
         .requestMicrophonePermissions()
         .then(logger.d);
 
@@ -76,14 +76,14 @@ class _HomePageState extends State<HomePage> {
         await _callKeep.setCurrentCallActive(event.callUUID!);
         await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID!);
 
-        await TwilioProgrammableVoice().answer();
+        await TwilioProgrammableVoice.instance.answer();
 
         await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID!);
       }
     });
 
     _callKeep.on(CallKeepPerformEndCallAction(), (event) async {
-      await TwilioProgrammableVoice().reject();
+      await TwilioProgrammableVoice.instance.reject();
     });
 
     await dotenv.load();
@@ -91,10 +91,10 @@ class _HomePageState extends State<HomePage> {
 
     final String platform = Platform.isAndroid ? "android" : "ios";
 
-    TwilioProgrammableVoice().callStatusStream.listen((event) async {
+    TwilioProgrammableVoice.instance.callStatusStream.listen((event) async {
       if (event is CallInvite) {
         print("CallInvite");
-        await _callKeep.displayIncomingCall(event.sid, "event.from",
+        await _callKeep.displayIncomingCall(event.sid, event.from,
             handleType: 'number', hasVideo: false);
       }
 
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
         // Note: we could have moved .makeCall call to BLoC
         context
             .read<CallBloc.CallBloc>()
-            .add(CallBloc.CallEmited(contactPerson: event.from));
+            .add(CallBloc.CallEmited(contactPerson: event.from ?? '???'));
       }
 
       if (event is CallRinging) {
@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
-    TwilioProgrammableVoice().setUp(
+    TwilioProgrammableVoice.instance.setUp(
         accessTokenUrl:
             "$accessTokenUrl/${dotenv.env['TWILIO_IDENTITY']}/$platform",
         headers: {
@@ -157,9 +157,10 @@ class _HomePageState extends State<HomePage> {
                       throw Exception('env not found : MAKE_CALL_NUMBER');
                     }
 
-                    final hasSucceed = await TwilioProgrammableVoice().makeCall(
-                        from: dotenv.env['TWILIO_IDENTITY']!,
-                        to: dotenv.env['MAKE_CALL_NUMBER']!);
+                    final hasSucceed = await TwilioProgrammableVoice.instance
+                        .makeCall(
+                            from: dotenv.env['TWILIO_IDENTITY']!,
+                            to: dotenv.env['MAKE_CALL_NUMBER']!);
 
                     print("Make call success state toto $hasSucceed");
                     GetIt.I<NB.NavigatorBloc>().add(NB.NavigateToCallScreen());
@@ -204,9 +205,9 @@ class AppComponentState extends State<AppComponent>
 
           final dataMap = Map<String, String>.from(message.data);
 
-          TwilioProgrammableVoice().handleMessage(data: dataMap);
-          logger
-              .d("TwilioProgrammableVoice().handleMessage called in main.dart");
+          TwilioProgrammableVoice.instance.handleMessage(data: dataMap);
+          logger.d(
+              "TwilioProgrammableVoice.instance.handleMessage called in main.dart");
         }
       }
     });
@@ -222,7 +223,7 @@ class AppComponentState extends State<AppComponent>
     switch (state) {
       case AppLifecycleState.resumed:
         print("app in resumed");
-        var test = TwilioProgrammableVoice().getCurrentCall();
+        var test = TwilioProgrammableVoice.instance.getCurrentCall();
         print("TEST:");
         print(test);
         break;

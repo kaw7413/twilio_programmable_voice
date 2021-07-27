@@ -9,13 +9,14 @@ import io.flutter.plugin.common.MethodChannel;
 import java.util.HashMap;
 
 public class CallStatusEventChannelWrapper extends BaseEventChannelWrapper {
+
     public CallStatusEventChannelWrapper(EventChannel eventChannel) {
         super(eventChannel);
     }
 
     public void sendCallInvite(HashMap<String, String> callInvite) {
         Log.d("[CallEventHandler]", "sendCallInvite called");
-        send(callInvite);
+        send(new JSONObject(callInvite).toString());
     }
 
     public void sendCancelledCallInvite(HashMap<String, String> cancelledCallInvite) {

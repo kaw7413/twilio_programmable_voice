@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:soundpool/soundpool.dart';
 
 class SoundPoolManager {
-  static late SoundPoolManager _instance;
+  static final SoundPoolManager _instance = SoundPoolManager._internal();
 
   late Future _soundsLoaded;
   late Soundpool _pool;
@@ -12,11 +12,7 @@ class SoundPoolManager {
   int? _ringingStreamId;
   bool _isPlaying = false;
 
-  static SoundPoolManager getInstance() {
-    if (_instance == null) {
-      _instance = SoundPoolManager._internal();
-    }
-
+  factory SoundPoolManager() {
     return _instance;
   }
 
@@ -88,5 +84,6 @@ class SoundPoolManager {
     }
   }
 
+  static SoundPoolManager get instance => _instance;
   Future get initializationDone => _soundsLoaded;
 }

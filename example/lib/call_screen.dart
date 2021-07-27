@@ -107,7 +107,7 @@ class CallScreen extends StatelessWidget {
                   RoundedButton(
                     iconSrc: "assets/icons/call_end.svg",
                     press: () async {
-                      await TPV.TwilioProgrammableVoice().reject();
+                      await TPV.TwilioProgrammableVoice.instance.reject();
 
                       // NavigationPop here doesn't work, it's a problem
                       GetIt.I<NB.NavigatorBloc>()
