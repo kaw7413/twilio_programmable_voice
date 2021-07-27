@@ -2,11 +2,6 @@ import Foundation
 import Flutter
 
 public class CallStatusEventChannelWrapper: BaseEventChannel {
-	// TODO: remove
-	public func testSend(data: [String: String]) {
-		print("testSend called")
-		self.send(data: data)
-	}
 
 	public func sendCallInvite(callInvite: [String: String]) {
 		print("sendCallInvite called")
