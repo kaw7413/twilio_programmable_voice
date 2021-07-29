@@ -186,7 +186,31 @@ class TwilioProgrammableVoice {
         .map((jsonString) => json.decode(jsonString))
         .where((data) => _containsCall(data['type']))
         .map((data) {
-      print('------------------------ ${data.toString()}');
+      // Uniform data when come from IOS
+      if (Platform.isIOS) {
+        // From / To mapping
+        data['from'] = data['from'] != 'UNKNOWN_FROM' ? data['from'] : null;
+        data['to'] = data['to'] != 'UNKNOWN_TO' ? data['to'] : null;
+
+        // State mapping
+        switch (data['state']) {
+          case '0':
+            data['state'] = 'CONNECTING';
+            break;
+          case '1':
+            data['state'] = 'RINGING';
+            break;
+          case '2':
+            data['state'] = 'CONNECTED';
+            break;
+          case '3':
+            data['state'] = 'RECONNECTING';
+            break;
+          case '4':
+            data['state'] = 'DISCONNECTED';
+            break;
+        }
+      }
 
       switch (data['type']) {
         case 'CallInvite':

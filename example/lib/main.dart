@@ -19,7 +19,7 @@ import 'package:twilio_programmable_voice_example/call_screen.dart';
 import 'bloc/navigator/navigator_bloc.dart' as NB;
 
 final logger = Logger();
-final FlutterCallkeep _callKeep = FlutterCallkeep();
+// final FlutterCallkeep _callKeep = FlutterCallkeep();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,48 +43,48 @@ class _HomePageState extends State<HomePage> {
         .requestMicrophonePermissions()
         .then(logger.d);
 
-    await _callKeep.setup(<String, dynamic>{
-      'ios': {
-        'appName': 'CallKeepDemo',
-      },
-      'android': {
-        'alertTitle': 'Permissions required',
-        'alertDescription':
-            'This application needs to access your phone accounts',
-        'cancelButton': 'Cancel',
-        'okButton': 'ok',
-        'additionalPermissions': <String>[]
-      },
-    });
+    // await _callKeep.setup(<String, dynamic>{
+    //   'ios': {
+    //     'appName': 'CallKeepDemo',
+    //   },
+    //   'android': {
+    //     'alertTitle': 'Permissions required',
+    //     'alertDescription':
+    //         'This application needs to access your phone accounts',
+    //     'cancelButton': 'Cancel',
+    //     'okButton': 'ok',
+    //     'additionalPermissions': <String>[]
+    //   },
+    // });
 
-    final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
-    if (!hasPhoneAccount) {
-      await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
-        'alertTitle': 'Permissions required',
-        'alertDescription':
-            'This application needs to access your phone accounts',
-        'cancelButton': 'Cancel',
-        'okButton': 'ok',
-      });
-    }
+    // final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+    // if (!hasPhoneAccount) {
+    //   await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
+    //     'alertTitle': 'Permissions required',
+    //     'alertDescription':
+    //         'This application needs to access your phone accounts',
+    //     'cancelButton': 'Cancel',
+    //     'okButton': 'ok',
+    //   });
+    // }
 
-    _callKeep.on(CallKeepPerformAnswerCallAction(),
-        (CallKeepPerformAnswerCallAction event) async {
-      if (event.callUUID != null) {
-        print("${event.callUUID} answered.");
+    // _callKeep.on(CallKeepPerformAnswerCallAction(),
+    //     (CallKeepPerformAnswerCallAction event) async {
+    //   if (event.callUUID != null) {
+    //     print("${event.callUUID} answered.");
 
-        await _callKeep.setCurrentCallActive(event.callUUID!);
-        await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID!);
+    //     await _callKeep.setCurrentCallActive(event.callUUID!);
+    //     await _callKeep.reportConnectingOutgoingCallWithUUID(event.callUUID!);
 
-        await TwilioProgrammableVoice.instance.answer();
+    //     await TwilioProgrammableVoice.instance.answer();
 
-        await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID!);
-      }
-    });
+    //     await _callKeep.reportConnectedOutgoingCallWithUUID(event.callUUID!);
+    //   }
+    // });
 
-    _callKeep.on(CallKeepPerformEndCallAction(), (event) async {
-      await TwilioProgrammableVoice.instance.reject();
-    });
+    // _callKeep.on(CallKeepPerformEndCallAction(), (event) async {
+    //   await TwilioProgrammableVoice.instance.reject();
+    // });
 
     await dotenv.load();
     final accessTokenUrl = dotenv.env['ACCESS_TOKEN_URL'];
@@ -94,12 +94,12 @@ class _HomePageState extends State<HomePage> {
     TwilioProgrammableVoice.instance.callStatusStream.listen((event) async {
       if (event is CallInvite) {
         print("CallInvite");
-        await _callKeep.displayIncomingCall(event.sid, event.from,
-            handleType: 'number', hasVideo: false);
+        // await _callKeep.displayIncomingCall(event.sid, event.from,
+        //    handleType: 'number', hasVideo: false);
       }
 
       if (event is CancelledCallInvite) {
-        await _callKeep.endCall(event.sid);
+        // await _callKeep.endCall(event.sid);
       }
 
       if (event is CallConnected) {
@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
 
       if (event is CallDisconnected) {
         print("CallDisconnected");
-        await _callKeep.endCall(event.sid);
+        // await _callKeep.endCall(event.sid);
       }
     });
 
@@ -251,7 +251,7 @@ class AppComponentState extends State<AppComponent>
             '/': (context) => HomePage(),
             '/call': (context) => CallScreen(),
           },
-          title: 'Twilio Programming Voice',
+          title: 'Twilio Programmable Voice',
           debugShowCheckedModeBanner: false,
         ));
   }
