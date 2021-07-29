@@ -121,7 +121,7 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 	private func getCallInvitePayload(callInvite: CallInvite) -> [String: String] {
 		return [
 			"type": "CallInvite",
-			"from": callInvite.from ?? "UNKNOW_FROM",
+			"from": callInvite.from ?? "UNKNOWN_FROM",
 			"to": callInvite.to,
 			"callSid": callInvite.callSid
 		]
@@ -130,7 +130,7 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 	private func getCancelledCallInvitePayload(cancelledCallInvite: CancelledCallInvite) -> [String: String] {
 		return [
 			"type": "CancelledCallInvite",
-			"from": cancelledCallInvite.from ?? "UNKNOW_FROM",
+			"from": cancelledCallInvite.from ?? "UNKNOWN_FROM",
 			"to": cancelledCallInvite.to,
 			"callSid": cancelledCallInvite.callSid
 		]
@@ -139,8 +139,8 @@ class TwilioVoiceDelegate: NSObject, NotificationDelegate, CallDelegate {
 	private func getCallPayload(call: Call, type: String) -> [String: Any] {
 		return [
 			"type": type,
-			"from": call.from ?? "UNKNOW_FROM",
-			"to": call.to ?? "UNKNOW_TO",
+			"from": call.from ?? "UNKNOWN_FROM",
+			"to": call.to ?? "UNKNOWN_TO",
 			"sid": call.sid,
 			"state": call.state.rawValue,
 			"isMuted": call.isMuted,

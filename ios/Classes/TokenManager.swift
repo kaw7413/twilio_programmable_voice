@@ -78,7 +78,6 @@ class TokenManager: NSObject, PKPushRegistryDelegate {
 
 	public func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
 			print("LOG|pushRegistry:didReceiveIncomingPushWithPayload:forType:")
-
 			if type == PKPushType.voIP {
 				TwilioVoice.handleNotification(payload.dictionaryPayload, delegate: TwilioProgrammableVoice.sharedInstance.twilioVoiceDelegate!, delegateQueue: nil)
 			}
