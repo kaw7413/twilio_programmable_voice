@@ -32,10 +32,12 @@ packages:
   callkeep:
     dependency: "direct main"
     description:
-      name: callkeep
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0"
+      path: "."
+      ref: empty-ios
+      resolved-ref: "9045f9a8baca20f754af40b82f49bc68ca76253a"
+      url: "git://github.com/kaw7413/callkeep.git"
+    source: git
+    version: "0.3.1"
   characters:
     dependency: transitive
     description:

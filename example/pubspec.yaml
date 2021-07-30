@@ -3,10 +3,10 @@ description: Demonstrates how to use the twilio_programmable_voice plugin.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -15,12 +15,17 @@ dependencies:
   # Not sure if the impact is huge or not tho.
   # flutter_apns: ^1.4.1
   # firebase_messaging: 7.0.3
-  callkeep: ^0.3.0
   flutter_dotenv: ^5.0.0
   logger: ^1.0.0
   flutter_svg: ^0.22.0
   flutter_bloc: ^7.0.1
   get_it: ^7.2.0
+
+  # Fork of callkeep to avoid ios part
+  callkeep:
+    git:
+      url: git://github.com/kaw7413/callkeep.git
+      ref: empty-ios
 
   twilio_programmable_voice:
     # When depending on this package from a real application you should use:

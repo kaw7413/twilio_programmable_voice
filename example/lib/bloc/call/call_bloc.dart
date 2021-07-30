@@ -46,9 +46,11 @@ class CallBloc extends Bloc<CallEvent, CallState> {
         TwilioVoice.SoundPoolManager.instance.stopRinging();
 
         // The type cast to CallRinging can throw exception in case this.state is a CallInitial
-        this.add(CallAnswered(
-            contactPerson: (this.state as CallRinging).contactPerson,
-            uuid: event.sid));
+        if (this.state is CallRinging) {
+          this.add(CallAnswered(
+              contactPerson: (this.state as CallRinging).contactPerson,
+              uuid: event.sid));
+        }
       } else if (event is TwilioVoice.CallReconnecting) {
         logger.d("CALL_RECONNECTING", event);
       } else if (event is TwilioVoice.CallReconnected) {
